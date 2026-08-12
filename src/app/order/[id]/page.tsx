@@ -16,10 +16,10 @@ export default function OrderTrackerPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  // Live order fetcher from real-time API
+  // Live order fetcher from real-time API with cache buster
   const fetchLiveOrder = async () => {
     try {
-      const res = await fetch('/api/admin/orders?status=ALL');
+      const res = await fetch(`/api/admin/orders?status=ALL&t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success && Array.isArray(data.orders)) {
         const found = data.orders.find(
@@ -53,9 +53,44 @@ export default function OrderTrackerPage() {
 
   useEffect(() => {
     fetchLiveOrder();
-    const interval = setInterval(fetchLiveOrder, 3000);
-    return () => clearInterval(interval);
-  }, [orderId, uploadSuccess]);
+
+    // Fast 1.5-second polling interval with cache-busting for instant live update
+    const interval = setInterval(fetchLiveOrder, 1500);
+
+    // Supabase Realtime Channel for instant push updates (<100ms)
+    let channel: any = null;
+    try {
+      import('@/lib/supabase/client').then(({ createClient }) => {
+        const supabase = createClient();
+        channel = supabase
+          .channel(`order_${orderId}`)
+          .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'orders' },
+            (payload) => {
+              if (payload.new && (payload.new.id === orderId || payload.new.tracking_secret === secret)) {
+                setOrder((prev: any) => ({ ...prev, ...payload.new }));
+              }
+              fetchLiveOrder();
+            }
+          )
+          .subscribe();
+      });
+    } catch (e) {
+      console.warn('Realtime channel error:', e);
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (channel) {
+        try {
+          import('@/lib/supabase/client').then(({ createClient }) => {
+            createClient().removeChannel(channel);
+          });
+        } catch (e) {}
+      }
+    };
+  }, [orderId, uploadSuccess, secret]);
 
   const handleSimulatedUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
