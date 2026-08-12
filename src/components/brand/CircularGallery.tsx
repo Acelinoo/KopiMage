@@ -444,27 +444,27 @@ class Media {
     let baseWidth = 700;
 
     if (isMobile) {
-      baseHeight = 420;
-      baseWidth = 300;
+      baseHeight = 620;
+      baseWidth = 460;
     } else if (isTablet) {
-      baseHeight = 650;
-      baseWidth = 480;
+      baseHeight = 720;
+      baseWidth = 520;
     }
 
     this.scale = this.screen.height / 1500;
     this.plane.scale.y = (this.viewport.height * (baseHeight * this.scale)) / this.screen.height;
     this.plane.scale.x = (this.viewport.width * (baseWidth * this.scale)) / this.screen.width;
 
-    // Enforce max width ratio so neighboring cards remain visible on mobile/tablet
+    // Enforce max width ratio so neighboring cards peek nicely on mobile (~68% width)
     if (isMobile) {
-      const maxMobileWidth = this.viewport.width * 0.48;
+      const maxMobileWidth = this.viewport.width * 0.68;
       if (this.plane.scale.x > maxMobileWidth) {
         const ratio = maxMobileWidth / this.plane.scale.x;
         this.plane.scale.x = maxMobileWidth;
         this.plane.scale.y *= ratio;
       }
     } else if (isTablet) {
-      const maxTabletWidth = this.viewport.width * 0.52;
+      const maxTabletWidth = this.viewport.width * 0.58;
       if (this.plane.scale.x > maxTabletWidth) {
         const ratio = maxTabletWidth / this.plane.scale.x;
         this.plane.scale.x = maxTabletWidth;
@@ -473,7 +473,7 @@ class Media {
     }
 
     this.plane.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y];
-    this.padding = isMobile ? 0.5 : isTablet ? 1.0 : 2.0;
+    this.padding = isMobile ? 0.65 : isTablet ? 1.0 : 2.0;
     this.width = this.plane.scale.x + this.padding;
     this.widthTotal = this.width * this.length;
     this.x = this.width * this.index;

@@ -508,7 +508,7 @@ export function EditorialHome() {
                 </div>
 
                 {/* WebGL Circular Canvas Gallery with responsive height wrapper */}
-                <div className="reveal-blur-focus relative w-full h-[360px] sm:h-[480px] md:h-[620px]">
+                <div className="reveal-blur-focus relative w-full h-[480px] sm:h-[560px] md:h-[640px]">
                     <CircularGallery
                         bend={3}
                         textColor="#FFFFFF"
