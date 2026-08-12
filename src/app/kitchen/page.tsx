@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Coffee,
   Clock,
@@ -8,314 +8,444 @@ import {
   Flame,
   RefreshCw,
   UtensilsCrossed,
-  Loader2,
-  BellRing,
-  AlertTriangle,
-  ChevronRight,
-  Search,
-  Check
+  Volume2,
+  VolumeX,
+  CheckSquare
 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  NEW_ORDER: { label: 'BARU MASUK', bg: 'bg-red-500/15', text: 'text-red-400', border: 'border-red-500/40' },
-  PREPARING: { label: 'DIPROSES', bg: 'bg-amber-500/15', text: 'text-amber-400', border: 'border-amber-500/40' },
-  READY: { label: 'SIAP ANTAR', bg: 'bg-emerald-500/15', text: 'text-emerald-400', border: 'border-emerald-500/40' },
+// Play clean synthetic Web Audio chime for new kitchen orders (No external asset files needed)
+const playNewOrderChime = () => {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.2); // A5
+    
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start();
+    osc.stop(ctx.currentTime + 0.6);
+  } catch (e) {
+    console.warn('Audio chime playback error:', e);
+  }
 };
 
 export default function KitchenDisplayPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [now, setNow] = useState(new Date());
-  const [searchTable, setSearchTable] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [now, setNow] = useState<Date>(new Date());
+  const [searchQuery, setSearchQuery] = useState('');
+  const [stationFilter, setStationFilter] = useState<'ALL' | 'BARISTA' | 'KITCHEN'>('ALL');
+  const [statusTab, setStatusTab] = useState<'ACTIVE' | 'COMPLETED'>('ACTIVE');
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const previousOrderCountRef = useRef<number>(0);
 
+  // Live timer tick
   useEffect(() => {
-    const tick = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(tick);
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
   }, []);
 
-  const fetchKitchenOrders = async () => {
-    setLoading(true);
+  // Real-time Order Fetcher from Live API
+  const fetchKitchenOrders = async (showLoader = false) => {
+    if (showLoader) setLoading(true);
+    setIsRefreshing(true);
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          order_items (
-            id,
-            item_name,
-            quantity,
-            notes,
-            order_item_modifiers (
-              modifier_name,
-              option_label
-            )
-          ),
-          tables (
-            code,
-            name
-          )
-        `)
-        .in('order_status', ['NEW_ORDER', 'PREPARING', 'READY'])
-        .order('created_at', { ascending: true });
+      const res = await fetch('/api/admin/orders?status=ALL');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.orders)) {
+        const fetchedOrders = data.orders;
+        
+        // Play sound chime if new uncompleted order count increased
+        const activeCount = fetchedOrders.filter((o: any) => o.order_status !== 'COMPLETED').length;
+        if (activeCount > previousOrderCountRef.current && previousOrderCountRef.current !== 0 && soundEnabled) {
+          playNewOrderChime();
+        }
+        previousOrderCountRef.current = activeCount;
 
-      if (!error && data) setOrders(data);
+        setOrders(fetchedOrders);
+      }
     } catch (err) {
       console.error('Failed to fetch kitchen orders:', err);
     } finally {
       setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
-    fetchKitchenOrders();
-    const supabase = createClient();
-    const channel = supabase
-      .channel('kds_orders')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-        fetchKitchenOrders();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    fetchKitchenOrders(true);
+    const interval = setInterval(() => fetchKitchenOrders(false), 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleUpdateStatus = async (orderId: string, nextStatus: 'PREPARING' | 'READY' | 'COMPLETED') => {
+  // Update order kitchen status handler
+  const handleUpdateOrderStatus = async (orderId: string, nextStatus: 'PREPARING' | 'READY' | 'COMPLETED') => {
     try {
-      const supabase = createClient();
-      await supabase.from('orders').update({ order_status: nextStatus }).eq('id', orderId);
+      // Optimistic UI update
       setOrders((prev) =>
-        prev
-          .map((o) => (o.id === orderId ? { ...o, order_status: nextStatus } : o))
-          .filter((o) => o.order_status !== 'COMPLETED')
+        prev.map((o) => (o.id === orderId ? { ...o, order_status: nextStatus } : o))
       );
+
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          order_status: nextStatus,
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Gagal memperbarui status');
+      }
+
+      fetchKitchenOrders(false);
     } catch (err) {
-      console.error('Failed to update order status:', err);
+      console.error('Failed to update kitchen order status:', err);
+      fetchKitchenOrders(false);
     }
   };
 
-  const getElapsedSeconds = (createdAt: string) => {
-    return Math.floor((now.getTime() - new Date(createdAt).getTime()) / 1000);
+  // Helper: Elapsed minutes calculation
+  const getElapsedMinutes = (createdAt: string) => {
+    if (!createdAt) return 0;
+    const diffMs = now.getTime() - new Date(createdAt).getTime();
+    return Math.max(0, Math.floor(diffMs / 60000));
   };
 
-  const formatElapsed = (createdAt: string) => {
-    const diff = getElapsedSeconds(createdAt);
-    if (diff < 60) return `${diff}d`;
-    return `${Math.floor(diff / 60)}m ${diff % 60}d`;
-  };
-
-  const getTimerBadgeStyle = (createdAt: string) => {
-    const seconds = getElapsedSeconds(createdAt);
-    if (seconds > 900) {
-      // Over 15 min - Urgent Alert
-      return 'bg-red-500/20 border-red-500/50 text-red-400 animate-pulse font-bold';
-    } else if (seconds > 300) {
-      // Over 5 min
-      return 'bg-amber-500/20 border-amber-500/40 text-amber-400 font-semibold';
+  // Helper: Determine station category for item
+  const getItemStation = (itemName: string) => {
+    const lower = (itemName || '').toLowerCase();
+    if (lower.includes('kopi') || lower.includes('espresso') || lower.includes('latte') || lower.includes('tea') || lower.includes('matcha') || lower.includes('es') || lower.includes('ice') || lower.includes('minum')) {
+      return 'BARISTA';
     }
-    return 'bg-[#0E0B0A] border-[#FFFFFF]/10 text-[#A89F91]';
+    return 'KITCHEN';
   };
 
-  const filteredOrders = orders.filter(o => {
-    const tableCode = o.tables?.code || o.table_number || '';
-    const tableName = o.tables?.name || '';
-    const query = searchTable.toLowerCase();
-    return tableCode.toLowerCase().includes(query) || tableName.toLowerCase().includes(query);
+  // Filter orders by search & tabs
+  const filteredOrders = orders.filter((o) => {
+    const isCompleted = o.order_status === 'COMPLETED';
+    if (statusTab === 'ACTIVE' && isCompleted) return false;
+    if (statusTab === 'COMPLETED' && !isCompleted) return false;
+
+    // Search Filter
+    const matchesSearch =
+      (o.order_number || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (o.tables?.code || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (o.customer_name || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    // Station Filter
+    if (stationFilter !== 'ALL') {
+      const hasStationItem = (o.order_items || []).some(
+        (item: any) => getItemStation(item.item_name) === stationFilter
+      );
+      if (!hasStationItem) return false;
+    }
+
+    return true;
   });
 
-  const newCount = orders.filter((o) => o.order_status === 'NEW_ORDER').length;
+  const activeOrdersCount = orders.filter((o) => o.order_status !== 'COMPLETED').length;
   const preparingCount = orders.filter((o) => o.order_status === 'PREPARING').length;
   const readyCount = orders.filter((o) => o.order_status === 'READY').length;
 
   return (
-    <main className="min-h-screen bg-[#0E0B0A] text-[#FFFFFF] font-sans pb-12 selection:bg-[#B82E2E] selection:text-[#FFFFFF]">
-      {/* KDS Header */}
-      <header className="sticky top-0 z-50 bg-[#161210]/95 backdrop-blur-md border-b border-[#FFFFFF]/10 px-4 sm:px-8 py-4">
-        <div className="max-w-screen-2xl mx-auto flex items-center justify-between gap-4 flex-wrap">
-          {/* Brand */}
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-[#B82E2E] flex items-center justify-center shrink-0 shadow-lg shadow-[#B82E2E]/20">
-              <UtensilsCrossed className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                <span className="text-[0.68rem] tracking-widest uppercase font-semibold text-[#B82E2E]">LIVE KITCHEN DISPLAY</span>
-              </div>
-              <h1 className="text-xl sm:text-2xl font-serif font-light text-white leading-tight">Dapur &amp; Barista Monitor</h1>
-            </div>
+    <div className="min-h-screen bg-[#070605] text-[#F7F4EF] font-sans p-4 md:p-8 selection:bg-[#B82E2E] selection:text-white">
+      {/* Top Bar Navigation */}
+      <header className="max-w-7xl mx-auto mb-8 bg-[#0E0C0A] border border-[#FFFFFF]/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#B82E2E] to-[#6E1A1A] flex items-center justify-center shadow-lg shadow-[#B82E2E]/20">
+            <Flame className="w-6 h-6 text-white animate-pulse" />
           </div>
-
-          {/* Real-time Order Counters & Time */}
-          <div className="flex items-center gap-3 flex-wrap">
+          <div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 text-xs font-bold shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <span>BARU: {newCount}</span>
-              </div>
-              <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-bold shadow-sm">
-                <Flame className="w-4 h-4 text-amber-400" />
-                <span>PROSES: {preparingCount}</span>
-              </div>
-              <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold shadow-sm">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>SIAP: {readyCount}</span>
-              </div>
+              <span className="text-[0.65rem] font-mono uppercase tracking-widest text-[#B82E2E] font-bold">KOPIMAGE KITCHEN SYSTEM</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             </div>
-
-            <div className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0E0B0A] border border-[#FFFFFF]/10 text-xs text-[#C29B7F] font-mono tabular-nums font-semibold">
-              <Clock className="w-4 h-4 text-[#B82E2E]" />
-              <span>{now.toLocaleTimeString('id-ID')} WIB</span>
-            </div>
-
-            <button
-              onClick={fetchKitchenOrders}
-              className="p-2.5 rounded-xl border border-[#FFFFFF]/15 bg-[#0E0B0A] text-[#A89F91] hover:text-white hover:border-[#B82E2E] transition-all cursor-pointer shadow-sm"
-              title="Refresh Antrian Dapur"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
+            <h1 className="text-xl md:text-2xl font-black font-serif tracking-tight text-white">
+              Kitchen & Barista Display (KDS)
+            </h1>
           </div>
+        </div>
+
+        {/* Stats Pills & Controls */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
+            <span className="text-[#A89F91]">Aktif:</span>
+            <span className="font-bold text-white bg-[#B82E2E] px-2 py-0.5 rounded-md">{activeOrdersCount}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
+            <span className="text-[#A89F91]">Disiapkan:</span>
+            <span className="font-bold text-[#C29B7F]">{preparingCount}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
+            <span className="text-[#A89F91]">Siap Antar:</span>
+            <span className="font-bold text-emerald-400">{readyCount}</span>
+          </div>
+
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+              soundEnabled
+                ? 'bg-[#B82E2E]/20 border-[#B82E2E] text-white hover:bg-[#B82E2E]/30'
+                : 'bg-[#161210] border-[#FFFFFF]/10 text-[#A89F91] hover:text-white'
+            }`}
+            title={soundEnabled ? 'Suara Alert Aktif' : 'Suara Alert Di-Mute'}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4 text-[#B82E2E]" /> : <VolumeX className="w-4 h-4" />}
+          </button>
+
+          <button
+            onClick={() => fetchKitchenOrders(false)}
+            disabled={isRefreshing}
+            className="p-2.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 hover:border-[#B82E2E] text-white transition-all cursor-pointer disabled:opacity-50"
+            title="Refresh Tiket Pesanan"
+          >
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#B82E2E]' : ''}`} />
+          </button>
         </div>
       </header>
 
-      {/* Orders Container */}
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-8 pt-8">
-        {/* Search Bar */}
-        <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
-          <div>
-            <h2 className="text-lg font-serif text-white font-light">Antrean Meja Aktif ({orders.length})</h2>
-            <p className="text-xs text-[#A89F91]">Pesanan urut berdasarkan waktu masuk tercepat di bar &amp; dapur.</p>
-          </div>
-          <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 text-[#A89F91] absolute left-3.5 top-3" />
-            <input
-              type="text"
-              placeholder="Cari Meja 07, Teras..."
-              value={searchTable}
-              onChange={(e) => setSearchTable(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
-            />
-          </div>
+      {/* Filter & Station Tabs */}
+      <div className="max-w-7xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4">
+        {/* Status Tabs (Pesanan Aktif vs Selesai) */}
+        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#0E0C0A] border border-[#FFFFFF]/10">
+          <button
+            onClick={() => setStatusTab('ACTIVE')}
+            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+              statusTab === 'ACTIVE'
+                ? 'bg-[#B82E2E] text-white shadow-md shadow-[#B82E2E]/20'
+                : 'text-[#A89F91] hover:text-white'
+            }`}
+          >
+            🔥 TIKET AKTIF DOK ({activeOrdersCount})
+          </button>
+          <button
+            onClick={() => setStatusTab('COMPLETED')}
+            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+              statusTab === 'COMPLETED'
+                ? 'bg-[#B82E2E] text-white shadow-md shadow-[#B82E2E]/20'
+                : 'text-[#A89F91] hover:text-white'
+            }`}
+          >
+            ✅ SELESAI DISAJIKAN
+          </button>
         </div>
 
+        {/* Station Filter (Semua, Barista, Dapur) */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[0.65rem] font-mono text-[#A89F91] uppercase">Stasiun:</span>
+          {[
+            { id: 'ALL', label: ' Semua Tiket', icon: UtensilsCrossed },
+            { id: 'BARISTA', label: '☕ Barista (Kopi/Minuman)', icon: Coffee },
+            { id: 'KITCHEN', label: '🍝 Dapur Utama (Makanan)', icon: Flame },
+          ].map((st) => (
+            <button
+              key={st.id}
+              onClick={() => setStationFilter(st.id as any)}
+              className={`px-3 py-1.5 rounded-xl border text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
+                stationFilter === st.id
+                  ? 'bg-[#C29B7F]/20 border-[#C29B7F] text-white'
+                  : 'bg-[#0E0C0A] border-[#FFFFFF]/10 text-[#A89F91] hover:border-[#C29B7F]'
+              }`}
+            >
+              <st.icon className="w-3.5 h-3.5" />
+              <span>{st.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Ticket Grid */}
+      <main className="max-w-7xl mx-auto">
         {loading ? (
-          <div className="flex items-center justify-center gap-3 py-32 text-[#A89F91]">
-            <Loader2 className="w-6 h-6 animate-spin text-[#B82E2E]" />
-            <span className="text-sm">Memuat antrean dapur...</span>
+          <div className="py-20 text-center flex flex-col items-center justify-center">
+            <RefreshCw className="w-8 h-8 text-[#B82E2E] animate-spin mb-3" />
+            <p className="text-sm font-mono text-[#A89F91]">Menghubungkan ke Stasiun Dapur KOPIMAGE...</p>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="p-16 rounded-3xl bg-[#161210] border border-emerald-500/30 text-center max-w-md mx-auto my-16 shadow-xl">
-            <div className="w-20 h-20 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400" />
-            </div>
-            <h3 className="text-xl font-serif text-white mb-2">Semua Pesanan Selesai!</h3>
-            <p className="text-xs text-[#A89F91]">Tidak ada pesanan pending di dapur saat ini. Standby untuk order baru.</p>
+          <div className="py-24 text-center border border-dashed border-[#FFFFFF]/10 rounded-3xl bg-[#0E0C0A]/50">
+            <UtensilsCrossed className="w-12 h-12 text-[#A89F91]/40 mx-auto mb-3" />
+            <h3 className="text-base font-serif text-white font-bold mb-1">
+              {statusTab === 'ACTIVE' ? 'Tidak Ada Tiket Pesanan Aktif Saat Ini' : 'Belum Ada Riwayat Tiket Selesai'}
+            </h3>
+            <p className="text-xs text-[#A89F91] font-mono">
+              {statusTab === 'ACTIVE'
+                ? 'Semua pesanan telah selesai disajikan atau belum ada pesanan baru.'
+                : 'Tiket pesanan yang selesai disajikan akan muncul di sini.'}
+            </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <AnimatePresence>
-              {filteredOrders.map((o) => {
-                const config = STATUS_CONFIG[o.order_status] || STATUS_CONFIG.NEW_ORDER;
-                const tableCode = o.tables?.code || o.table_number || '00';
-                const tableName = o.tables?.name || `MEJA ${tableCode}`;
+              {filteredOrders.map((order) => {
+                const elapsedMin = getElapsedMinutes(order.created_at);
+                const isUrgent = elapsedMin >= 12;
+                const isWarning = elapsedMin >= 6 && elapsedMin < 12;
+
+                const currentStatus = order.order_status || 'NEW_ORDER';
 
                 return (
                   <motion.div
-                    key={o.id}
+                    key={order.id}
                     layout
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className={`rounded-3xl bg-[#161210] border ${config.border} p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden`}
+                    className={`rounded-3xl border p-5 flex flex-col justify-between transition-all shadow-xl relative overflow-hidden ${
+                      isUrgent
+                        ? 'bg-[#140807] border-[#B82E2E] shadow-[#B82E2E]/20 ring-1 ring-[#B82E2E]/40'
+                        : currentStatus === 'READY'
+                        ? 'bg-[#06120B] border-emerald-500/50 shadow-emerald-500/10'
+                        : currentStatus === 'PREPARING'
+                        ? 'bg-[#120E09] border-[#C29B7F]/50 shadow-[#C29B7F]/10'
+                        : 'bg-[#0E0C0A] border-[#FFFFFF]/10'
+                    }`}
                   >
+                    {/* Header Top Badge & Timer */}
                     <div>
-                      {/* Card Header: Table Number & Status Pill */}
-                      <div className="flex items-start justify-between mb-4 pb-4 border-b border-[#FFFFFF]/10 gap-2">
+                      <div className="flex items-center justify-between gap-2 border-b border-[#FFFFFF]/10 pb-3 mb-4">
                         <div>
-                          <span className="text-[0.62rem] tracking-widest uppercase font-semibold text-[#A89F91] block">NOMOR MEJA</span>
-                          <div className="font-serif text-2xl font-bold text-white flex items-center gap-2">
-                            <span>{tableName}</span>
-                          </div>
+                          <span className="text-[0.65rem] font-mono text-[#A89F91] block">
+                            TIKET #{order.order_number}
+                          </span>
+                          <h2 className="text-lg font-black font-serif text-white flex items-center gap-2">
+                            <span>MEJA {order.tables?.code || order.table_id || '01'}</span>
+                            <span className="text-xs font-normal text-[#C29B7F] font-mono">
+                              ({order.mode === 'takeaway' ? 'TAKEAWAY' : 'DINE-IN'})
+                            </span>
+                          </h2>
                         </div>
 
-                        <div className="flex flex-col items-end gap-1.5">
-                          <span className={`px-3 py-1 rounded-full border text-[0.65rem] font-sans tracking-widest uppercase font-bold ${config.bg} ${config.text} ${config.border}`}>
-                            {config.label}
-                          </span>
-                          <span className={`px-2.5 py-0.5 rounded-lg border text-[0.68rem] font-mono tabular-nums flex items-center gap-1 ${getTimerBadgeStyle(o.created_at)}`}>
-                            <Clock className="w-3 h-3" />
-                            {formatElapsed(o.created_at)}
-                          </span>
+                        {/* Elapsed Timer Badge */}
+                        <div
+                          className={`px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-mono font-bold ${
+                            isUrgent
+                              ? 'bg-[#B82E2E] text-white border-red-400 animate-pulse'
+                              : isWarning
+                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                          }`}
+                        >
+                          <Clock className="w-3.5 h-3.5" />
+                          <span>{elapsedMin} mnt</span>
                         </div>
                       </div>
 
-                      {/* Order Items List */}
+                      {/* Customer Name & Notes */}
+                      <div className="mb-4">
+                        <span className="text-[0.7rem] text-[#A89F91] block font-mono">
+                          Pemesan: <strong className="text-white font-serif">{order.customer_name || 'Pelanggan'}</strong> ({order.customer_phone || '-'})
+                        </span>
+                      </div>
+
+                      {/* Items Checklist */}
                       <div className="space-y-3 mb-6">
-                        {o.order_items?.map((item: any) => (
-                          <div key={item.id} className="p-3 rounded-xl bg-[#0E0B0A] border border-[#FFFFFF]/08">
-                            <div className="flex items-start justify-between gap-2">
-                              <span className="font-sans text-sm font-semibold text-white leading-snug">
-                                {item.item_name}
-                              </span>
-                              <span className="px-2 py-0.5 rounded-md bg-[#B82E2E] text-white text-xs font-bold shrink-0">
-                                x{item.quantity}
+                        <span className="text-[0.65rem] font-mono uppercase text-[#A89F91] tracking-wider block mb-1">
+                          ITEM PESANAN DIBUAT:
+                        </span>
+                        {(order.order_items || []).map((item: any, idx: number) => {
+                          const station = getItemStation(item.item_name);
+                          return (
+                            <div
+                              key={item.id || idx}
+                              className="p-3 rounded-2xl bg-[#161210] border border-[#FFFFFF]/5 flex items-start justify-between gap-2"
+                            >
+                              <div className="flex items-start gap-2.5">
+                                <span className="w-6 h-6 rounded-lg bg-[#B82E2E]/20 text-[#B82E2E] font-mono font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                                  {item.quantity}x
+                                </span>
+                                <div>
+                                  <h4 className="text-sm font-bold text-white leading-tight">
+                                    {item.item_name}
+                                  </h4>
+
+                                  {/* Modifiers / Temperature */}
+                                  {item.order_item_modifiers && item.order_item_modifiers.length > 0 && (
+                                    <div className="text-[0.7rem] text-[#C29B7F] font-mono mt-0.5">
+                                      {item.order_item_modifiers.map((m: any) => `${m.modifier_name}: ${m.option_label}`).join(', ')}
+                                    </div>
+                                  )}
+
+                                  {/* Item Special Catatan */}
+                                  {item.notes && (
+                                    <div className="mt-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[0.65rem] font-mono text-amber-300">
+                                      Catatan: "{item.notes}"
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Station Badge */}
+                              <span
+                                className={`px-2 py-0.5 rounded text-[0.6rem] font-mono font-semibold uppercase ${
+                                  station === 'BARISTA'
+                                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20'
+                                    : 'bg-[#B82E2E]/15 text-[#B82E2E] border border-[#B82E2E]/20'
+                                }`}
+                              >
+                                {station === 'BARISTA' ? '☕ Bar' : '🍝 Dapur'}
                               </span>
                             </div>
-
-                            {/* Modifiers List (Hot/Ice, Literan) */}
-                            {item.order_item_modifiers?.length > 0 && (
-                              <div className="mt-1.5 flex flex-wrap gap-1">
-                                {item.order_item_modifiers.map((mod: any, idx: number) => (
-                                  <span key={idx} className="px-2 py-0.5 rounded bg-[#C29B7F]/15 text-[#C29B7F] text-[0.65rem] font-sans">
-                                    {mod.option_label}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-
-                            {/* Special Customer Notes */}
-                            {item.notes && (
-                              <div className="mt-2 text-[0.72rem] text-amber-300 bg-amber-500/10 border border-amber-500/20 p-2 rounded-lg italic">
-                                "{item.notes}"
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
 
-                    {/* Footer Advancement Button */}
-                    <div className="pt-3 border-t border-[#FFFFFF]/10">
-                      {o.order_status === 'NEW_ORDER' && (
+                    {/* Bottom Action Controls */}
+                    <div className="pt-3 border-t border-[#FFFFFF]/10 space-y-2">
+                      {currentStatus === 'NEW_ORDER' && (
                         <button
-                          onClick={() => handleUpdateStatus(o.id, 'PREPARING')}
-                          className="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold tracking-wider uppercase transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                          onClick={() => handleUpdateOrderStatus(order.id, 'PREPARING')}
+                          className="w-full p-3 rounded-2xl bg-[#C29B7F] hover:bg-[#D4A373] text-[#070605] font-mono text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-lg"
                         >
-                          <Flame className="w-4 h-4 text-white" />
-                          <span>MULAI DIPROSES DAPUR</span>
+                          <Flame className="w-4 h-4" />
+                          <span>MULAI PREPARASI / BREWING</span>
                         </button>
                       )}
 
-                      {o.order_status === 'PREPARING' && (
+                      {currentStatus === 'PREPARING' && (
                         <button
-                          onClick={() => handleUpdateStatus(o.id, 'READY')}
-                          className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold tracking-wider uppercase transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                          onClick={() => handleUpdateOrderStatus(order.id, 'READY')}
+                          className="w-full p-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-lg"
                         >
-                          <BellRing className="w-4 h-4 text-white animate-bounce" />
-                          <span>PESANAN SIAP DIANTAR</span>
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>TANDAI SIAP DISAJIKAN</span>
                         </button>
                       )}
 
-                      {o.order_status === 'READY' && (
+                      {currentStatus === 'READY' && (
                         <button
-                          onClick={() => handleUpdateStatus(o.id, 'COMPLETED')}
-                          className="w-full py-3 rounded-xl bg-[#0E0B0A] hover:bg-emerald-950 border border-emerald-500/40 text-emerald-400 text-xs font-semibold tracking-wider uppercase transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                          onClick={() => handleUpdateOrderStatus(order.id, 'COMPLETED')}
+                          className="w-full p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 border border-slate-700"
                         >
-                          <Check className="w-4 h-4 text-emerald-400" />
-                          <span>SELESAI (DISAJIKAN)</span>
+                          <CheckSquare className="w-4 h-4 text-emerald-400" />
+                          <span>SELESAI / DISAJIKAN KE MEJA</span>
                         </button>
+                      )}
+
+                      {currentStatus === 'COMPLETED' && (
+                        <div className="text-center py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-xs font-mono text-emerald-400 flex items-center justify-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>PESANAN SUDAH DISAJIKAN 100%</span>
+                        </div>
                       )}
                     </div>
                   </motion.div>
@@ -324,7 +454,7 @@ export default function KitchenDisplayPage() {
             </AnimatePresence>
           </div>
         )}
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

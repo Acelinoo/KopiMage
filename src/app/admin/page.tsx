@@ -557,6 +557,16 @@ export default function AdminDashboardPage() {
               >
                 <span>MEJA QR</span>
               </button>
+
+              <a
+                href="/kitchen"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3.5 py-2 rounded-lg bg-[#C29B7F]/15 border border-[#C29B7F]/40 text-[#C29B7F] hover:bg-[#C29B7F] hover:text-[#070605] font-mono text-xs font-bold uppercase transition-all flex items-center gap-1.5"
+                title="Buka Monitor Dapur / Kitchen Display System"
+              >
+                <span>🔥 STASIUN DAPUR (KDS)</span>
+              </a>
             </div>
           </div>
         </div>
