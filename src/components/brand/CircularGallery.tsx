@@ -574,8 +574,10 @@ class App {
     this.onCheck();
   }
   onWheel(e: any) {
-    const delta = e.deltaY || e.wheelDelta || e.detail;
-    this.scroll.target += (delta > 0 ? this.scrollSpeed : -this.scrollSpeed) * 0.2;
+    const delta = e.deltaY || e.wheelDelta || e.detail || 0;
+    if (!delta) return;
+    const step = (delta > 0 ? 1 : -1) * Math.max(Math.abs(delta) * 0.015, 1.2) * this.scrollSpeed;
+    this.scroll.target += step;
     this.onCheckDebounce();
   }
   onKeyDown(e: any) {
@@ -646,19 +648,25 @@ class App {
     this.boundOnKeyDown = this.onKeyDown.bind(this);
 
     window.addEventListener('resize', this.boundOnResize);
+    
+    // Bind wheel listeners to both container and window for responsive horizontal gallery scrolling
+    if (this.container) {
+      this.container.addEventListener('wheel', this.boundOnWheel, { passive: true });
+      this.container.addEventListener('mousewheel', this.boundOnWheel, { passive: true });
+    }
     window.addEventListener('mousewheel', this.boundOnWheel, { passive: true });
     window.addEventListener('wheel', this.boundOnWheel, { passive: true });
     
-    // Bind touch initiation directly to canvas container
-    this.container.addEventListener('mousedown', this.boundOnTouchDown);
+    // Bind touch/mouse drag directly to container
+    if (this.container) {
+      this.container.addEventListener('mousedown', this.boundOnTouchDown);
+      this.container.addEventListener('touchstart', this.boundOnTouchDown, { passive: true });
+      this.container.addEventListener('keydown', this.boundOnKeyDown);
+    }
     window.addEventListener('mousemove', this.boundOnTouchMove);
     window.addEventListener('mouseup', this.boundOnTouchUp);
-
-    this.container.addEventListener('touchstart', this.boundOnTouchDown, { passive: true });
     window.addEventListener('touchmove', this.boundOnTouchMove, { passive: true });
     window.addEventListener('touchend', this.boundOnTouchUp);
-
-    this.container.addEventListener('keydown', this.boundOnKeyDown);
   }
   destroy() {
     window.cancelAnimationFrame(this.raf);
@@ -667,6 +675,8 @@ class App {
     window.removeEventListener('wheel', this.boundOnWheel);
 
     if (this.container) {
+      this.container.removeEventListener('wheel', this.boundOnWheel);
+      this.container.removeEventListener('mousewheel', this.boundOnWheel);
       this.container.removeEventListener('mousedown', this.boundOnTouchDown);
       this.container.removeEventListener('touchstart', this.boundOnTouchDown);
       this.container.removeEventListener('keydown', this.boundOnKeyDown);
