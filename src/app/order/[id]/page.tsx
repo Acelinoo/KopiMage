@@ -122,7 +122,7 @@ export default function OrderTrackerPage() {
               gap: '1rem',
             }}
           >
-            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', shrink: 0 }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <CheckCircle size={28} color="#070605" />
             </div>
             <div>
@@ -315,7 +315,7 @@ export default function OrderTrackerPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* STEP 1 */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(37, 211, 102, 0.2)', border: '2px solid #25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', shrink: 0 }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(37, 211, 102, 0.2)', border: '2px solid #25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CheckCircle size={16} color="#25D366" />
               </div>
               <div>
@@ -326,7 +326,7 @@ export default function OrderTrackerPage() {
 
             {/* STEP 2 */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', opacity: isPreparing ? 1 : 0.4 }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: isPreparing ? 'rgba(37, 211, 102, 0.2)' : 'transparent', border: isPreparing ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', shrink: 0 }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: isPreparing ? 'rgba(37, 211, 102, 0.2)' : 'transparent', border: isPreparing ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {isPreparing ? <CheckCircle size={16} color="#25D366" /> : <Clock size={16} color="#A89F91" />}
               </div>
               <div>
@@ -349,7 +349,7 @@ export default function OrderTrackerPage() {
                 transition: 'all 0.3s ease',
               }}
             >
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: isReady ? '#25D366' : 'transparent', border: isReady ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', shrink: 0 }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: isReady ? '#25D366' : 'transparent', border: isReady ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <CheckCircle size={18} color={isReady ? '#070605' : '#A89F91'} />
               </div>
               <div>
