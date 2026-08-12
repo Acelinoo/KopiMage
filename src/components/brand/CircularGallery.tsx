@@ -576,7 +576,20 @@ class App {
   onWheel(e: any) {
     const delta = e.deltaY || e.wheelDelta || e.detail || 0;
     if (!delta) return;
-    const step = (delta > 0 ? 1 : -1) * Math.max(Math.abs(delta) * 0.015, 1.2) * this.scrollSpeed;
+
+    const isMobileOrTablet = this.screen.width < 1024;
+    let step = 0;
+
+    if (isMobileOrTablet) {
+      // Touchpad / Mobile wheel multiplier: responsive yet smooth
+      step = (delta > 0 ? 1 : -1) * Math.min(Math.abs(delta) * 0.008, 1.2) * this.scrollSpeed;
+    } else {
+      // Desktop physical mouse wheel: gentle, subtle, and controlled (prevents fast spinning)
+      const sign = Math.sign(delta);
+      const normalizedMagnitude = Math.min(Math.abs(delta) * 0.0015, 0.35);
+      step = sign * Math.max(normalizedMagnitude, 0.15) * (this.scrollSpeed * 0.35);
+    }
+
     this.scroll.target += step;
     this.onCheckDebounce();
   }
