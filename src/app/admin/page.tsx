@@ -136,7 +136,33 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const sanitizeMenuForStorage = (items: any[]) => {
+    return items.map((item) => {
+      // Strip any Base64 data URL from localStorage to keep payload < 2KB
+      const cleanImage =
+        item.image && item.image.startsWith('data:')
+          ? '/images/kopimage_hero_atmosphere_1786480906850.png'
+          : item.image;
+      return {
+        ...item,
+        image: cleanImage,
+      };
+    });
+  };
+
   useEffect(() => {
+    // Auto-clean legacy bloated localStorage keys on load to guarantee 0MB clean state
+    if (typeof window !== 'undefined') {
+      try {
+        ['kopimage_custom_menu', 'kopimage_custom_menu_v2', 'kopimage_custom_menu_v3'].forEach((k) => {
+          const raw = localStorage.getItem(k);
+          if (raw && (raw.includes('data:image') || raw.length > 10000)) {
+            localStorage.removeItem(k);
+          }
+        });
+      } catch (e) {}
+    }
+
     fetchAdminOrders(true);
     fetchAuxiliaryData();
 

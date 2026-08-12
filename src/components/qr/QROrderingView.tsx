@@ -21,6 +21,17 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
 
   // Fetch Live Menu Items from /api/menu & LocalStorage fallback
   React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        ['kopimage_custom_menu', 'kopimage_custom_menu_v2', 'kopimage_custom_menu_v3'].forEach((k) => {
+          const raw = localStorage.getItem(k);
+          if (raw && (raw.includes('data:image') || raw.length > 10000)) {
+            localStorage.removeItem(k);
+          }
+        });
+      } catch (e) {}
+    }
+
     const isCleared = typeof window !== 'undefined' && localStorage.getItem('kopimage_menu_cleared') === 'true';
     const localMenu = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_menu_v3') : null;
     const parsedLocal = localMenu ? JSON.parse(localMenu) : [];
