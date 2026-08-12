@@ -513,7 +513,8 @@ export function EditorialHome() {
                         bend={0}
                         textColor="#FFFFFF"
                         borderRadius={0.05}
-                        scrollEase={0.02}
+                        scrollEase={0.12}
+                        scrollSpeed={2.5}
                         fontUrl="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700&display=swap"
                         font="bold 26px Plus Jakarta Sans"
                         items={galleryMoments}

@@ -185,10 +185,18 @@ class Title {
     });
     this.mesh = new Mesh(this.gl, { geometry, program });
     const aspect = width / height;
-    const textHeight = this.plane.scale.y * 0.15;
-    const textWidth = textHeight * aspect;
+    let textHeight = this.plane.scale.y * 0.12;
+    let textWidth = textHeight * aspect;
+
+    // Constrain title width to prevent horizontal text collision between cards
+    const maxTextWidth = this.plane.scale.x * 0.92;
+    if (textWidth > maxTextWidth) {
+      textWidth = maxTextWidth;
+      textHeight = textWidth / aspect;
+    }
+
     this.mesh.scale.set(textWidth, textHeight, 1);
-    this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.05;
+    this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.08;
     this.mesh.setParent(this.plane);
   }
 }
@@ -259,7 +267,7 @@ class Media {
   }
   createShader() {
     const texture = new Texture(this.gl, {
-      generateMipmaps: true
+      generateMipmaps: false
     });
     this.program = new Program(this.gl, {
       depthTest: false,
@@ -276,7 +284,8 @@ class Media {
         void main() {
           vUv = uv;
           vec3 p = position;
-          p.z = (sin(p.x * 4.0 + uTime) * 1.5 + cos(p.y * 2.0 + uTime) * 1.5) * (0.1 + uSpeed * 0.5);
+          // Ultra lightweight Z-wave distortion
+          p.z = sin(p.x * 2.0 + uTime) * (0.05 + uSpeed * 0.3);
           gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
         }
       `,
@@ -306,7 +315,7 @@ class Media {
           
           float d = roundedBoxSDF(vUv - 0.5, vec2(0.5 - uBorderRadius), uBorderRadius);
           
-          float edgeSmooth = 0.002;
+          float edgeSmooth = 0.003;
           float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
           
           gl_FragColor = vec4(color.rgb, alpha);
@@ -372,7 +381,7 @@ class Media {
     }
 
     this.speed = scroll.current - scroll.last;
-    this.program.uniforms.uTime.value += 0.04;
+    this.program.uniforms.uTime.value += 0.03;
     this.program.uniforms.uSpeed.value = this.speed;
 
     const planeOffset = this.plane.scale.x / 2;
@@ -400,30 +409,31 @@ class Media {
     const isMobile = this.screen.width < 640;
     const isTablet = this.screen.width >= 640 && this.screen.width < 1024;
 
-    let baseHeight = 900;
-    let baseWidth = 700;
+    let baseHeight = 920;
+    let baseWidth = 680;
 
     if (isMobile) {
-      baseHeight = 620;
-      baseWidth = 460;
+      baseHeight = 760;
+      baseWidth = 540;
     } else if (isTablet) {
-      baseHeight = 720;
-      baseWidth = 520;
+      baseHeight = 820;
+      baseWidth = 580;
     }
 
     this.scale = this.screen.height / 1500;
     this.plane.scale.y = (this.viewport.height * (baseHeight * this.scale)) / this.screen.height;
     this.plane.scale.x = (this.viewport.width * (baseWidth * this.scale)) / this.screen.width;
 
+    // Zoom card scale on mobile to ~76% viewport width
     if (isMobile) {
-      const maxMobileWidth = this.viewport.width * 0.68;
+      const maxMobileWidth = this.viewport.width * 0.76;
       if (this.plane.scale.x > maxMobileWidth) {
         const ratio = maxMobileWidth / this.plane.scale.x;
         this.plane.scale.x = maxMobileWidth;
         this.plane.scale.y *= ratio;
       }
     } else if (isTablet) {
-      const maxTabletWidth = this.viewport.width * 0.58;
+      const maxTabletWidth = this.viewport.width * 0.62;
       if (this.plane.scale.x > maxTabletWidth) {
         const ratio = maxTabletWidth / this.plane.scale.x;
         this.plane.scale.x = maxTabletWidth;
@@ -432,7 +442,7 @@ class Media {
     }
 
     this.plane.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y];
-    this.padding = isMobile ? 0.65 : isTablet ? 1.0 : 2.0;
+    this.padding = isMobile ? 0.7 : isTablet ? 1.1 : 2.0;
     this.width = this.plane.scale.x + this.padding;
     this.widthTotal = this.width * this.length;
     this.x = this.width * this.index;
@@ -472,8 +482,8 @@ class App {
       textColor = '#ffffff',
       borderRadius = 0,
       font = 'bold 30px Figtree',
-      scrollSpeed = 2,
-      scrollEase = 0.05
+      scrollSpeed = 2.5,
+      scrollEase = 0.12
     }: any = {}
   ) {
     document.documentElement.classList.remove('no-js');
@@ -494,7 +504,7 @@ class App {
     this.renderer = new Renderer({
       alpha: true,
       antialias: true,
-      dpr: Math.min(window.devicePixelRatio || 1, 2)
+      dpr: Math.min(window.devicePixelRatio || 1, 1.5)
     });
     this.gl = this.renderer.gl;
     this.gl.clearColor(0, 0, 0, 0);
@@ -509,9 +519,10 @@ class App {
     this.scene = new Transform();
   }
   createGeometry() {
+    // Optimized lightweight plane geometry (10x10 instead of 50x100) for maximum mobile performance
     this.planeGeometry = new Plane(this.gl, {
-      heightSegments: 50,
-      widthSegments: 100
+      heightSegments: 10,
+      widthSegments: 10
     });
   }
   createMedias(items: any, bend = 0, textColor: string, borderRadius: number, font: string) {
@@ -554,7 +565,7 @@ class App {
     if (!this.isDown) return;
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const isMobile = this.screen.width < 640;
-    const speedMultiplier = isMobile ? 0.045 : 0.025;
+    const speedMultiplier = isMobile ? 0.055 : 0.035;
     const distance = (this.start - clientX) * (this.scrollSpeed * speedMultiplier);
     this.scroll.target = this.scroll.position + distance;
   }
@@ -635,8 +646,8 @@ class App {
     this.boundOnKeyDown = this.onKeyDown.bind(this);
 
     window.addEventListener('resize', this.boundOnResize);
-    window.addEventListener('mousewheel', this.boundOnWheel);
-    window.addEventListener('wheel', this.boundOnWheel);
+    window.addEventListener('mousewheel', this.boundOnWheel, { passive: true });
+    window.addEventListener('wheel', this.boundOnWheel, { passive: true });
     
     // Bind touch initiation directly to canvas container
     this.container.addEventListener('mousedown', this.boundOnTouchDown);
@@ -644,7 +655,7 @@ class App {
     window.addEventListener('mouseup', this.boundOnTouchUp);
 
     this.container.addEventListener('touchstart', this.boundOnTouchDown, { passive: true });
-    window.addEventListener('touchmove', this.boundOnTouchMove);
+    window.addEventListener('touchmove', this.boundOnTouchMove, { passive: true });
     window.addEventListener('touchend', this.boundOnTouchUp);
 
     this.container.addEventListener('keydown', this.boundOnKeyDown);
@@ -689,8 +700,8 @@ export default function CircularGallery({
   borderRadius = 0.05,
   font = 'bold 30px Figtree',
   fontUrl,
-  scrollSpeed = 2,
-  scrollEase = 0.05
+  scrollSpeed = 2.5,
+  scrollEase = 0.12
 }: CircularGalleryProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
