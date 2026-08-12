@@ -289,6 +289,19 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleDeleteMenu = async (menuId: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus menu ini dari katalog QR?')) return;
+    try {
+      const res = await fetch(`/api/menu?id=${menuId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setMenuItemsState((prev) => prev.filter((m) => m.id !== menuId));
+      }
+    } catch (err) {
+      console.error('Delete menu error:', err);
+    }
+  };
+
   const handleClearAllMenu = async () => {
     if (!confirm('Apakah Anda yakin ingin MENGHAPUS SEMUA MENU? Anda dapat menambah menu baru secara manual setelah ini.')) return;
     try {
