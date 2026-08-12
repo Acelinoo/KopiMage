@@ -84,7 +84,7 @@ export default function OrderTrackerPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: '#070605', color: '#F7F4EF', display: 'flex', alignItems: 'center', justifyCenter: 'center', padding: '2rem' }}>
+      <div style={{ minHeight: '100vh', background: '#070605', color: '#F7F4EF', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <p style={{ fontFamily: 'monospace', color: '#A89F91' }}>Memuat live tracker pesanan KOPIMAGE...</p>
       </div>
     );
@@ -122,7 +122,7 @@ export default function OrderTrackerPage() {
               gap: '1rem',
             }}
           >
-            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#25D366', display: 'flex', alignItems: 'center', justifyCenter: 'center', shrink: 0 }}>
+            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', shrink: 0 }}>
               <CheckCircle size={28} color="#070605" />
             </div>
             <div>
@@ -171,7 +171,7 @@ export default function OrderTrackerPage() {
                 {order.mode === 'takeaway' ? 'TAKEAWAY (Dibawa Pulang)' : `Dine-In • MEJA ${order.tables?.code || order.table_id || '01'}`}
               </span>
             </div>
-            <div style={{ width: '44px', height: '44px', borderRadius: '16px', background: 'linear-gradient(135deg, #B82E2E 0%, #6E1A1A 100%)', display: 'flex', alignItems: 'center', justifyCenter: 'center' }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '16px', background: 'linear-gradient(135deg, #B82E2E 0%, #6E1A1A 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Coffee size={22} color="#FFFFFF" />
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function OrderTrackerPage() {
 
             <div style={{ background: '#FFF', padding: '1rem', borderRadius: '16px', textAlign: 'center', width: '180px', margin: '0 auto 1.25rem auto' }}>
               <div style={{ fontSize: '0.8rem', color: '#000', fontWeight: 800, marginBottom: '0.4rem' }}>QRIS KOPIMAGE</div>
-              <div style={{ width: '140px', height: '140px', background: '#F4F4F4', margin: '0 auto', display: 'flex', alignItems: 'center', justifyCenter: 'center', border: '2px dashed #000' }}>
+              <div style={{ width: '140px', height: '140px', background: '#F4F4F4', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px dashed #000' }}>
                 <QrCode size={100} color="#000" />
               </div>
             </div>
@@ -315,7 +315,7 @@ export default function OrderTrackerPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {/* STEP 1 */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(37, 211, 102, 0.2)', border: '2px solid #25D366', display: 'flex', alignItems: 'center', justifyCenter: 'center', shrink: 0 }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(37, 211, 102, 0.2)', border: '2px solid #25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', shrink: 0 }}>
                 <CheckCircle size={16} color="#25D366" />
               </div>
               <div>
@@ -326,7 +326,7 @@ export default function OrderTrackerPage() {
 
             {/* STEP 2 */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', opacity: isPreparing ? 1 : 0.4 }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: isPreparing ? 'rgba(37, 211, 102, 0.2)' : 'transparent', border: isPreparing ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyCenter: 'center', shrink: 0 }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: isPreparing ? 'rgba(37, 211, 102, 0.2)' : 'transparent', border: isPreparing ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', shrink: 0 }}>
                 {isPreparing ? <CheckCircle size={16} color="#25D366" /> : <Clock size={16} color="#A89F91" />}
               </div>
               <div>
@@ -349,7 +349,7 @@ export default function OrderTrackerPage() {
                 transition: 'all 0.3s ease',
               }}
             >
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: isReady ? '#25D366' : 'transparent', border: isReady ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyCenter: 'center', shrink: 0 }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: isReady ? '#25D366' : 'transparent', border: isReady ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', shrink: 0 }}>
                 <CheckCircle size={18} color={isReady ? '#070605' : '#A89F91'} />
               </div>
               <div>
