@@ -99,6 +99,30 @@ export default function OrderTrackerPage() {
           </div>
         </div>
 
+        {/* REJECTION ALERT BANNER */}
+        {order.payment_status === 'REJECTED' && (
+          <div className="glass-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '1.5rem', marginBottom: '1.5rem', background: '#241212', border: '1px solid #B82E2E' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem', color: '#FF6B6B' }}>
+              <AlertCircle size={24} />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Bukti Pembayaran Ditolak Kasir</h3>
+            </div>
+            <p style={{ fontSize: '0.88rem', color: '#F7F4EF', marginBottom: '1rem', lineHeight: 1.5 }}>
+              Alasan: <strong style={{ color: '#FF6B6B' }}>"{order.rejection_reason || 'Bukti transfer tidak terbaca / nominal kurang'}"</strong>
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <a
+                href="https://wa.me/6281312345678?text=Halo%20Kasir%20KOPIMAGE%2C%20saya%20ingin%20mengonfirmasi%20pembayaran%20pesanan%20saya."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-whatsapp btn-sm"
+                style={{ textDecoration: 'none' }}
+              >
+                <span>Hubungi Kasir via WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        )}
+
         {/* QRIS / Transfer Payment Section */}
         {order.payment_status !== 'PAID' && order.payment_method !== 'cashier' && (
           <div className="glass-panel" style={{ borderRadius: 'var(--radius-lg)', padding: '1.75rem', marginBottom: '1.5rem', background: '#161311' }}>

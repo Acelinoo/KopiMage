@@ -34,6 +34,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
       return;
     }
 
+    if (!customerPhone.trim()) {
+      setErrorMessage('Harap masukkan Nomor WhatsApp Anda agar kasir dapat mengonfirmasi pesanan.');
+      return;
+    }
+
     if (mode === 'dine-in' && !selectedTable) {
       setErrorMessage('Harap pilih Nomor Meja untuk Dine-In.');
       return;
@@ -272,10 +277,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
             <div>
               <label style={{ fontSize: '0.85rem', color: '#C4BBB4', fontWeight: 600, display: 'block', marginBottom: '0.35rem' }}>
-                No. WhatsApp (Opsional)
+                No. WhatsApp (Wajib) *
               </label>
               <input
                 type="tel"
+                required
                 placeholder="0813xxxxxxxx"
                 value={customerPhone}
                 onChange={(e) => setCustomerPhone(e.target.value)}
