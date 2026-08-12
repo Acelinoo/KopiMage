@@ -19,16 +19,29 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
   const [liveMenuItems, setLiveMenuItems] = useState<MenuItem[]>([]);
   const { totalItemsCount, estimatedSubtotal, setIsCartOpen } = useCart();
 
-  // Fetch Live Menu Items from /api/menu
+  // Fetch Live Menu Items from /api/menu & LocalStorage fallback
   React.useEffect(() => {
+    const isCleared = typeof window !== 'undefined' && localStorage.getItem('kopimage_menu_cleared') === 'true';
+    const localMenu = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_menu_v3') : null;
+    const parsedLocal = localMenu ? JSON.parse(localMenu) : [];
+
     fetch('/api/menu')
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.menu)) {
-          setLiveMenuItems(data.menu);
+          if (isCleared && parsedLocal.length === 0) {
+            setLiveMenuItems([]);
+          } else {
+            const apiIds = new Set(data.menu.map((m: any) => m.id));
+            const merged = [...data.menu, ...parsedLocal.filter((m: any) => !apiIds.has(m.id))];
+            setLiveMenuItems(isCleared && merged.length === 0 ? [] : merged);
+          }
         }
       })
-      .catch((err) => console.error('Failed to fetch live menu:', err));
+      .catch((err) => {
+        console.error('Failed to fetch live menu:', err);
+        setLiveMenuItems(isCleared ? [] : parsedLocal);
+      });
   }, []);
 
   // Filtered menu items

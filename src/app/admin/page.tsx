@@ -89,14 +89,48 @@ export default function AdminDashboardPage() {
 
   const fetchAuxiliaryData = async () => {
     try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
+      // 1. MENU SYNC
+      const isMenuCleared = typeof window !== 'undefined' && localStorage.getItem('kopimage_menu_cleared') === 'true';
+      const localCustomMenu = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_menu_v3') : null;
+      let parsedCustomMenu: any[] = localCustomMenu ? JSON.parse(localCustomMenu) : [];
 
-      const { data: menuData } = await supabase.from('menu_items').select('*').order('name');
-      if (menuData) setMenuItemsState(menuData);
+      try {
+        const menuRes = await fetch('/api/menu');
+        const menuData = await menuRes.json();
+        if (menuData.success && Array.isArray(menuData.menu)) {
+          if (isMenuCleared && parsedCustomMenu.length === 0) {
+            setMenuItemsState([]);
+          } else {
+            // Merge API menu with local custom menu
+            const apiIds = new Set(menuData.menu.map((m: any) => m.id));
+            const merged = [...menuData.menu, ...parsedCustomMenu.filter((m: any) => !apiIds.has(m.id))];
+            setMenuItemsState(isMenuCleared && merged.length === 0 ? [] : merged);
+          }
+        }
+      } catch (e) {
+        setMenuItemsState(isMenuCleared ? [] : parsedCustomMenu);
+      }
 
-      const { data: tablesData } = await supabase.from('tables').select('*').order('code');
-      if (tablesData) setTablesState(tablesData);
+      // 2. TABLES SYNC
+      const isTablesCleared = typeof window !== 'undefined' && localStorage.getItem('kopimage_tables_cleared') === 'true';
+      const localCustomTables = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_tables_v3') : null;
+      let parsedCustomTables: any[] = localCustomTables ? JSON.parse(localCustomTables) : [];
+
+      try {
+        const tablesRes = await fetch('/api/tables');
+        const tablesData = await tablesRes.json();
+        if (tablesData.success && Array.isArray(tablesData.tables)) {
+          if (isTablesCleared && parsedCustomTables.length === 0) {
+            setTablesState([]);
+          } else {
+            const apiCodes = new Set(tablesData.tables.map((t: any) => t.code || t.id));
+            const merged = [...tablesData.tables, ...parsedCustomTables.filter((t: any) => !apiCodes.has(t.code || t.id))];
+            setTablesState(isTablesCleared && merged.length === 0 ? [] : merged);
+          }
+        }
+      } catch (e) {
+        setTablesState(isTablesCleared ? [] : parsedCustomTables);
+      }
     } catch (err) {
       console.error('Failed to fetch auxiliary data:', err);
     }
@@ -201,7 +235,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // TABLE CRUD HANDLERS (Real-time DB & API Synchronized)
+  // TABLE CRUD HANDLERS (Real-time DB & API & Local Storage Synchronized)
   const handleSaveTable = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tableCodeInput.trim()) return;
@@ -209,21 +243,33 @@ export default function AdminDashboardPage() {
     try {
       const newCode = tableCodeInput.padStart(2, '0');
       const newName = tableNameInput || `MEJA ${newCode}`;
+      const newArea = tableAreaInput || 'Indoor AC';
 
-      const res = await fetch('/api/tables', {
+      const newTableObj = {
+        id: editingTable?.id || `table_${newCode}_${Date.now()}`,
+        code: newCode,
+        name: newName,
+        area: newArea,
+        is_active: true,
+      };
+
+      // Unset cleared flag & Update state immediately
+      localStorage.removeItem('kopimage_tables_cleared');
+      setTablesState((prev) => {
+        const updated = [...prev.filter((t) => t.id !== newTableObj.id && t.code !== newCode), newTableObj];
+        localStorage.setItem('kopimage_custom_tables_v3', JSON.stringify(updated));
+        return updated;
+      });
+
+      await fetch('/api/tables', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: newCode,
           name: newName,
-          area: tableAreaInput,
+          area: newArea,
         }),
       });
-
-      const data = await res.json();
-      if (data.success) {
-        fetchAuxiliaryData();
-      }
     } catch (err) {
       console.error('Save table error:', err);
     } finally {
@@ -237,17 +283,35 @@ export default function AdminDashboardPage() {
   const handleDeleteTable = async (tableId: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus nomor meja ini?')) return;
     try {
-      const res = await fetch(`/api/tables?id=${tableId}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setTablesState((prev) => prev.filter((t) => t.id !== tableId && t.code !== tableId));
-      }
+      setTablesState((prev) => {
+        const updated = prev.filter((t) => t.id !== tableId && t.code !== tableId);
+        localStorage.setItem('kopimage_custom_tables_v3', JSON.stringify(updated));
+        if (updated.length === 0) {
+          localStorage.setItem('kopimage_tables_cleared', 'true');
+        }
+        return updated;
+      });
+
+      await fetch(`/api/tables?id=${tableId}`, { method: 'DELETE' });
     } catch (err) {
       console.error('Delete table error:', err);
     }
   };
 
-  // MENU CRUD HANDLERS (Real-time DB Synchronized)
+  const handleClearAllTables = async () => {
+    if (!confirm('Apakah Anda yakin ingin MENGHAPUS SEMUA MEJA? Anda dapat menambah meja baru secara manual setelah ini.')) return;
+    try {
+      localStorage.setItem('kopimage_tables_cleared', 'true');
+      localStorage.removeItem('kopimage_custom_tables_v3');
+      setTablesState([]);
+
+      await fetch('/api/tables?all=true', { method: 'DELETE' });
+    } catch (err) {
+      console.error('Clear all tables error:', err);
+    }
+  };
+
+  // MENU CRUD HANDLERS (Real-time DB & API & Local Storage Synchronized)
   const handleSaveMenu = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!menuName.trim() || !menuPrice) return;
@@ -256,27 +320,31 @@ export default function AdminDashboardPage() {
       const numPrice = parseInt(menuPrice.replace(/[^0-9]/g, '')) || 25000;
       const formattedPrice = `Rp ${numPrice.toLocaleString('id-ID')}`;
 
-      const payload = {
-        id: editingMenu?.id,
+      const newMenuObj = {
+        id: editingMenu?.id || `menu_${Date.now()}_${Math.random().toString(36).substring(7)}`,
         name: menuName,
         category: menuCategory,
         price: formattedPrice,
         base_price: numPrice,
-        description: menuDesc,
+        description: menuDesc || 'Racikan khas berkualitas disajikan hangat di KOPIMAGE.',
         image: menuImg || editingMenu?.image || '/images/kopimage_hero_atmosphere_1786480906850.png',
-        temperature: menuTemp,
+        temperature: menuTemp || 'Hot / Ice',
+        is_available: true,
       };
 
-      const res = await fetch('/api/menu', {
-        method: editingMenu ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      // Unset cleared flag & Update state immediately
+      localStorage.removeItem('kopimage_menu_cleared');
+      setMenuItemsState((prev) => {
+        const updated = [newMenuObj, ...prev.filter((m) => m.id !== newMenuObj.id)];
+        localStorage.setItem('kopimage_custom_menu_v3', JSON.stringify(updated));
+        return updated;
       });
 
-      const data = await res.json();
-      if (data.success) {
-        fetchAuxiliaryData();
-      }
+      await fetch('/api/menu', {
+        method: editingMenu ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newMenuObj),
+      });
     } catch (err) {
       console.error('Save menu error:', err);
     } finally {
@@ -292,11 +360,16 @@ export default function AdminDashboardPage() {
   const handleDeleteMenu = async (menuId: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus menu ini dari katalog QR?')) return;
     try {
-      const res = await fetch(`/api/menu?id=${menuId}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setMenuItemsState((prev) => prev.filter((m) => m.id !== menuId));
-      }
+      setMenuItemsState((prev) => {
+        const updated = prev.filter((m) => m.id !== menuId);
+        localStorage.setItem('kopimage_custom_menu_v3', JSON.stringify(updated));
+        if (updated.length === 0) {
+          localStorage.setItem('kopimage_menu_cleared', 'true');
+        }
+        return updated;
+      });
+
+      await fetch(`/api/menu?id=${menuId}`, { method: 'DELETE' });
     } catch (err) {
       console.error('Delete menu error:', err);
     }
@@ -305,26 +378,13 @@ export default function AdminDashboardPage() {
   const handleClearAllMenu = async () => {
     if (!confirm('Apakah Anda yakin ingin MENGHAPUS SEMUA MENU? Anda dapat menambah menu baru secara manual setelah ini.')) return;
     try {
-      const res = await fetch('/api/menu?all=true', { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setMenuItemsState([]);
-      }
+      localStorage.setItem('kopimage_menu_cleared', 'true');
+      localStorage.removeItem('kopimage_custom_menu_v3');
+      setMenuItemsState([]);
+
+      await fetch('/api/menu?all=true', { method: 'DELETE' });
     } catch (err) {
       console.error('Clear all menu error:', err);
-    }
-  };
-
-  const handleClearAllTables = async () => {
-    if (!confirm('Apakah Anda yakin ingin MENGHAPUS SEMUA MEJA? Anda dapat menambah meja baru secara manual setelah ini.')) return;
-    try {
-      const res = await fetch('/api/tables?all=true', { method: 'DELETE' });
-      const data = await res.json();
-      if (data.success) {
-        setTablesState([]);
-      }
-    } catch (err) {
-      console.error('Clear all tables error:', err);
     }
   };
 

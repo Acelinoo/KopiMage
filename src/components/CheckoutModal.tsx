@@ -26,16 +26,29 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Fetch Live Tables from /api/tables
+  // Fetch Live Tables from /api/tables & LocalStorage fallback
   React.useEffect(() => {
+    const isCleared = typeof window !== 'undefined' && localStorage.getItem('kopimage_tables_cleared') === 'true';
+    const localTables = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_tables_v3') : null;
+    const parsedLocal = localTables ? JSON.parse(localTables) : [];
+
     fetch('/api/tables')
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.tables)) {
-          setLiveTables(data.tables);
+          if (isCleared && parsedLocal.length === 0) {
+            setLiveTables([]);
+          } else {
+            const apiCodes = new Set(data.tables.map((t: any) => t.code || t.id));
+            const merged = [...data.tables, ...parsedLocal.filter((t: any) => !apiCodes.has(t.code || t.id))];
+            setLiveTables(isCleared && merged.length === 0 ? [] : merged);
+          }
         }
       })
-      .catch((err) => console.error('Failed to fetch live tables in CheckoutModal:', err));
+      .catch((err) => {
+        console.error('Failed to fetch live tables in CheckoutModal:', err);
+        setLiveTables(isCleared ? [] : parsedLocal);
+      });
   }, []);
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
