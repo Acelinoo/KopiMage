@@ -67,11 +67,11 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { order_id, payment_status, rejection_reason } = body;
+    const { order_id, payment_status, order_status, rejection_reason } = body;
 
-    if (!order_id || !payment_status) {
+    if (!order_id) {
       return NextResponse.json(
-        { error: 'Order ID dan payment_status wajib diisi.' },
+        { error: 'Order ID wajib diisi.' },
         { status: 400 }
       );
     }
@@ -80,16 +80,23 @@ export async function PATCH(request: Request) {
 
     // Update in Supabase using Service Role
     const updatePayload: any = {
-      payment_status,
       updated_at: new Date().toISOString(),
     };
+
+    if (payment_status) {
+      updatePayload.payment_status = payment_status;
+    }
+
+    if (order_status) {
+      updatePayload.order_status = order_status;
+    }
 
     if (rejection_reason !== undefined) {
       updatePayload.rejection_reason = rejection_reason;
     }
 
-    // If approving payment, update order_status to PREPARING
-    if (payment_status === 'PAID') {
+    // If approving payment and no specific order_status sent, default to PREPARING
+    if (payment_status === 'PAID' && !order_status) {
       updatePayload.order_status = 'PREPARING';
     }
 
