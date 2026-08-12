@@ -95,21 +95,20 @@ export default function AdminDashboardPage() {
       const localCustomMenu = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_menu_v3') : null;
       let parsedCustomMenu: any[] = localCustomMenu ? JSON.parse(localCustomMenu) : [];
 
-      try {
-        const menuRes = await fetch('/api/menu');
-        const menuData = await menuRes.json();
-        if (menuData.success && Array.isArray(menuData.menu)) {
-          if (isMenuCleared && parsedCustomMenu.length === 0) {
-            setMenuItemsState([]);
-          } else {
-            // Merge API menu with local custom menu
+      if (isMenuCleared && parsedCustomMenu.length === 0) {
+        setMenuItemsState([]);
+      } else {
+        try {
+          const menuRes = await fetch('/api/menu');
+          const menuData = await menuRes.json();
+          if (menuData.success && Array.isArray(menuData.menu)) {
             const apiIds = new Set(menuData.menu.map((m: any) => m.id));
             const merged = [...menuData.menu, ...parsedCustomMenu.filter((m: any) => !apiIds.has(m.id))];
-            setMenuItemsState(isMenuCleared && merged.length === 0 ? [] : merged);
+            setMenuItemsState(merged);
           }
+        } catch (e) {
+          setMenuItemsState(parsedCustomMenu);
         }
-      } catch (e) {
-        setMenuItemsState(isMenuCleared ? [] : parsedCustomMenu);
       }
 
       // 2. TABLES SYNC
@@ -117,20 +116,20 @@ export default function AdminDashboardPage() {
       const localCustomTables = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_tables_v3') : null;
       let parsedCustomTables: any[] = localCustomTables ? JSON.parse(localCustomTables) : [];
 
-      try {
-        const tablesRes = await fetch('/api/tables');
-        const tablesData = await tablesRes.json();
-        if (tablesData.success && Array.isArray(tablesData.tables)) {
-          if (isTablesCleared && parsedCustomTables.length === 0) {
-            setTablesState([]);
-          } else {
+      if (isTablesCleared && parsedCustomTables.length === 0) {
+        setTablesState([]);
+      } else {
+        try {
+          const tablesRes = await fetch('/api/tables');
+          const tablesData = await tablesRes.json();
+          if (tablesData.success && Array.isArray(tablesData.tables)) {
             const apiCodes = new Set(tablesData.tables.map((t: any) => t.code || t.id));
             const merged = [...tablesData.tables, ...parsedCustomTables.filter((t: any) => !apiCodes.has(t.code || t.id))];
-            setTablesState(isTablesCleared && merged.length === 0 ? [] : merged);
+            setTablesState(merged);
           }
+        } catch (e) {
+          setTablesState(parsedCustomTables);
         }
-      } catch (e) {
-        setTablesState(isTablesCleared ? [] : parsedCustomTables);
       }
     } catch (err) {
       console.error('Failed to fetch auxiliary data:', err);

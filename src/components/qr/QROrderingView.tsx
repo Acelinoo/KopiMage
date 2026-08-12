@@ -25,23 +25,23 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
     const localMenu = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_menu_v3') : null;
     const parsedLocal = localMenu ? JSON.parse(localMenu) : [];
 
-    fetch('/api/menu')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && Array.isArray(data.menu)) {
-          if (isCleared && parsedLocal.length === 0) {
-            setLiveMenuItems([]);
-          } else {
+    if (isCleared && parsedLocal.length === 0) {
+      setLiveMenuItems([]);
+    } else {
+      fetch('/api/menu')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && Array.isArray(data.menu)) {
             const apiIds = new Set(data.menu.map((m: any) => m.id));
             const merged = [...data.menu, ...parsedLocal.filter((m: any) => !apiIds.has(m.id))];
-            setLiveMenuItems(isCleared && merged.length === 0 ? [] : merged);
+            setLiveMenuItems(merged);
           }
-        }
-      })
-      .catch((err) => {
-        console.error('Failed to fetch live menu:', err);
-        setLiveMenuItems(isCleared ? [] : parsedLocal);
-      });
+        })
+        .catch((err) => {
+          console.error('Failed to fetch live menu:', err);
+          setLiveMenuItems(parsedLocal);
+        });
+    }
   }, []);
 
   // Filtered menu items
