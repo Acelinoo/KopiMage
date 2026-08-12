@@ -65,15 +65,29 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         const fileExt = proofFile.name.split('.').pop() || 'jpg';
         const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-        const { data: uploadData, error: uploadErr } = await supabase.storage
-          .from('payment-proofs')
-          .upload(fileName, proofFile, { cacheControl: '3600', upsert: false });
+        try {
+          const { data: uploadData, error: uploadErr } = await supabase.storage
+            .from('payment-proofs')
+            .upload(fileName, proofFile, { cacheControl: '3600', upsert: true });
 
-        if (uploadErr) {
-          console.error('Storage upload error:', uploadErr);
-          // Fallback or record path
+          if (!uploadErr && uploadData) {
+            const { data: publicData } = supabase.storage
+              .from('payment-proofs')
+              .getPublicUrl(uploadData.path);
+            uploadedProofUrl = publicData?.publicUrl || uploadData.path;
+          }
+        } catch (sErr) {
+          console.warn('Supabase storage upload fallback:', sErr);
         }
-        uploadedProofUrl = uploadData ? uploadData.path : fileName;
+
+        // Fallback to Base64 data URL if storage bucket fails/errors
+        if (!uploadedProofUrl) {
+          uploadedProofUrl = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(proofFile);
+          });
+        }
       }
 
       // Build order items payload
