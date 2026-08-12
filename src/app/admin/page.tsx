@@ -360,18 +360,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const sanitizeMenuForStorage = (items: any[]) => {
-    return items.map((item) => {
-      if (item.image && item.image.startsWith('data:') && item.image.length > 50000) {
-        return {
-          ...item,
-          image: '/images/kopimage_hero_atmosphere_1786480906850.png',
-        };
-      }
-      return item;
-    });
-  };
-
   // IMAGE FILE UPLOAD HANDLER WITH CANVAS COMPRESSION (MAX 600px JPEG)
   const handleMenuImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
