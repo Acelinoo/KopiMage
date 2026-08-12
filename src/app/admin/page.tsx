@@ -289,16 +289,29 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleDeleteMenu = async (menuId: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus menu ini dari katalog QR?')) return;
+  const handleClearAllMenu = async () => {
+    if (!confirm('Apakah Anda yakin ingin MENGHAPUS SEMUA MENU? Anda dapat menambah menu baru secara manual setelah ini.')) return;
     try {
-      const res = await fetch(`/api/menu?id=${menuId}`, { method: 'DELETE' });
+      const res = await fetch('/api/menu?all=true', { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
-        setMenuItemsState((prev) => prev.filter((m) => m.id !== menuId));
+        setMenuItemsState([]);
       }
     } catch (err) {
-      console.error('Delete menu error:', err);
+      console.error('Clear all menu error:', err);
+    }
+  };
+
+  const handleClearAllTables = async () => {
+    if (!confirm('Apakah Anda yakin ingin MENGHAPUS SEMUA MEJA? Anda dapat menambah meja baru secara manual setelah ini.')) return;
+    try {
+      const res = await fetch('/api/tables?all=true', { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setTablesState([]);
+      }
+    } catch (err) {
+      console.error('Clear all tables error:', err);
     }
   };
 
@@ -631,19 +644,29 @@ export default function AdminDashboardPage() {
                 <h2 className="text-xl font-serif text-white font-light">Katalog Menu QR Order</h2>
                 <p className="text-xs text-[#A89F91]">Tambah, edit, hapus item menu dan kelola ketersediaan stok.</p>
               </div>
-              <button
-                onClick={() => {
-                  setEditingMenu(null);
-                  setMenuName('');
-                  setMenuPrice('');
-                  setMenuDesc('');
-                  setIsAddMenuOpen(true);
-                }}
-                className="px-4 py-2.5 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-md"
-              >
-                <Plus className="w-4 h-4" />
-                <span>TAMBAH MENU BARU</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleClearAllMenu}
+                  className="px-3.5 py-2.5 rounded-xl bg-[#0B0908] hover:bg-red-950 border border-red-500/40 text-red-400 text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
+                  title="Kosongkan Semua Katalog Menu"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>HAPUS SEMUA MENU</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingMenu(null);
+                    setMenuName('');
+                    setMenuPrice('');
+                    setMenuDesc('');
+                    setIsAddMenuOpen(true);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-md"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>TAMBAH MENU BARU</span>
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -712,18 +735,28 @@ export default function AdminDashboardPage() {
                 <h2 className="text-xl font-serif text-white font-light">Registry Meja &amp; Generator Stiker QR</h2>
                 <p className="text-xs text-[#A89F91]">Kelola daftar meja dan cetak stiker Kode QR presisi per meja.</p>
               </div>
-              <button
-                onClick={() => {
-                  setEditingTable(null);
-                  setTableCodeInput('');
-                  setTableNameInput('');
-                  setIsAddTableOpen(true);
-                }}
-                className="px-4 py-2.5 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-md"
-              >
-                <Plus className="w-4 h-4" />
-                <span>TAMBAH MEJA BARU</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleClearAllTables}
+                  className="px-3.5 py-2.5 rounded-xl bg-[#0B0908] hover:bg-red-950 border border-red-500/40 text-red-400 text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
+                  title="Kosongkan Semua Registry Meja"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>HAPUS SEMUA MEJA</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingTable(null);
+                    setTableCodeInput('');
+                    setTableNameInput('');
+                    setIsAddTableOpen(true);
+                  }}
+                  className="px-4 py-2.5 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-md"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>TAMBAH MEJA BARU</span>
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

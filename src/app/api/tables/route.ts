@@ -2,13 +2,7 @@ import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
 import { VALID_TABLES_REGISTRY as defaultTables } from '@/types/table';
 
-let inMemoryTablesStore: any[] = defaultTables.map((t) => ({
-  id: t.id,
-  code: t.id,
-  name: t.name,
-  area: t.area || 'Indoor AC',
-  is_active: t.active !== false,
-}));
+let inMemoryTablesStore: any[] = [];
 
 export async function GET() {
   try {
@@ -19,7 +13,7 @@ export async function GET() {
       .select('*')
       .order('code');
 
-    if (!error && dbTables && dbTables.length > 0) {
+    if (!error && dbTables) {
       const dbCodes = new Set(dbTables.map((t) => t.code || t.id));
       const customAdded = inMemoryTablesStore.filter((t) => !dbCodes.has(t.code || t.id));
       return NextResponse.json({ success: true, tables: [...dbTables, ...customAdded] });
@@ -97,14 +91,21 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const isClearAll = searchParams.get('all') === 'true';
+
+    const supabase = createAdminSupabaseClient();
+
+    if (isClearAll) {
+      inMemoryTablesStore = [];
+      await supabase.from('tables').delete().neq('id', '0');
+      return NextResponse.json({ success: true, message: 'Semua meja berhasil dihapus.', allTables: [] });
+    }
 
     if (!id) {
       return NextResponse.json({ error: 'ID meja wajib diisi.' }, { status: 400 });
     }
 
     inMemoryTablesStore = inMemoryTablesStore.filter((t) => t.id !== id && t.code !== id);
-
-    const supabase = createAdminSupabaseClient();
     await supabase.from('tables').delete().eq('id', id);
 
     return NextResponse.json({ success: true, deletedId: id, allTables: inMemoryTablesStore });

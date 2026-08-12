@@ -2,18 +2,8 @@ import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
 import { MENU_ITEMS as defaultMenuItems } from '@/data/menuData';
 
-// Persistent server-side in-memory store for 100% demo & production stability
-let inMemoryMenuItemsStore: any[] = defaultMenuItems.map((item) => ({
-  id: item.id,
-  name: item.name,
-  category: item.category,
-  price: item.price,
-  base_price: (item as any).basePrice || parseInt(item.price.replace(/[^0-9]/g, '')) * 1000 || 22000,
-  description: item.description,
-  image: item.image || '/images/kopimage_hero_atmosphere_1786480906850.png',
-  temperature: item.temperature || 'Hot / Ice',
-  is_available: true,
-}));
+// Persistent server-side in-memory store for custom menu items
+let inMemoryMenuItemsStore: any[] = [];
 
 export async function GET() {
   try {
@@ -25,15 +15,13 @@ export async function GET() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error && dbItems && dbItems.length > 0) {
-      // Merge DB items with memory items to ensure custom added menu items are never lost
+    if (!error && dbItems) {
       const dbIds = new Set(dbItems.map((i) => i.id));
       const customAdded = inMemoryMenuItemsStore.filter((i) => !dbIds.has(i.id));
       const mergedMenu = [...dbItems, ...customAdded];
       return NextResponse.json({ success: true, menu: mergedMenu });
     }
 
-    // Return in-memory store if DB query is empty/unconfigured
     return NextResponse.json({ success: true, menu: inMemoryMenuItemsStore });
   } catch (err: any) {
     console.error('Error fetching menu items:', err);
@@ -161,6 +149,15 @@ export async function DELETE(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const isClearAll = searchParams.get('all') === 'true';
+
+    const supabase = createAdminSupabaseClient();
+
+    if (isClearAll) {
+      inMemoryMenuItemsStore = [];
+      await supabase.from('menu_items').delete().neq('id', '0');
+      return NextResponse.json({ success: true, message: 'Semua menu berhasil dihapus.', allMenu: [] });
+    }
 
     if (!id) {
       return NextResponse.json({ error: 'ID menu wajib diisi.' }, { status: 400 });
@@ -168,8 +165,6 @@ export async function DELETE(request: Request) {
 
     // Remove from in-memory store immediately
     inMemoryMenuItemsStore = inMemoryMenuItemsStore.filter((m) => m.id !== id);
-
-    const supabase = createAdminSupabaseClient();
     const { error } = await supabase.from('menu_items').delete().eq('id', id);
 
     if (error) {
