@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     const formattedPrice = `Rp ${numPrice.toLocaleString('id-ID')}`;
 
     const newMenuItem = {
-      id: `menu_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+      id: body.id || `menu_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       name,
       category: category || 'coffee',
       price: formattedPrice,

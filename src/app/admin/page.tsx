@@ -311,6 +311,24 @@ export default function AdminDashboardPage() {
     }
   };
 
+  // IMAGE FILE UPLOAD HANDLER
+  const handleMenuImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 4 * 1024 * 1024) {
+        alert('Ukuran file foto maksimal 4MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setMenuImg(event.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // MENU CRUD HANDLERS (Real-time DB & API & Local Storage Synchronized)
   const handleSaveMenu = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -319,9 +337,10 @@ export default function AdminDashboardPage() {
     try {
       const numPrice = parseInt(menuPrice.replace(/[^0-9]/g, '')) || 25000;
       const formattedPrice = `Rp ${numPrice.toLocaleString('id-ID')}`;
+      const menuId = editingMenu?.id || `menu_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 
       const newMenuObj = {
-        id: editingMenu?.id || `menu_${Date.now()}_${Math.random().toString(36).substring(7)}`,
+        id: menuId,
         name: menuName,
         category: menuCategory,
         price: formattedPrice,
@@ -1180,31 +1199,68 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div>
-                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">URL Foto Menu</label>
-                  <input
-                    type="text"
-                    placeholder="/images/kopimage_hero_atmosphere_1786480906850.png"
-                    value={menuImg}
-                    onChange={(e) => setMenuImg(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E] mb-2"
-                  />
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[0.6rem] font-mono text-[#A89F91]">Preset Foto:</span>
-                    {[
-                      { label: '☕ Kopi', url: '/images/kopimage_hero_atmosphere_1786480906850.png' },
-                      { label: '🍵 Non-Coffee', url: '/images/Moments-Top coffe.png' },
-                      { label: '🍝 Makanan', url: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.png' },
-                      { label: '🥐 Cemilan', url: '/images/Moments-Weekend perfect with coffe in hand.png' },
-                    ].map((p) => (
-                      <button
-                        key={p.label}
-                        type="button"
-                        onClick={() => setMenuImg(p.url)}
-                        className="px-2 py-1 rounded-md bg-[#0B0908] border border-[#FFFFFF]/10 hover:border-[#B82E2E] text-[0.65rem] font-mono text-[#C29B7F] hover:text-white transition-colors cursor-pointer"
-                      >
-                        {p.label}
-                      </button>
-                    ))}
+                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">
+                    FOTO MENU (PILIH GAMBAR ATAU UPLOAD)
+                  </label>
+
+                  {/* 1. Direct File Upload Button */}
+                  <div className="mb-3 p-3 rounded-2xl bg-[#0B0908] border border-dashed border-[#B82E2E]/40 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 flex items-center justify-center overflow-hidden shrink-0">
+                        {menuImg ? (
+                          <img src={menuImg} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <ImageIcon className="w-5 h-5 text-[#A89F91]" />
+                        )}
+                      </div>
+                      <div>
+                        <span className="text-xs text-white font-semibold block">Upload Foto dari Perangkat</span>
+                        <span className="text-[0.65rem] text-[#A89F91]">Pilih file JPG/PNG dari Komputer atau HP</span>
+                      </div>
+                    </div>
+                    <label className="px-3 py-2 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-[0.7rem] font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer shrink-0">
+                      <span>PILIH FILE</span>
+                      <input type="file" accept="image/*" onChange={handleMenuImageFileSelect} className="hidden" />
+                    </label>
+                  </div>
+
+                  {/* 2. Visual Preset Selector */}
+                  <div className="mb-3">
+                    <span className="text-[0.6rem] font-mono text-[#A89F91] block mb-1.5">Atau Pilih dari Preset Foto KOPIMAGE:</span>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[
+                        { label: '☕ Kopi', url: '/images/kopimage_hero_atmosphere_1786480906850.png' },
+                        { label: '🍵 Thai Tea', url: '/images/Moments-Top coffe.png' },
+                        { label: '🍝 Makanan', url: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.png' },
+                        { label: '🥐 Cemilan', url: '/images/Moments-Weekend perfect with coffe in hand.png' },
+                      ].map((p) => (
+                        <button
+                          key={p.label}
+                          type="button"
+                          onClick={() => setMenuImg(p.url)}
+                          className={`p-1.5 rounded-xl border flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                            menuImg === p.url
+                              ? 'bg-[#B82E2E]/20 border-[#B82E2E] text-white'
+                              : 'bg-[#0B0908] border-[#FFFFFF]/10 text-[#A89F91] hover:border-[#C29B7F]'
+                          }`}
+                        >
+                          <img src={p.url} alt={p.label} className="w-full h-10 object-cover rounded-lg" />
+                          <span className="text-[0.6rem] font-mono font-semibold">{p.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 3. Link URL Input (Optional) */}
+                  <div>
+                    <span className="text-[0.6rem] font-mono text-[#A89F91] block mb-1">Atau Paste Link URL Gambar (Opsional):</span>
+                    <input
+                      type="text"
+                      placeholder="https://..."
+                      value={menuImg}
+                      onChange={(e) => setMenuImg(e.target.value)}
+                      className="w-full p-2.5 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                    />
                   </div>
                 </div>
 
