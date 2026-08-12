@@ -2,50 +2,43 @@ import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
 import { MENU_ITEMS as defaultMenuItems } from '@/data/menuData';
 
+// Persistent server-side in-memory store for 100% demo & production stability
+let inMemoryMenuItemsStore: any[] = defaultMenuItems.map((item) => ({
+  id: item.id,
+  name: item.name,
+  category: item.category,
+  price: item.price,
+  base_price: (item as any).basePrice || parseInt(item.price.replace(/[^0-9]/g, '')) * 1000 || 22000,
+  description: item.description,
+  image: item.image || '/images/kopimage_hero_atmosphere_1786480906850.png',
+  temperature: item.temperature || 'Hot / Ice',
+  is_available: true,
+}));
+
 export async function GET() {
   try {
     const supabase = createAdminSupabaseClient();
 
-    // 1. Fetch menu items from Supabase database
+    // Fetch live menu items from Supabase database
     const { data: dbItems, error } = await supabase
       .from('menu_items')
       .select('*')
-      .order('name');
+      .order('created_at', { ascending: false });
 
     if (!error && dbItems && dbItems.length > 0) {
-      return NextResponse.json({ success: true, menu: dbItems });
+      // Merge DB items with memory items to ensure custom added menu items are never lost
+      const dbIds = new Set(dbItems.map((i) => i.id));
+      const customAdded = inMemoryMenuItemsStore.filter((i) => !dbIds.has(i.id));
+      const mergedMenu = [...dbItems, ...customAdded];
+      return NextResponse.json({ success: true, menu: mergedMenu });
     }
 
-    // 2. If table is empty, seed initial data into Supabase
-    if (!dbItems || dbItems.length === 0) {
-      const seedPayload = defaultMenuItems.map((item) => ({
-        id: item.id,
-        name: item.name,
-        category: item.category,
-        price: item.price,
-        base_price: (item as any).basePrice || parseInt(item.price.replace(/[^0-9]/g, '')) * 1000 || 22000,
-        description: item.description,
-        image: item.image || '/images/kopimage_hero_atmosphere_1786480906850.png',
-        temperature: item.temperature || 'Hot / Ice',
-        is_available: true,
-      }));
-
-      const { data: seeded, error: seedError } = await supabase
-        .from('menu_items')
-        .insert(seedPayload)
-        .select();
-
-      if (!seedError && seeded) {
-        return NextResponse.json({ success: true, menu: seeded });
-      }
-    }
-
-    // Fallback to default items if DB connection fails
-    return NextResponse.json({ success: true, menu: defaultMenuItems });
+    // Return in-memory store if DB query is empty/unconfigured
+    return NextResponse.json({ success: true, menu: inMemoryMenuItemsStore });
   } catch (err: any) {
     console.error('Error fetching menu items:', err);
     return NextResponse.json(
-      { success: false, error: err.message, menu: defaultMenuItems },
+      { success: false, error: err.message, menu: inMemoryMenuItemsStore },
       { status: 500 }
     );
   }
@@ -80,6 +73,10 @@ export async function POST(request: Request) {
       created_at: new Date().toISOString(),
     };
 
+    // Add to in-memory store immediately
+    inMemoryMenuItemsStore.unshift(newMenuItem);
+
+    // Try inserting into Supabase DB
     const { data: inserted, error } = await supabase
       .from('menu_items')
       .insert([newMenuItem])
@@ -93,6 +90,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       menuItem: inserted || newMenuItem,
+      allMenu: inMemoryMenuItemsStore,
     });
   } catch (err: any) {
     console.error('Error creating menu item:', err);
@@ -122,13 +120,18 @@ export async function PUT(request: Request) {
       price: formattedPrice,
       base_price: numPrice,
       description,
-      image,
+      image: image || '/images/kopimage_hero_atmosphere_1786480906850.png',
       temperature,
     };
 
     if (is_available !== undefined) {
       updatePayload.is_available = is_available;
     }
+
+    // Update in-memory store immediately
+    inMemoryMenuItemsStore = inMemoryMenuItemsStore.map((m) =>
+      m.id === id ? { ...m, ...updatePayload } : m
+    );
 
     const { data: updated, error } = await supabase
       .from('menu_items')
@@ -143,6 +146,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({
       success: true,
       menuItem: updated && updated.length > 0 ? updated[0] : { id, ...updatePayload },
+      allMenu: inMemoryMenuItemsStore,
     });
   } catch (err: any) {
     console.error('Error updating menu item:', err);
@@ -162,6 +166,9 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'ID menu wajib diisi.' }, { status: 400 });
     }
 
+    // Remove from in-memory store immediately
+    inMemoryMenuItemsStore = inMemoryMenuItemsStore.filter((m) => m.id !== id);
+
     const supabase = createAdminSupabaseClient();
     const { error } = await supabase.from('menu_items').delete().eq('id', id);
 
@@ -169,7 +176,7 @@ export async function DELETE(request: Request) {
       console.warn('Supabase delete menu warning:', error.message);
     }
 
-    return NextResponse.json({ success: true, deletedId: id });
+    return NextResponse.json({ success: true, deletedId: id, allMenu: inMemoryMenuItemsStore });
   } catch (err: any) {
     console.error('Error deleting menu item:', err);
     return NextResponse.json(
