@@ -1,0 +1,273 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------------------------------------------------
+   KOPI MAGE DESIGN SYSTEM — UNIFIED INDUSTRIAL COKLAT THEME
+   Palette: Merah Logo (#B82E2E), Putih (#FFFFFF), Coklat Mewah (#C29B7F), Dark Matte (#0E0B0A)
+   ---------------------------------------------------- */
+
+:root {
+  --bg-dark: #0E0B0A;
+  --bg-dark-paper: #161210;
+  --bg-dark-surface: #1E1815;
+  
+  --text-light: #FFFFFF;
+  --text-[#F3EFEA]: #F8F6F0;
+  --text-muted: #A89F91;
+  --text-subtle: #6E6358;
+  
+  --accent-red: #B82E2E;          /* Merah Logo Kopi Mage */
+  --accent-red-bright: #D63434;   /* Highlight Red */
+  --accent-copper: #C29B7F;       /* Industrial Coklat Mewah */
+  --accent-brown: #A3734C;        /* Warm Industrial Bronze */
+  
+  --border-line: rgba(255, 255, 255, 0.1);
+  --border-line-hover: rgba(255, 255, 255, 0.25);
+  --border-accent-red: rgba(184, 46, 46, 0.4);
+  --border-accent-copper: rgba(194, 155, 127, 0.4);
+  
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  
+  --transition-smooth: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark !important;
+  background-color: var(--bg-dark) !important;
+  color: var(--text-light) !important;
+}
+
+body {
+  background-color: var(--bg-dark) !important;
+  color: var(--text-light) !important;
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Typography Classes */
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.tracking-editorial {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Layout Utilities */
+.editorial-container {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+@media (max-width: 768px) {
+  .editorial-container {
+    padding: 0 1.25rem;
+  }
+}
+
+.editorial-border-b {
+  border-bottom: 1px solid var(--border-line);
+}
+
+.editorial-border-t {
+  border-top: 1px solid var(--border-line);
+}
+
+.editorial-border-l {
+  border-left: 1px solid var(--border-line);
+}
+
+.editorial-border-r {
+  border-right: 1px solid var(--border-line);
+}
+
+/* Editorial Image Container */
+.editorial-img-wrapper {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-dark-paper);
+}
+
+.editorial-img-wrapper img {
+  transition: transform var(--transition-smooth), filter var(--transition-smooth);
+}
+
+.editorial-img-wrapper:hover img {
+  transform: scale(1.035);
+  filter: brightness(1.05);
+}
+
+/* ----------------------------------------------------
+   INFINITE MARQUEE ANIMATIONS (FIXED DUAL-ROW UNLIMITED SCROLL)
+   ---------------------------------------------------- */
+@keyframes marqueeScrollLeft {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marqueeScrollRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-left {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  width: max-content !important;
+  animation: marqueeScrollLeft 35s linear infinite !important;
+  will-change: transform;
+}
+
+.animate-marquee-right {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  width: max-content !important;
+  animation: marqueeScrollRight 35s linear infinite !important;
+  will-change: transform;
+}
+
+.marquee-container:hover .animate-marquee-left,
+.marquee-container:hover .animate-marquee-right {
+  animation-play-state: paused !important;
+}
+
+/* Map Frame Dark Mode Filter */
+.dark-map-filter {
+  filter: invert(92%) hue-rotate(180deg) contrast(1.15) brightness(0.85);
+  transition: filter 0.5s ease;
+}
+
+.dark-map-filter:hover {
+  filter: invert(90%) hue-rotate(180deg) contrast(1.2) brightness(0.95);
+}
+
+/* Scroll Reveal Animations */
+.reveal-fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-fade-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-slide-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-slide-left.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-slide-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-slide-right.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale-pop {
+  opacity: 0;
+  transform: scale(0.91);
+  transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-scale-pop.is-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.reveal-blur-focus {
+  opacity: 0;
+  filter: blur(14px);
+  transform: scale(0.97);
+  transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1), filter 1.1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-blur-focus.is-visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+
+.reveal-step-card {
+  opacity: 0;
+  transform: translateY(32px) scale(0.95);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-step-card.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-red);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-red-bright);
+}
