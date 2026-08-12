@@ -1101,7 +1101,7 @@ export default function AdminDashboardPage() {
               {/* QR Vector Box */}
               <div className="bg-white p-6 rounded-2xl inline-block border-4 border-[#B82E2E] shadow-2xl mb-6 my-2">
                 <QRCodeSVG
-                  value={`https://kopimage.vercel.app/experience?table=${viewingQrTable.code}`}
+                  value={`https://kopimage.vercel.app/?table=${viewingQrTable.code}`}
                   size={200}
                   bgColor="#FFFFFF"
                   fgColor="#0B0908"
@@ -1115,7 +1115,7 @@ export default function AdminDashboardPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(`https://kopimage.vercel.app/experience?table=${viewingQrTable.code}`);
+                    navigator.clipboard.writeText(`https://kopimage.vercel.app/?table=${viewingQrTable.code}`);
                     alert('Link QR Meja berhasil disalin!');
                   }}
                   className="flex-1 py-3 rounded-xl bg-[#0B0908] hover:bg-[#FFFFFF]/10 border border-[#FFFFFF]/20 text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer"

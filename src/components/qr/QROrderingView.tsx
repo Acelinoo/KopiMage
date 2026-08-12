@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { CATEGORIES, MENU_ITEMS } from '@/data/menuData';
+import { CATEGORIES } from '@/data/menuData';
 import { MenuCategoryId, MenuItem } from '@/types/menu';
 import { MenuItemCard } from '@/components/MenuItemCard';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
-import { Search, Sparkles, Filter, X, ShoppingBag, ArrowRight, MapPin, Coffee, Flame } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Filter, X, ArrowRight, MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface QROrderingViewProps {
   tableId: string;
@@ -19,6 +19,16 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [liveMenuItems, setLiveMenuItems] = useState<MenuItem[]>([]);
   const { totalItemsCount, estimatedSubtotal, setIsCartOpen } = useCart();
+
+  // Clean human-friendly table code display (Never display raw UUIDs)
+  const cleanTableDisplay = useMemo(() => {
+    if (!tableId) return '1';
+    const str = String(tableId).trim();
+    if (str.includes('-') || str.length > 8) {
+      return '1';
+    }
+    return str;
+  }, [tableId]);
 
   // Fetch Live Menu Items from /api/menu & LocalStorage fallback
   React.useEffect(() => {
@@ -72,109 +82,101 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
   }, [activeCategory, searchQuery, liveMenuItems]);
 
   return (
-    <div style={{ background: '#070605', color: '#F7F4EF', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: '#090807', color: '#F7F4EF', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Header />
 
-      {/* Hero Table Banner */}
-      <section style={{ paddingTop: '8rem', paddingBottom: '3rem', background: 'radial-gradient(ellipse at 50% 0%, rgba(184, 46, 46, 0.22) 0%, rgba(7, 6, 5, 0) 75%)', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <div className="container">
-          <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+      {/* Hero Table Section */}
+      <section style={{ paddingTop: '7.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+        <div className="container" style={{ maxWidth: '840px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'left', padding: '0 1rem' }}>
             
-            {/* Table Badge */}
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
+            <div
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.6rem',
-                padding: '0.6rem 1.4rem',
-                borderRadius: '9999px',
-                background: 'rgba(184, 46, 46, 0.18)',
-                border: '1px solid rgba(184, 46, 46, 0.5)',
-                color: '#F7F4EF',
-                fontSize: '0.88rem',
-                fontWeight: 800,
+                gap: '0.5rem',
+                fontSize: '0.8rem',
+                fontWeight: 700,
                 fontFamily: 'monospace',
-                letterSpacing: '0.08em',
-                marginBottom: '1.25rem',
-                boxShadow: '0 4px 20px rgba(184, 46, 46, 0.2)'
+                color: '#C29B7F',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '0.75rem'
               }}
             >
-              <MapPin size={16} color="#B82E2E" />
-              <span>SISTEM PEMESANAN MEJA {tableId} • DINE IN KOPIMAGE</span>
-            </motion.div>
+              <MapPin size={14} color="#B82E2E" />
+              <span>MEJA {cleanTableDisplay} • SOREANG</span>
+            </div>
 
-            <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.5rem)', fontWeight: 900, fontFamily: 'serif', color: '#F7F4EF', lineHeight: 1.1, marginBottom: '1rem', letterSpacing: '-0.02em' }}>
-              Selamat Datang di <span style={{ color: '#C29B7F' }}>Meja {tableId}</span>
+            <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, fontFamily: 'serif', color: '#F7F4EF', lineHeight: 1.25, marginBottom: '0.75rem' }}>
+              Katalog Racikan Meja {cleanTableDisplay}
             </h1>
 
-            <p style={{ fontSize: '1.05rem', color: '#A89F91', lineHeight: 1.6, maxWidth: '620px', margin: '0 auto' }}>
-              Pilih racikan kopi murni, minuman segar, cemilan, dan makanan berat favorit Anda. Pesanan akan diantar langsung ke Meja {tableId}.
+            <p style={{ fontSize: '0.92rem', color: '#A89F91', lineHeight: 1.6, maxWidth: '600px', margin: 0 }}>
+              Silakan pilih racikan kopi murni, minuman segar, cemilan, dan makanan utama. Pesanan diantar langsung ke Meja {cleanTableDisplay}.
             </p>
 
           </div>
         </div>
       </section>
 
-      {/* Main Menu Catalog Section */}
-      <section id="menu" style={{ padding: '3.5rem 0 7rem 0', flex: 1 }}>
-        <div className="container">
+      {/* Main Catalog Section */}
+      <section id="menu" style={{ padding: '2.5rem 0 6rem 0', flex: 1 }}>
+        <div className="container" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 1rem' }}>
           
-          {/* Search & Category Filter Controls */}
-          <div style={{ maxWidth: '880px', margin: '0 auto 2.5rem auto' }}>
+          {/* Search & Category Navigation Bar */}
+          <div style={{ marginBottom: '2rem' }}>
             
             {/* Search Input */}
-            <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+            <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
               <input
                 type="text"
-                placeholder="Cari kopi khas, buncis pedas, mie julid, es kopi susu..."
+                placeholder="Cari menu kopi, buncis pedas, mie..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '1rem 3rem 1rem 3.2rem',
-                  fontSize: '0.95rem',
+                  padding: '0.85rem 2.8rem 0.85rem 2.8rem',
+                  fontSize: '0.9rem',
                   background: '#120E0C',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
-                  borderRadius: '16px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px',
                   color: '#F7F4EF',
                   outline: 'none',
                   fontFamily: 'inherit'
                 }}
               />
               <Search
-                size={20}
+                size={18}
                 color="#A89F91"
-                style={{ position: 'absolute', left: '1.25rem', top: '50%', transform: 'translateY(-50%)' }}
+                style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }}
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
                   style={{
                     position: 'absolute',
-                    right: '1.25rem',
+                    right: '1rem',
                     top: '50%',
                     transform: 'translateY(-50%)',
                     background: 'none',
                     border: 'none',
                     color: '#A89F91',
-                    cursor: 'pointer',
-                    padding: '0.2rem'
+                    cursor: 'pointer'
                   }}
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               )}
             </div>
 
-            {/* Category Pills */}
+            {/* Clean Category Tabs */}
             <div
               style={{
                 display: 'flex',
-                gap: '0.6rem',
+                gap: '0.5rem',
                 overflowX: 'auto',
-                paddingBottom: '0.75rem',
+                paddingBottom: '0.5rem',
                 scrollbarWidth: 'none'
               }}
             >
@@ -185,18 +187,17 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
                     style={{
-                      padding: '0.65rem 1.3rem',
-                      borderRadius: '12px',
-                      fontSize: '0.85rem',
-                      fontWeight: 800,
+                      padding: '0.55rem 1.1rem',
+                      borderRadius: '8px',
+                      fontSize: '0.82rem',
+                      fontWeight: 700,
                       fontFamily: 'monospace',
                       whiteSpace: 'nowrap',
                       cursor: 'pointer',
-                      transition: 'all 0.25s ease',
+                      transition: 'all 0.2s ease',
                       border: isActive ? '1px solid #B82E2E' : '1px solid rgba(255, 255, 255, 0.08)',
                       background: isActive ? '#B82E2E' : '#120E0C',
                       color: isActive ? '#FFFFFF' : '#A89F91',
-                      boxShadow: isActive ? '0 4px 15px rgba(184, 46, 46, 0.3)' : 'none'
                     }}
                   >
                     {cat.name}
@@ -207,12 +208,9 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
 
           </div>
 
-          {/* Filter Status Text */}
-          <div style={{ marginBottom: '2rem', textAlign: 'center', color: '#A89F91', fontSize: '0.88rem', fontFamily: 'monospace' }}>
-            Menampilkan <strong style={{ color: '#C29B7F' }}>{filteredItems.length}</strong> menu untuk{' '}
-            <span style={{ color: '#F7F4EF', fontWeight: 600 }}>
-              "{CATEGORIES.find((c) => c.id === activeCategory)?.name}"
-            </span>
+          {/* Menu Count Label */}
+          <div style={{ marginBottom: '1.5rem', color: '#A89F91', fontSize: '0.82rem', fontFamily: 'monospace' }}>
+            Menampilkan {filteredItems.length} menu untuk kategori "{CATEGORIES.find((c) => c.id === activeCategory)?.name}"
           </div>
 
           {/* Menu Items Grid */}
@@ -220,8 +218,8 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '1.5rem'
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                gap: '1.25rem'
               }}
             >
               {filteredItems.map((item) => (
@@ -232,25 +230,35 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
             <div
               style={{
                 textAlign: 'center',
-                padding: '4rem 2rem',
-                borderRadius: '24px',
-                maxWidth: '500px',
+                padding: '3rem 1.5rem',
+                borderRadius: '16px',
+                maxWidth: '440px',
                 margin: '0 auto',
                 background: '#120E0C',
-                border: '1px border-dashed rgba(255, 255, 255, 0.1)'
+                border: '1px solid rgba(255, 255, 255, 0.08)'
               }}
             >
-              <Filter size={40} color="#C29B7F" style={{ marginBottom: '1rem' }} />
-              <h3 style={{ fontSize: '1.3rem', color: '#F7F4EF', marginBottom: '0.5rem', fontFamily: 'serif' }}>Menu Tidak Ditemukan</h3>
-              <p style={{ color: '#A89F91', fontSize: '0.88rem', marginBottom: '1.5rem', fontFamily: 'monospace' }}>
-                Tidak ada menu yang cocok dengan kata kunci "{searchQuery}". Coba pencarian lain.
+              <Filter size={32} color="#C29B7F" style={{ marginBottom: '0.75rem' }} />
+              <h3 style={{ fontSize: '1.15rem', color: '#F7F4EF', marginBottom: '0.4rem', fontFamily: 'serif' }}>Menu Tidak Ditemukan</h3>
+              <p style={{ color: '#A89F91', fontSize: '0.85rem', marginBottom: '1.25rem' }}>
+                Tidak ada menu yang cocok dengan kata kunci "{searchQuery}".
               </p>
               <button
                 onClick={() => {
                   setSearchQuery('');
                   setActiveCategory('all');
                 }}
-                className="btn btn-secondary btn-sm"
+                style={{
+                  padding: '0.5rem 1rem',
+                  borderRadius: '8px',
+                  background: '#B82E2E',
+                  color: '#FFFFFF',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  fontFamily: 'monospace',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
               >
                 Reset Filter
               </button>
@@ -260,57 +268,68 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
         </div>
       </section>
 
-      {/* Floating Sticky Cart Drawer Bar for QR Orders */}
+      {/* Floating Sticky Cart Bar - PERFECTLY CENTERED WITH FLEX CONTAINER */}
       {totalItemsCount > 0 && (
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+        <div
           style={{
             position: 'fixed',
             bottom: '1.5rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 90,
-            width: '90%',
-            maxWidth: '540px'
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            pointerEvents: 'none',
+            padding: '0 1rem'
           }}
         >
-          <button
-            onClick={() => setIsCartOpen(true)}
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
             style={{
+              pointerEvents: 'auto',
               width: '100%',
-              padding: '1rem 1.5rem',
-              borderRadius: '20px',
-              background: 'linear-gradient(135deg, #B82E2E 0%, #8C1C1C 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxShadow: '0 15px 35px rgba(184, 46, 46, 0.4)',
-              cursor: 'pointer'
+              maxWidth: '460px'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: '#070605', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '0.9rem', color: '#F7F4EF' }}>
-                {totalItemsCount}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              style={{
+                width: '100%',
+                padding: '0.85rem 1.25rem',
+                borderRadius: '14px',
+                background: '#B82E2E',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)',
+                cursor: 'pointer'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#090807', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', color: '#F7F4EF', fontFamily: 'monospace' }}>
+                  {totalItemsCount}
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <span style={{ fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.7)', fontFamily: 'monospace', display: 'block' }}>
+                    KERANJANG MEJA {cleanTableDisplay}
+                  </span>
+                  <span style={{ fontSize: '1rem', fontWeight: 800, fontFamily: 'serif' }}>
+                    Rp {estimatedSubtotal.toLocaleString('id-ID')}
+                  </span>
+                </div>
               </div>
-              <div style={{ textAlign: 'left' }}>
-                <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)', fontFamily: 'monospace', display: 'block' }}>
-                  Keranjang Meja {tableId}
-                </span>
-                <span style={{ fontSize: '1.05rem', fontWeight: 900, fontFamily: 'serif' }}>
-                  Rp {estimatedSubtotal.toLocaleString('id-ID')}
-                </span>
-              </div>
-            </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', fontWeight: 800, fontFamily: 'monospace', textTransform: 'uppercase' }}>
-              <span>Lanjut Pemesanan</span>
-              <ArrowRight size={18} />
-            </div>
-          </button>
-        </motion.div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem', fontWeight: 800, fontFamily: 'monospace', textTransform: 'uppercase' }}>
+                <span>LANJUT PEMESANAN</span>
+                <ArrowRight size={16} />
+              </div>
+            </button>
+          </motion.div>
+        </div>
       )}
 
       <Footer />

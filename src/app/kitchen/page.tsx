@@ -246,6 +246,7 @@ export default function KitchenDisplayPage() {
             }`}
           >
             ✅ SELESAI DISAJIKAN
+            SELESAI DISAJIKAN
           </button>
         </div>
 
@@ -253,9 +254,9 @@ export default function KitchenDisplayPage() {
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-[0.65rem] font-mono text-[#A89F91] uppercase">Stasiun:</span>
           {[
-            { id: 'ALL', label: ' Semua Tiket', icon: UtensilsCrossed },
-            { id: 'BARISTA', label: '☕ Barista (Kopi/Minuman)', icon: Coffee },
-            { id: 'KITCHEN', label: '🍝 Dapur Utama (Makanan)', icon: Flame },
+            { id: 'ALL', label: 'Semua Tiket', icon: UtensilsCrossed },
+            { id: 'BARISTA', label: 'Barista (Kopi/Minuman)', icon: Coffee },
+            { id: 'KITCHEN', label: 'Dapur Utama (Makanan)', icon: Flame },
           ].map((st) => (
             <button
               key={st.id}
@@ -301,6 +302,10 @@ export default function KitchenDisplayPage() {
                 const isWarning = elapsedMin >= 6 && elapsedMin < 12;
 
                 const currentStatus = order.order_status || 'NEW_ORDER';
+                const cleanTableCode =
+                  order.table_code ||
+                  (order.tables?.code && !order.tables.code.includes('-') ? order.tables.code : null) ||
+                  (order.table_id && !String(order.table_id).includes('-') ? order.table_id : '01');
 
                 return (
                   <motion.div
@@ -327,7 +332,7 @@ export default function KitchenDisplayPage() {
                             TIKET #{order.order_number}
                           </span>
                           <h2 className="text-lg font-black font-serif text-white flex items-center gap-2">
-                            <span>MEJA {order.tables?.code || order.table_id || '01'}</span>
+                            <span>MEJA {cleanTableCode}</span>
                             <span className="text-xs font-normal text-[#C29B7F] font-mono">
                               ({order.mode === 'takeaway' ? 'TAKEAWAY' : 'DINE-IN'})
                             </span>

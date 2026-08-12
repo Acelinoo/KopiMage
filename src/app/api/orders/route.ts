@@ -73,17 +73,20 @@ export async function POST(request: Request) {
 
     const supabase = createAdminSupabaseClient();
 
-    // 3. Resolve table code to UUID (Flexible Table Code Matching & Auto-Resolution)
+    // 3. Resolve table code (Human-friendly e.g. "1" or "01")
     let resolvedTableUuid: string | null = null;
+    let cleanTableCode = '01';
+
     if (mode === 'dine-in' && table_id) {
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(table_id);
       
       const paddedCode = String(table_id).padStart(2, '0');
       const unpaddedCode = String(parseInt(table_id, 10) || table_id);
+      cleanTableCode = unpaddedCode || paddedCode;
 
       let { data: tableRecord } = isUuid
-        ? await supabase.from('tables').select('id, is_active').eq('id', table_id).maybeSingle()
-        : await supabase.from('tables').select('id, is_active').in('code', [String(table_id), paddedCode, unpaddedCode]).maybeSingle();
+        ? await supabase.from('tables').select('id, code, is_active').eq('id', table_id).maybeSingle()
+        : await supabase.from('tables').select('id, code, is_active').in('code', [String(table_id), paddedCode, unpaddedCode]).maybeSingle();
 
       // Fallback: If table record is not in Supabase yet, auto-create/upsert table to guarantee order success
       if (!tableRecord) {
@@ -97,7 +100,7 @@ export async function POST(request: Request) {
             area: 'Indoor AC',
             is_active: true,
           })
-          .select('id, is_active')
+          .select('id, code, is_active')
           .maybeSingle();
 
         if (createdTable) {
@@ -107,6 +110,9 @@ export async function POST(request: Request) {
 
       if (tableRecord && tableRecord.is_active !== false) {
         resolvedTableUuid = tableRecord.id;
+        if (tableRecord.code) {
+          cleanTableCode = String(parseInt(tableRecord.code, 10) || tableRecord.code);
+        }
       }
     }
 
@@ -122,24 +128,29 @@ export async function POST(request: Request) {
     const initialPaymentStatus = payment_method === 'cashier' ? 'UNPAID' : 'VERIFYING';
 
     // 5. Insert into database
+    const insertPayload: any = {
+      id: orderId,
+      order_number: orderNumber,
+      tracking_secret: trackingSecret,
+      mode,
+      table_id: mode === 'dine-in' ? cleanTableCode : null,
+      customer_name,
+      customer_phone,
+      payment_method,
+      payment_proof_url,
+      subtotal: calculatedSubtotal,
+      total_amount: calculatedSubtotal,
+      order_status: initialOrderStatus,
+      payment_status: initialPaymentStatus,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
-      .insert({
-        id: orderId,
-        order_number: orderNumber,
-        tracking_secret: trackingSecret,
-        mode,
-        table_id: resolvedTableUuid,
-        customer_name,
-        customer_phone: customer_phone || null,
-        subtotal: calculatedSubtotal,
-        payment_method,
-        payment_status: initialPaymentStatus,
-        order_status: initialOrderStatus,
-        payment_proof_url: payment_proof_url || null,
-      })
+      .insert(insertPayload)
       .select()
-      .single();
+      .maybeSingle();
 
     // If Supabase table isn't created in remote DB yet, respond with verified calculated payload
     return NextResponse.json({

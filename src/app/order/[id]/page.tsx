@@ -146,26 +146,25 @@ export default function OrderTrackerPage() {
         {currentOrderStatus === 'READY' && (
           <div
             style={{
-              background: 'linear-gradient(135deg, rgba(37, 211, 102, 0.25) 0%, rgba(16, 185, 129, 0.15) 100%)',
-              border: '2px solid #25D366',
+              background: 'rgba(39, 174, 96, 0.15)',
+              border: '1px solid #27AE60',
               padding: '1.25rem 1.5rem',
-              borderRadius: '20px',
+              borderRadius: '16px',
               marginBottom: '1.5rem',
-              boxShadow: '0 10px 30px rgba(37, 211, 102, 0.25)',
               display: 'flex',
               alignItems: 'center',
               gap: '1rem',
             }}
           >
-            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <CheckCircle size={28} color="#070605" />
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#27AE60', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <CheckCircle size={24} color="#FFFFFF" />
             </div>
             <div>
-              <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#25D366', fontWeight: 800 }}>STASIUN KITCHEN NOTIFIKASI</span>
-              <h3 style={{ fontSize: '1.25rem', color: '#FFFFFF', fontWeight: 900, margin: '0.1rem 0 0.2rem 0' }}>
-                🎉 PESANAN SIAP DISAJIKAN!
+              <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#27AE60', fontWeight: 800 }}>STASIUN KITCHEN NOTIFIKASI</span>
+              <h3 style={{ fontSize: '1.15rem', color: '#FFFFFF', fontWeight: 800, margin: '0.1rem 0 0.2rem 0' }}>
+                PESANAN SIAP DISAJIKAN
               </h3>
-              <p style={{ fontSize: '0.85rem', color: '#E2F9EB', margin: 0 }}>
+              <p style={{ fontSize: '0.85rem', color: '#C4BBB4', margin: 0 }}>
                 Hidangan racikan Anda sudah siap di-barista/dapur dan sedang diantar ke meja Anda.
               </p>
             </div>
@@ -176,8 +175,8 @@ export default function OrderTrackerPage() {
         {isCompleted && (
           <div
             style={{
-              background: 'rgba(37, 211, 102, 0.15)',
-              border: '1px solid #25D366',
+              background: 'rgba(39, 174, 96, 0.12)',
+              border: '1px solid #27AE60',
               padding: '1rem 1.25rem',
               borderRadius: '16px',
               marginBottom: '1.5rem',
@@ -186,24 +185,30 @@ export default function OrderTrackerPage() {
               gap: '0.75rem',
             }}
           >
-            <CheckCircle size={22} color="#25D366" />
+            <CheckCircle size={20} color="#27AE60" />
             <div>
-              <h4 style={{ fontSize: '1rem', color: '#25D366', fontWeight: 800, margin: 0 }}>
+              <h4 style={{ fontSize: '0.95rem', color: '#27AE60', fontWeight: 800, margin: 0 }}>
                 Pesanan Telah Selesai Disajikan 100%
               </h4>
-              <span style={{ fontSize: '0.8rem', color: '#C4BBB4' }}>Selamat menikmati hidangan racikan KOPIMAGE!</span>
+              <span style={{ fontSize: '0.8rem', color: '#A89F91' }}>Selamat menikmati hidangan racikan KOPIMAGE.</span>
             </div>
           </div>
         )}
 
         {/* Order Header Card */}
-        <div style={{ borderRadius: '24px', padding: '1.75rem', marginBottom: '1.5rem', background: '#0E0C0A', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <div style={{ borderRadius: '20px', padding: '1.5rem', marginBottom: '1.5rem', background: '#0E0C0A', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <div>
               <span style={{ fontSize: '0.75rem', color: '#A89F91', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'monospace' }}>Nomor Pesanan</span>
-              <h2 style={{ fontSize: '1.6rem', color: '#F7F4EF', fontWeight: 800, margin: '0.2rem 0' }}>{order.order_number}</h2>
+              <h2 style={{ fontSize: '1.5rem', color: '#F7F4EF', fontWeight: 800, margin: '0.2rem 0' }}>{order.order_number}</h2>
               <span style={{ fontSize: '0.85rem', color: '#C29B7F', fontWeight: 600 }}>
-                {order.mode === 'takeaway' ? 'TAKEAWAY (Dibawa Pulang)' : `Dine-In • MEJA ${order.tables?.code || order.table_id || '01'}`}
+                {order.mode === 'takeaway'
+                  ? 'TAKEAWAY (Dibawa Pulang)'
+                  : `Dine-In • MEJA ${
+                      order.table_code ||
+                      (order.tables?.code && !order.tables.code.includes('-') ? order.tables.code : null) ||
+                      (order.table_id && !String(order.table_id).includes('-') ? order.table_id : '01')
+                    }`}
               </span>
             </div>
             <div style={{ width: '44px', height: '44px', borderRadius: '16px', background: 'linear-gradient(135deg, #B82E2E 0%, #6E1A1A 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -388,11 +393,11 @@ export default function OrderTrackerPage() {
                 <CheckCircle size={18} color={isReady ? '#070605' : '#A89F91'} />
               </div>
               <div>
-                <div style={{ fontSize: '1rem', color: isReady ? '#25D366' : '#F7F4EF', fontWeight: 900 }}>
-                  3. Siap Dihidangkan (READY) {isReady && '✅'}
+                <div style={{ fontSize: '0.95rem', color: isReady ? '#27AE60' : '#F7F4EF', fontWeight: 800 }}>
+                  3. Siap Dihidangkan (READY)
                 </div>
-                <div style={{ fontSize: '0.8rem', color: isReady ? '#E2F9EB' : '#A89F91' }}>
-                  {isReady ? '🎉 PESANAN SIAP DISAJIKAN / DIANTAR KE MEJA!' : 'Pesanan siap diambil di counter / diantar ke meja'}
+                <div style={{ fontSize: '0.8rem', color: isReady ? '#27AE60' : '#A89F91' }}>
+                  {isReady ? 'PESANAN SIAP DISAJIKAN / DIANTAR KE MEJA' : 'Pesanan siap diambil di counter / diantar ke meja'}
                 </div>
               </div>
             </div>
