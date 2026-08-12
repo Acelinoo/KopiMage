@@ -27,15 +27,18 @@ import {
 
 import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedList from './AnimatedList';
+import MenuDetailModal from './MenuDetailModal';
+import { MenuItem } from '../../types/menu';
 
 // Dynamic import for WebGL CircularGallery component with explicit .default unwrapping
 const CircularGallery = dynamic(() => import('./CircularGallery').then(mod => mod.default), {
     ssr: false,
     loading: () => (
         <div className="w-full h-[600px] flex items-center justify-center border border-[#FFFFFF]/10 bg-[#161210]">
-            <span className="font-sans text-xs tracking-[0.2em] uppercase text-[#C29B7F] animate-pulse">
-                MEMUAT GALERI VISUAL 3D MOMEN...
-            </span>
+            <div className="flex items-center gap-3 text-[#A89F91] text-xs uppercase tracking-widest font-sans">
+                <span className="w-2 h-2 rounded-full bg-[#B82E2E] animate-ping" />
+                <span>Memuat Galeri Momen 3D...</span>
+            </div>
         </div>
     ),
 });
@@ -44,6 +47,7 @@ export function EditorialHome() {
     const [activeOutlet, setActiveOutlet] = useState<'gading' | 'lanud'>('gading');
     const [activeMenuCategory, setActiveMenuCategory] = useState<string>('all');
     const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
+    const [selectedDetailItem, setSelectedDetailItem] = useState<MenuItem | null>(null);
 
     // Automatic Multi-Variant Scroll Reveal Observer
     useEffect(() => {
@@ -371,7 +375,8 @@ export function EditorialHome() {
                                         items={displayedMenuItems.map(item => (
                                             <div
                                                 key={item.id}
-                                                className="p-5 border border-[#FFFFFF]/10 bg-[#161210] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#B82E2E]/40 transition-all group"
+                                                onClick={() => setSelectedDetailItem(item)}
+                                                className="p-5 border border-[#FFFFFF]/10 bg-[#161210] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#B82E2E]/40 transition-all group cursor-pointer"
                                             >
                                                 <div className="flex items-center gap-4">
                                                     {item.image && (
@@ -389,6 +394,9 @@ export function EditorialHome() {
                                                         <div className="flex items-center gap-2 mb-1">
                                                             <span className="px-2 py-0.5 bg-[#B82E2E] text-[#FFFFFF] text-[0.6rem] font-sans tracking-wider uppercase font-semibold rounded-md shadow-sm">
                                                                 BEST SELLER
+                                                            </span>
+                                                            <span className="px-2 py-0.5 bg-[#FFFFFF]/05 text-[#C29B7F] text-[0.6rem] font-sans tracking-wider uppercase font-medium rounded-md border border-[#FFFFFF]/10">
+                                                                KLIK UNTUK DETAIL ↗
                                                             </span>
                                                         </div>
                                                         <h3 className="font-serif text-lg font-normal text-[#FFFFFF] group-hover:text-[#C29B7F] transition-colors">
@@ -408,6 +416,7 @@ export function EditorialHome() {
                                                 </div>
                                             </div>
                                         ))}
+                                        onItemSelect={(item, index) => setSelectedDetailItem(displayedMenuItems[index])}
                                         showGradients={true}
                                         enableArrowNavigation={true}
                                         displayScrollbar={false}
@@ -921,12 +930,14 @@ export function EditorialHome() {
                                         </span>
                                         <ArrowUpRight className="w-4 h-4" />
                                     </span>
-                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
+            {/* Menu Detail Pop-up Modal */}
+            <MenuDetailModal item={selectedDetailItem} onClose={() => setSelectedDetailItem(null)} />
         </div>
     );
 }
