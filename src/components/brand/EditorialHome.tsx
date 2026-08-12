@@ -510,7 +510,7 @@ export function EditorialHome() {
                 {/* WebGL Circular Canvas Gallery with responsive height wrapper */}
                 <div className="reveal-blur-focus relative w-full h-[480px] sm:h-[560px] md:h-[640px]">
                     <CircularGallery
-                        bend={3}
+                        bend={0}
                         textColor="#FFFFFF"
                         borderRadius={0.05}
                         scrollEase={0.02}

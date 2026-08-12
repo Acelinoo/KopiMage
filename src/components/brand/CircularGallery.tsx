@@ -101,7 +101,7 @@ async function resolveFont(font: string, fontUrl?: string) {
       try {
         await (document.fonts as any).load(resolved);
       } catch {
-        // Ignore fallback
+        // Ignore
       }
     }
     return resolved;
@@ -116,54 +116,21 @@ function getFontSize(font: string) {
   return match ? parseInt(match[1], 10) : 30;
 }
 
-function createTextTexture(gl: any, text: string, font = 'bold 24px monospace', color = 'white') {
+function createTextTexture(gl: any, text: string, font = 'bold 30px monospace', color = 'black') {
   const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  if (!context) return { texture: new Texture(gl, { generateMipmaps: false }), width: 100, height: 50 };
-
-  const fontSize = getFontSize(font);
+  const context = canvas.getContext('2d')!;
   context.font = font;
-
-  // Wrap long text into clean multi-line caption
-  const words = text.split(' ');
-  const lines: string[] = [];
-  let currentLine = words[0] || '';
-
-  for (let i = 1; i < words.length; i++) {
-    const word = words[i];
-    const width = context.measureText(currentLine + ' ' + word).width;
-    if (width < 280 || text.length < 22) {
-      currentLine += ' ' + word;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  lines.push(currentLine);
-
-  let maxLineWidth = 0;
-  lines.forEach(line => {
-    const w = context.measureText(line).width;
-    if (w > maxLineWidth) maxLineWidth = w;
-  });
-
-  const lineHeight = fontSize * 1.3;
-  const totalTextHeight = lines.length * lineHeight;
-
-  canvas.width = Math.max(Math.ceil(maxLineWidth) + 30, 220);
-  canvas.height = Math.ceil(totalTextHeight) + 20;
-
+  const metrics = context.measureText(text);
+  const textWidth = Math.ceil(metrics.width);
+  const textHeight = Math.ceil(getFontSize(font) * 1.2);
+  canvas.width = textWidth + 20;
+  canvas.height = textHeight + 20;
   context.font = font;
   context.fillStyle = color;
   context.textBaseline = 'middle';
   context.textAlign = 'center';
   context.clearRect(0, 0, canvas.width, canvas.height);
-
-  const startY = (canvas.height - totalTextHeight) / 2 + lineHeight / 2;
-  lines.forEach((line, index) => {
-    context.fillText(line, canvas.width / 2, startY + index * lineHeight);
-  });
-
+  context.fillText(text, canvas.width / 2, canvas.height / 2);
   const texture = new Texture(gl, { generateMipmaps: false });
   texture.image = canvas;
   return { texture, width: canvas.width, height: canvas.height };
@@ -209,7 +176,7 @@ class Title {
         varying vec2 vUv;
         void main() {
           vec4 color = texture2D(tMap, vUv);
-          if (color.a < 0.05) discard;
+          if (color.a < 0.1) discard;
           gl_FragColor = color;
         }
       `,
@@ -218,24 +185,16 @@ class Title {
     });
     this.mesh = new Mesh(this.gl, { geometry, program });
     const aspect = width / height;
-    let textHeight = this.plane.scale.y * 0.13;
-    let textWidth = textHeight * aspect;
-
-    // Strict width clamp: max 86% of photo card width to prevent collisions
-    const maxAllowedWidth = this.plane.scale.x * 0.86;
-    if (textWidth > maxAllowedWidth) {
-      textWidth = maxAllowedWidth;
-      textHeight = textWidth / aspect;
-    }
-
+    const textHeight = this.plane.scale.y * 0.15;
+    const textWidth = textHeight * aspect;
     this.mesh.scale.set(textWidth, textHeight, 1);
-    this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.06;
+    this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.05;
     this.mesh.setParent(this.plane);
   }
 }
 
 class Media {
-  extra = 0;
+  extra: number;
   geometry: any;
   gl: any;
   image: string;
@@ -253,14 +212,14 @@ class Media {
   program: any;
   plane: any;
   title: any;
-  scale = 1;
-  padding = 2;
-  width = 0;
-  widthTotal = 0;
-  x = 0;
-  speed = 0;
-  isBefore = false;
-  isAfter = false;
+  speed: number = 0;
+  scale: number = 1;
+  padding: number = 2;
+  width: number = 0;
+  widthTotal: number = 0;
+  x: number = 0;
+  isBefore: boolean = false;
+  isAfter: boolean = false;
 
   constructor({
     geometry,
@@ -278,6 +237,7 @@ class Media {
     borderRadius = 0,
     font
   }: any) {
+    this.extra = 0;
     this.geometry = geometry;
     this.gl = gl;
     this.image = image;
@@ -455,7 +415,6 @@ class Media {
     this.plane.scale.y = (this.viewport.height * (baseHeight * this.scale)) / this.screen.height;
     this.plane.scale.x = (this.viewport.width * (baseWidth * this.scale)) / this.screen.width;
 
-    // Enforce max width ratio so neighboring cards peek nicely on mobile (~68% width)
     if (isMobile) {
       const maxMobileWidth = this.viewport.width * 0.68;
       if (this.plane.scale.x > maxMobileWidth) {
@@ -481,7 +440,7 @@ class Media {
 }
 
 class App {
-  container: any;
+  container: HTMLElement;
   scrollSpeed: number;
   scroll: any;
   onCheckDebounce: any;
@@ -491,12 +450,13 @@ class App {
   scene: any;
   planeGeometry: any;
   mediasImages: any;
-  medias: any;
+  medias: Media[] = [];
+  isDown: boolean = false;
+  start: number = 0;
   screen: any;
   viewport: any;
-  isDown = false;
-  start = 0;
   raf: any;
+
   boundOnResize: any;
   boundOnWheel: any;
   boundOnTouchDown: any;
@@ -505,7 +465,7 @@ class App {
   boundOnKeyDown: any;
 
   constructor(
-    container: any,
+    container: HTMLElement,
     {
       items,
       bend,
@@ -520,7 +480,7 @@ class App {
     this.container = container;
     this.scrollSpeed = scrollSpeed;
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
-    this.onCheckDebounce = debounce(this.onCheck, 200);
+    this.onCheckDebounce = debounce(this.onCheck.bind(this), 200);
     this.createRenderer();
     this.createCamera();
     this.createScene();
@@ -554,7 +514,7 @@ class App {
       widthSegments: 100
     });
   }
-  createMedias(items: any, bend = 1, textColor: string, borderRadius: number, font: string) {
+  createMedias(items: any, bend = 0, textColor: string, borderRadius: number, font: string) {
     const defaultItems = [
       { image: `/images/kopimage_hero_atmosphere_1786480906850.png`, text: 'Suasana Soreang' },
       { image: `/images/kopimage_space_morning.png`, text: 'Cahaya Pagi' },
@@ -653,14 +613,14 @@ class App {
     const width = height * this.camera.aspect;
     this.viewport = { width, height };
     if (this.medias) {
-      this.medias.forEach((media: any) => media.onResize({ screen: this.screen, viewport: this.viewport }));
+      this.medias.forEach(media => media.onResize({ screen: this.screen, viewport: this.viewport }));
     }
   }
   update() {
     this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease);
     const direction = this.scroll.current > this.scroll.last ? 'right' : 'left';
     if (this.medias) {
-      this.medias.forEach((media: any) => media.update(this.scroll, direction));
+      this.medias.forEach(media => media.update(this.scroll, direction));
     }
     this.renderer.render({ scene: this.scene, camera: this.camera });
     this.scroll.last = this.scroll.current;
@@ -677,34 +637,36 @@ class App {
     window.addEventListener('resize', this.boundOnResize);
     window.addEventListener('mousewheel', this.boundOnWheel);
     window.addEventListener('wheel', this.boundOnWheel);
-
-    // Bind touch/mouse initiation to container element for clean mobile interaction
-    this.container?.addEventListener('mousedown', this.boundOnTouchDown);
-    this.container?.addEventListener('touchstart', this.boundOnTouchDown, { passive: true });
+    
+    // Bind touch initiation directly to canvas container
+    this.container.addEventListener('mousedown', this.boundOnTouchDown);
     window.addEventListener('mousemove', this.boundOnTouchMove);
     window.addEventListener('mouseup', this.boundOnTouchUp);
-    window.addEventListener('touchmove', this.boundOnTouchMove, { passive: true });
+
+    this.container.addEventListener('touchstart', this.boundOnTouchDown, { passive: true });
+    window.addEventListener('touchmove', this.boundOnTouchMove);
     window.addEventListener('touchend', this.boundOnTouchUp);
 
-    this.container?.addEventListener('keydown', this.boundOnKeyDown);
+    this.container.addEventListener('keydown', this.boundOnKeyDown);
   }
   destroy() {
     window.cancelAnimationFrame(this.raf);
     window.removeEventListener('resize', this.boundOnResize);
     window.removeEventListener('mousewheel', this.boundOnWheel);
     window.removeEventListener('wheel', this.boundOnWheel);
-    this.container?.removeEventListener('mousedown', this.boundOnTouchDown);
-    this.container?.removeEventListener('touchstart', this.boundOnTouchDown);
+
+    if (this.container) {
+      this.container.removeEventListener('mousedown', this.boundOnTouchDown);
+      this.container.removeEventListener('touchstart', this.boundOnTouchDown);
+      this.container.removeEventListener('keydown', this.boundOnKeyDown);
+    }
     window.removeEventListener('mousemove', this.boundOnTouchMove);
     window.removeEventListener('mouseup', this.boundOnTouchUp);
     window.removeEventListener('touchmove', this.boundOnTouchMove);
     window.removeEventListener('touchend', this.boundOnTouchUp);
+
     if (this.renderer && this.renderer.gl && this.renderer.gl.canvas.parentNode) {
       this.renderer.gl.canvas.parentNode.removeChild(this.renderer.gl.canvas);
-    }
-
-    if (this.container) {
-      this.container.removeEventListener('keydown', this.boundOnKeyDown);
     }
   }
 }
@@ -722,15 +684,15 @@ export interface CircularGalleryProps {
 
 export default function CircularGallery({
   items,
-  bend = 3,
-  textColor = '#F3EFEA',
+  bend = 0,
+  textColor = '#ffffff',
   borderRadius = 0.05,
   font = 'bold 30px Figtree',
-  fontUrl = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700&display=swap',
+  fontUrl,
   scrollSpeed = 2,
   scrollEase = 0.05
 }: CircularGalleryProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!containerRef.current) return;
     let app: App | undefined;
@@ -760,7 +722,7 @@ export default function CircularGallery({
       ref={containerRef}
       tabIndex={0}
       role="region"
-      aria-label="Circular image gallery for KOPIMAGE moments."
+      aria-label="Image gallery. Use left and right arrow keys or swipe to navigate."
     />
   );
 }
