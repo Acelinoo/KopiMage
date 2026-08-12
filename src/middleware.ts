@@ -38,28 +38,9 @@ export async function middleware(request: NextRequest) {
   });
 
   // Refresh auth session
-  const { data: { user } } = await supabase.auth.getUser();
+  await supabase.auth.getUser();
 
-  const url = request.nextUrl.clone();
-
-  // Protect /admin routes
-  if (url.pathname.startsWith('/admin')) {
-    if (!user && process.env.NODE_ENV === 'production') {
-      url.pathname = '/login';
-      url.searchParams.set('redirect', request.nextUrl.pathname);
-      return NextResponse.redirect(url);
-    }
-  }
-
-  // Protect /kitchen routes
-  if (url.pathname.startsWith('/kitchen')) {
-    if (!user && process.env.NODE_ENV === 'production') {
-      url.pathname = '/login';
-      url.searchParams.set('redirect', request.nextUrl.pathname);
-      return NextResponse.redirect(url);
-    }
-  }
-
+  // Allow direct access to admin and kitchen in production for demo & management
   return response;
 }
 
