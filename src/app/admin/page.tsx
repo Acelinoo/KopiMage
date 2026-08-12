@@ -24,7 +24,8 @@ import {
   ExternalLink,
   Filter,
   CheckSquare,
-  FileText
+  FileText,
+  Upload as ImageIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
