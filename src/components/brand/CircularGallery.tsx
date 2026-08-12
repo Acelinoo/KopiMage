@@ -726,6 +726,7 @@ export default function CircularGallery({
   scrollSpeed = 2.5,
   scrollEase = 0.12
 }: CircularGalleryProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // Preload gallery images in parallel immediately for instant rendering
     const galleryItems = items && items.length ? items : [
