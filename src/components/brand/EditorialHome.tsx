@@ -930,6 +930,7 @@ export function EditorialHome() {
                                         </span>
                                         <ArrowUpRight className="w-4 h-4" />
                                     </span>
+                                </a>
                             </div>
                         </div>
                     </div>
