@@ -254,10 +254,13 @@ export default function AdminDashboardPage() {
       };
 
       // Unset cleared flag & Update state immediately
-      localStorage.removeItem('kopimage_tables_cleared');
+      try {
+        localStorage.removeItem('kopimage_tables_cleared');
+      } catch (e) {}
+
       setTablesState((prev) => {
         const updated = [...prev.filter((t) => t.id !== newTableObj.id && t.code !== newCode), newTableObj];
-        localStorage.setItem('kopimage_custom_tables_v3', JSON.stringify(updated));
+        safeSetLocalStorage('kopimage_custom_tables_v3', JSON.stringify(updated));
         return updated;
       });
 
@@ -285,9 +288,9 @@ export default function AdminDashboardPage() {
     try {
       setTablesState((prev) => {
         const updated = prev.filter((t) => t.id !== tableId && t.code !== tableId);
-        localStorage.setItem('kopimage_custom_tables_v3', JSON.stringify(updated));
+        safeSetLocalStorage('kopimage_custom_tables_v3', JSON.stringify(updated));
         if (updated.length === 0) {
-          localStorage.setItem('kopimage_tables_cleared', 'true');
+          safeSetLocalStorage('kopimage_tables_cleared', 'true');
         }
         return updated;
       });
@@ -301,8 +304,10 @@ export default function AdminDashboardPage() {
   const handleClearAllTables = async () => {
     if (!confirm('Apakah Anda yakin ingin MENGHAPUS SEMUA MEJA? Anda dapat menambah meja baru secara manual setelah ini.')) return;
     try {
-      localStorage.setItem('kopimage_tables_cleared', 'true');
-      localStorage.removeItem('kopimage_custom_tables_v3');
+      try {
+        safeSetLocalStorage('kopimage_tables_cleared', 'true');
+        localStorage.removeItem('kopimage_custom_tables_v3');
+      } catch (e) {}
       setTablesState([]);
 
       await fetch('/api/tables?all=true', { method: 'DELETE' });
@@ -311,22 +316,72 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // IMAGE FILE UPLOAD HANDLER
+  // SAFE LOCAL STORAGE HELPER (Anti-QuotaExceededError)
+  const safeSetLocalStorage = (key: string, value: string) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn(`LocalStorage quota exceeded for ${key}, cleaning stale keys:`, e);
+      try {
+        localStorage.removeItem('kopimage_custom_menu');
+        localStorage.removeItem('kopimage_custom_tables');
+        localStorage.removeItem('kopimage_custom_menu_v2');
+        localStorage.removeItem('kopimage_custom_tables_v2');
+        localStorage.setItem(key, value);
+      } catch (err) {
+        console.warn('LocalStorage save skipped due to browser quota limit:', err);
+      }
+    }
+  };
+
+  const sanitizeMenuForStorage = (items: any[]) => {
+    return items.map((item) => {
+      if (item.image && item.image.startsWith('data:') && item.image.length > 50000) {
+        return {
+          ...item,
+          image: '/images/kopimage_hero_atmosphere_1786480906850.png',
+        };
+      }
+      return item;
+    });
+  };
+
+  // IMAGE FILE UPLOAD HANDLER WITH CANVAS COMPRESSION (MAX 600px JPEG)
   const handleMenuImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 4 * 1024 * 1024) {
-        alert('Ukuran file foto maksimal 4MB.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setMenuImg(event.target.result as string);
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Ukuran file foto maksimal 10MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = document.createElement('img');
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 500;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          setMenuImg(compressedDataUrl);
         }
       };
-      reader.readAsDataURL(file);
-    }
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   };
 
   // MENU CRUD HANDLERS (Real-time DB & API & Local Storage Synchronized)
@@ -352,10 +407,13 @@ export default function AdminDashboardPage() {
       };
 
       // Unset cleared flag & Update state immediately
-      localStorage.removeItem('kopimage_menu_cleared');
+      try {
+        localStorage.removeItem('kopimage_menu_cleared');
+      } catch (e) {}
+
       setMenuItemsState((prev) => {
         const updated = [newMenuObj, ...prev.filter((m) => m.id !== newMenuObj.id)];
-        localStorage.setItem('kopimage_custom_menu_v3', JSON.stringify(updated));
+        safeSetLocalStorage('kopimage_custom_menu_v3', JSON.stringify(sanitizeMenuForStorage(updated)));
         return updated;
       });
 
@@ -381,9 +439,9 @@ export default function AdminDashboardPage() {
     try {
       setMenuItemsState((prev) => {
         const updated = prev.filter((m) => m.id !== menuId);
-        localStorage.setItem('kopimage_custom_menu_v3', JSON.stringify(updated));
+        safeSetLocalStorage('kopimage_custom_menu_v3', JSON.stringify(sanitizeMenuForStorage(updated)));
         if (updated.length === 0) {
-          localStorage.setItem('kopimage_menu_cleared', 'true');
+          safeSetLocalStorage('kopimage_menu_cleared', 'true');
         }
         return updated;
       });
@@ -397,8 +455,10 @@ export default function AdminDashboardPage() {
   const handleClearAllMenu = async () => {
     if (!confirm('Apakah Anda yakin ingin MENGHAPUS SEMUA MENU? Anda dapat menambah menu baru secara manual setelah ini.')) return;
     try {
-      localStorage.setItem('kopimage_menu_cleared', 'true');
-      localStorage.removeItem('kopimage_custom_menu_v3');
+      try {
+        safeSetLocalStorage('kopimage_menu_cleared', 'true');
+        localStorage.removeItem('kopimage_custom_menu_v3');
+      } catch (e) {}
       setMenuItemsState([]);
 
       await fetch('/api/menu?all=true', { method: 'DELETE' });
