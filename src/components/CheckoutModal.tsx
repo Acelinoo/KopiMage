@@ -18,7 +18,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
   const [mode, setMode] = useState<OrderMode>(activeTableId ? 'dine-in' : 'dine-in');
   const [selectedTable, setSelectedTable] = useState<string>(activeTableId || '01');
-  const [liveTables, setLiveTables] = useState<any[]>(VALID_TABLES_REGISTRY);
+  const [liveTables, setLiveTables] = useState<any[]>([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cashier');
@@ -31,7 +31,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
     fetch('/api/tables')
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && data.tables && data.tables.length > 0) {
+        if (data.success && Array.isArray(data.tables)) {
           setLiveTables(data.tables);
         }
       })

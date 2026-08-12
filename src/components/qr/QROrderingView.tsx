@@ -16,7 +16,7 @@ interface QROrderingViewProps {
 export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
   const [activeCategory, setActiveCategory] = useState<MenuCategoryId>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [liveMenuItems, setLiveMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
+  const [liveMenuItems, setLiveMenuItems] = useState<MenuItem[]>([]);
   const { totalItemsCount, estimatedSubtotal, setIsCartOpen } = useCart();
 
   // Fetch Live Menu Items from /api/menu
@@ -24,7 +24,7 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
     fetch('/api/menu')
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && data.menu && data.menu.length > 0) {
+        if (data.success && Array.isArray(data.menu)) {
           setLiveMenuItems(data.menu);
         }
       })

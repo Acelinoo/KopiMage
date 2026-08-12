@@ -48,14 +48,14 @@ export function EditorialHome() {
     const [activeMenuCategory, setActiveMenuCategory] = useState<string>('all');
     const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
     const [selectedDetailItem, setSelectedDetailItem] = useState<MenuItem | null>(null);
-    const [liveMenuItems, setLiveMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
+    const [liveMenuItems, setLiveMenuItems] = useState<MenuItem[]>([]);
 
     // Fetch Live Menu Items from /api/menu for table QR & main landing page
     useEffect(() => {
         fetch('/api/menu')
             .then((res) => res.json())
             .then((data) => {
-                if (data.success && data.menu && data.menu.length > 0) {
+                if (data.success && Array.isArray(data.menu)) {
                     setLiveMenuItems(data.menu);
                 }
             })
