@@ -264,67 +264,35 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // MENU CRUD HANDLERS
+  // MENU CRUD HANDLERS (Real-time DB Synchronized)
   const handleSaveMenu = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!menuName.trim() || !menuPrice) return;
 
     try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-
       const numPrice = parseInt(menuPrice.replace(/[^0-9]/g, '')) || 25000;
       const formattedPrice = `Rp ${numPrice.toLocaleString('id-ID')}`;
 
-      if (editingMenu) {
-        const { error } = await supabase.from('menu_items').update({
-          name: menuName,
-          category: menuCategory,
-          base_price: numPrice,
-          price: formattedPrice,
-          description: menuDesc,
-          image: menuImg || editingMenu.image,
-          temperature: menuTemp,
-        }).eq('id', editingMenu.id);
+      const payload = {
+        id: editingMenu?.id,
+        name: menuName,
+        category: menuCategory,
+        price: formattedPrice,
+        base_price: numPrice,
+        description: menuDesc,
+        image: menuImg || editingMenu?.image || '/images/kopimage_hero_atmosphere_1786480906850.png',
+        temperature: menuTemp,
+      };
 
-        if (!error) {
-          setMenuItemsState((prev) =>
-            prev.map((m) =>
-              m.id === editingMenu.id
-                ? { ...m, name: menuName, category: menuCategory, base_price: numPrice, price: formattedPrice, description: menuDesc, image: menuImg || m.image }
-                : m
-            )
-          );
-        }
-      } else {
-        const { data, error } = await supabase.from('menu_items').insert([{
-          name: menuName,
-          category: menuCategory,
-          base_price: numPrice,
-          price: formattedPrice,
-          description: menuDesc,
-          image: menuImg || '/images/kopimage_hero_atmosphere_1786480906850.png',
-          temperature: menuTemp,
-          is_available: true,
-        }]).select();
+      const res = await fetch('/api/menu', {
+        method: editingMenu ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-        if (!error && data) {
-          setMenuItemsState((prev) => [...prev, data[0]]);
-        } else {
-          setMenuItemsState((prev) => [
-            ...prev,
-            {
-              id: `menu_${Date.now()}`,
-              name: menuName,
-              category: menuCategory,
-              base_price: numPrice,
-              price: formattedPrice,
-              description: menuDesc,
-              image: menuImg || '/images/kopimage_hero_atmosphere_1786480906850.png',
-              is_available: true,
-            },
-          ]);
-        }
+      const data = await res.json();
+      if (data.success) {
+        fetchAuxiliaryData();
       }
     } catch (err) {
       console.error('Save menu error:', err);
@@ -341,10 +309,11 @@ export default function AdminDashboardPage() {
   const handleDeleteMenu = async (menuId: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus menu ini dari katalog QR?')) return;
     try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      await supabase.from('menu_items').delete().eq('id', menuId);
-      setMenuItemsState((prev) => prev.filter((m) => m.id !== menuId));
+      const res = await fetch(`/api/menu?id=${menuId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setMenuItemsState((prev) => prev.filter((m) => m.id !== menuId));
+      }
     } catch (err) {
       console.error('Delete menu error:', err);
     }
@@ -1128,8 +1097,26 @@ export default function AdminDashboardPage() {
                     placeholder="/images/kopimage_hero_atmosphere_1786480906850.png"
                     value={menuImg}
                     onChange={(e) => setMenuImg(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                    className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E] mb-2"
                   />
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[0.6rem] font-mono text-[#A89F91]">Preset Foto:</span>
+                    {[
+                      { label: '☕ Kopi', url: '/images/kopimage_hero_atmosphere_1786480906850.png' },
+                      { label: '🍵 Non-Coffee', url: '/images/Moments-Top coffe.png' },
+                      { label: '🍝 Makanan', url: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.png' },
+                      { label: '🥐 Cemilan', url: '/images/Moments-Weekend perfect with coffe in hand.png' },
+                    ].map((p) => (
+                      <button
+                        key={p.label}
+                        type="button"
+                        onClick={() => setMenuImg(p.url)}
+                        className="px-2 py-1 rounded-md bg-[#0B0908] border border-[#FFFFFF]/10 hover:border-[#B82E2E] text-[0.65rem] font-mono text-[#C29B7F] hover:text-white transition-colors cursor-pointer"
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 <div>

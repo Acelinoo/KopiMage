@@ -16,11 +16,24 @@ interface QROrderingViewProps {
 export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
   const [activeCategory, setActiveCategory] = useState<MenuCategoryId>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [liveMenuItems, setLiveMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
   const { totalItemsCount, estimatedSubtotal, setIsCartOpen } = useCart();
+
+  // Fetch Live Menu Items from /api/menu
+  React.useEffect(() => {
+    fetch('/api/menu')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.menu && data.menu.length > 0) {
+          setLiveMenuItems(data.menu);
+        }
+      })
+      .catch((err) => console.error('Failed to fetch live menu:', err));
+  }, []);
 
   // Filtered menu items
   const filteredItems = useMemo(() => {
-    return MENU_ITEMS.filter((item) => {
+    return liveMenuItems.filter((item) => {
       const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
       const query = searchQuery.toLowerCase().trim();
       const matchesSearch =
@@ -31,7 +44,7 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
 
       return matchesCategory && matchesSearch;
     });
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, liveMenuItems]);
 
   return (
     <div style={{ background: '#0F0D0C', color: '#F7F4EF', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

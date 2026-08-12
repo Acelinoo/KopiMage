@@ -48,6 +48,19 @@ export function EditorialHome() {
     const [activeMenuCategory, setActiveMenuCategory] = useState<string>('all');
     const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
     const [selectedDetailItem, setSelectedDetailItem] = useState<MenuItem | null>(null);
+    const [liveMenuItems, setLiveMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
+
+    // Fetch Live Menu Items from /api/menu for table QR & main landing page
+    useEffect(() => {
+        fetch('/api/menu')
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success && data.menu && data.menu.length > 0) {
+                    setLiveMenuItems(data.menu);
+                }
+            })
+            .catch((err) => console.error('Failed to fetch live menu in EditorialHome:', err));
+    }, []);
 
     // Automatic Multi-Variant Scroll Reveal Observer
     useEffect(() => {
@@ -158,10 +171,7 @@ export function EditorialHome() {
         { id: 'cemilan', name: 'CEMILAN' },
     ];
 
-    const displayedMenuItems = MENU_ITEMS.filter(item => {
-        // Strict filter: ONLY show menu items with uploaded photos
-        if (!item.image) return false;
-
+    const displayedMenuItems = liveMenuItems.filter(item => {
         if (activeMenuCategory === 'all') return true;
         if (activeMenuCategory === 'coffee') return item.category === 'coffee' || item.category === 'seasonal';
         if (activeMenuCategory === 'non-coffee') return item.category === 'non-coffee';

@@ -29,6 +29,18 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
         }}
       >
         <div>
+          {/* Menu Image Preview */}
+          <div style={{ position: 'relative', width: '100%', height: '140px', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '1rem', background: '#161311', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <img
+              src={item.image || '/images/kopimage_hero_atmosphere_1786480906850.png'}
+              alt={item.name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/images/kopimage_hero_atmosphere_1786480906850.png';
+              }}
+            />
+          </div>
+
           {/* Badges Bar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.85rem' }}>
             {item.isSeasonal && (
