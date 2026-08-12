@@ -23,7 +23,7 @@ export async function GET() {
         name: item.name,
         category: item.category,
         price: item.price,
-        base_price: item.basePrice || parseInt(item.price.replace(/[^0-9]/g, '')) * 1000 || 22000,
+        base_price: (item as any).basePrice || parseInt(item.price.replace(/[^0-9]/g, '')) * 1000 || 22000,
         description: item.description,
         image: item.image || '/images/kopimage_hero_atmosphere_1786480906850.png',
         temperature: item.temperature || 'Hot / Ice',
