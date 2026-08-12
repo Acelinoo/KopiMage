@@ -726,8 +726,23 @@ export default function CircularGallery({
   scrollSpeed = 2.5,
   scrollEase = 0.12
 }: CircularGalleryProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    // Preload gallery images in parallel immediately for instant rendering
+    const galleryItems = items && items.length ? items : [
+      { image: `/images/kopimage_hero_atmosphere_1786480906850.png`, text: 'Suasana Soreang' },
+      { image: `/images/kopimage_space_morning.png`, text: 'Cahaya Pagi' },
+      { image: `/images/kopimage_space_terrace_1786480961312.png`, text: 'Teras Terbuka' },
+      { image: `/images/kopimage_barista_pouring_1786480929425.png`, text: 'Penyeduhan Kopi' },
+      { image: `/images/kopimage_food_table_1786480947275.png`, text: 'Sajian Kuliner' },
+      { image: `/images/kopimage_space_night.png`, text: 'Pendar Malam' }
+    ];
+    galleryItems.forEach(item => {
+      if (item.image) {
+        const img = new Image();
+        img.src = item.image;
+      }
+    });
+
     if (!containerRef.current) return;
     let app: App | undefined;
     let isMounted = true;

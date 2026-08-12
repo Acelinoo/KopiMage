@@ -271,6 +271,7 @@ export function EditorialHome() {
                                     src="/images/kopimage_space_morning.png"
                                     alt="Suasana Pagi Kopi Mage"
                                     fill
+                                    loading="eager"
                                     className="object-cover"
                                     sizes="(max-width: 768px) 100vw, 50vw"
                                 />
@@ -280,6 +281,7 @@ export function EditorialHome() {
                                     src="/images/WFC.png"
                                     alt="Suasana Malam Kopi Mage Lanud Sulaiman"
                                     fill
+                                    loading="eager"
                                     className="object-cover"
                                     sizes="(max-width: 768px) 100vw, 50vw"
                                 />
