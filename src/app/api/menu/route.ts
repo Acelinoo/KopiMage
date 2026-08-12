@@ -155,8 +155,10 @@ export async function DELETE(request: Request) {
 
     if (isClearAll) {
       inMemoryMenuItemsStore = [];
-      await supabase.from('menu_items').delete().neq('id', '0');
-      return NextResponse.json({ success: true, message: 'Semua menu berhasil dihapus.', allMenu: [] });
+      const zeroUuid = '00000000-0000-0000-0000-000000000000';
+      await supabase.from('order_items').delete().neq('id', zeroUuid);
+      await supabase.from('menu_items').delete().neq('name', '___NEVER_EXIST___');
+      return NextResponse.json({ success: true, message: 'Semua menu berhasil dihapus dari database.', allMenu: [] });
     }
 
     if (!id) {

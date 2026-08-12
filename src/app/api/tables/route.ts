@@ -97,8 +97,11 @@ export async function DELETE(request: Request) {
 
     if (isClearAll) {
       inMemoryTablesStore = [];
-      await supabase.from('tables').delete().neq('id', '0');
-      return NextResponse.json({ success: true, message: 'Semua meja berhasil dihapus.', allTables: [] });
+      const zeroUuid = '00000000-0000-0000-0000-000000000000';
+      await supabase.from('order_items').delete().neq('id', zeroUuid);
+      await supabase.from('orders').delete().neq('id', zeroUuid);
+      await supabase.from('tables').delete().neq('name', '___NEVER_EXIST___');
+      return NextResponse.json({ success: true, message: 'Semua meja berhasil dihapus dari database.', allTables: [] });
     }
 
     if (!id) {
