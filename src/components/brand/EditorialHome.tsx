@@ -25,6 +25,9 @@ import {
     QrCode
 } from 'lucide-react';
 
+import { motion, AnimatePresence } from 'framer-motion';
+import AnimatedList from './AnimatedList';
+
 // Dynamic import for WebGL CircularGallery component with explicit .default unwrapping
 const CircularGallery = dynamic(() => import('./CircularGallery').then(mod => mod.default), {
     ssr: false,
@@ -336,103 +339,117 @@ export function EditorialHome() {
                         </button>
                     </div>
 
-                    {/* Dropdown Expandable Body */}
-                    {isMenuExpanded && (
-                        <div className="mt-8 pt-8 border-t border-[#FFFFFF]/10 animate-fade-in">
-                            {/* Category Filter Pills (Read-Only) */}
-                            <div className="flex flex-wrap gap-2.5 mb-8 overflow-x-auto pb-2">
-                                {menuCategories.map(cat => (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => setActiveMenuCategory(cat.id)}
-                                        className={`px-5 py-2.5 rounded-full font-sans text-xs tracking-wider uppercase transition-all whitespace-nowrap ${activeMenuCategory === cat.id
-                                            ? 'bg-[#B82E2E] text-[#FFFFFF] font-semibold shadow-sm'
-                                            : 'bg-[#161210] text-[#A89F91] hover:text-[#FFFFFF] border border-[#FFFFFF]/10 hover:border-[#B82E2E]/40'
-                                            }`}
-                                    >
-                                        {cat.name}
-                                    </button>
-                                ))}
-                            </div>
+                    {/* Dropdown Expandable Body with Smooth Open/Close Animation */}
+                    <AnimatePresence>
+                        {isMenuExpanded && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                                className="overflow-hidden"
+                            >
+                                <div className="mt-8 pt-8 border-t border-[#FFFFFF]/10">
+                                    {/* Category Filter Pills (Read-Only) */}
+                                    <div className="flex flex-wrap gap-2.5 mb-8 overflow-x-auto pb-2">
+                                        {menuCategories.map(cat => (
+                                            <button
+                                                key={cat.id}
+                                                onClick={() => setActiveMenuCategory(cat.id)}
+                                                className={`px-5 py-2.5 rounded-full font-sans text-xs tracking-wider uppercase transition-all whitespace-nowrap ${activeMenuCategory === cat.id
+                                                    ? 'bg-[#B82E2E] text-[#FFFFFF] font-semibold shadow-sm'
+                                                    : 'bg-[#161210] text-[#A89F91] hover:text-[#FFFFFF] border border-[#FFFFFF]/10 hover:border-[#B82E2E]/40'
+                                                    }`}
+                                            >
+                                                {cat.name}
+                                            </button>
+                                        ))}
+                                    </div>
 
-                            {/* Menu Items Showcase Grid (Only Items with Photos) */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                                {displayedMenuItems.map(item => (
-                                    <div
-                                        key={item.id}
-                                        className="p-5 border border-[#FFFFFF]/10 bg-[#161210] rounded-2xl flex flex-col justify-between hover:border-[#B82E2E]/40 transition-all group"
-                                    >
-                                        <div>
-                                            {/* Image Frame */}
-                                            <div className="relative h-52 w-full rounded-xl overflow-hidden mb-4 bg-[#0E0B0A] border border-[#FFFFFF]/05 flex items-center justify-center">
-                                                {item.image && (
-                                                    <Image
-                                                        src={item.image}
-                                                        alt={item.name}
-                                                        fill
-                                                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                                        sizes="(max-width: 768px) 100vw, 33vw"
-                                                    />
-                                                )}
-                                                <span className="absolute top-2.5 right-2.5 px-2.5 py-1 bg-[#B82E2E] text-[#FFFFFF] text-[0.6rem] font-sans tracking-wider uppercase font-semibold rounded-md shadow-sm">
-                                                    BEST SELLER
-                                                </span>
+                                    {/* Menu Items Showcase Grid with React Bits AnimatedList */}
+                                    <AnimatedList
+                                        items={displayedMenuItems.map(item => (
+                                            <div
+                                                key={item.id}
+                                                className="p-5 border border-[#FFFFFF]/10 bg-[#161210] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#B82E2E]/40 transition-all group"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    {item.image && (
+                                                        <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-[#0E0B0A] border border-[#FFFFFF]/05 shrink-0">
+                                                            <Image
+                                                                src={item.image}
+                                                                alt={item.name}
+                                                                fill
+                                                                className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                                                sizes="80px"
+                                                            />
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <div className="flex items-center gap-2 mb-1">
+                                                            <span className="px-2 py-0.5 bg-[#B82E2E] text-[#FFFFFF] text-[0.6rem] font-sans tracking-wider uppercase font-semibold rounded-md shadow-sm">
+                                                                BEST SELLER
+                                                            </span>
+                                                        </div>
+                                                        <h3 className="font-serif text-lg font-normal text-[#FFFFFF] group-hover:text-[#C29B7F] transition-colors">
+                                                            {item.name}
+                                                        </h3>
+                                                        <p className="font-sans text-xs text-[#A89F91] font-light leading-relaxed max-w-lg">
+                                                            {item.description || 'Racikan khas berkualitas disajikan hangat di Kopi Mage.'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="pt-2 sm:pt-0 sm:border-l sm:border-[#FFFFFF]/08 sm:pl-6 flex sm:flex-col items-center sm:items-end justify-between shrink-0">
+                                                    <span className="font-sans text-[0.65rem] tracking-wider uppercase text-[#9E9287]">HARGA</span>
+                                                    <span className="font-serif text-xl font-medium text-[#C29B7F]">
+                                                        {item.price.includes('K') || item.price.includes('Rp') ? item.price : `Rp ${item.price}`}
+                                                    </span>
+                                                </div>
                                             </div>
+                                        ))}
+                                        showGradients={true}
+                                        enableArrowNavigation={true}
+                                        displayScrollbar={false}
+                                        className="w-full mb-8"
+                                    />
 
-                                            {/* Title & Description */}
-                                            <h3 className="font-serif text-xl font-normal text-[#FFFFFF] mb-2 group-hover:text-[#C29B7F] transition-colors">
-                                                {item.name}
-                                            </h3>
-                                            <p className="font-sans text-xs text-[#A89F91] font-light leading-relaxed mb-4">
-                                                {item.description || 'Racikan khas berkualitas disajikan hangat di Kopi Mage.'}
-                                            </p>
+                                    {/* Informational QR Barcode Banner */}
+                                    <div className="p-5 sm:p-6 border border-[#B82E2E]/30 bg-[#161210] rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-xl bg-[#B82E2E]/15 border border-[#B82E2E]/30 flex items-center justify-center shrink-0">
+                                                <QrCode className="w-6 h-6 text-[#B82E2E]" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-serif text-lg text-[#FFFFFF] font-normal">Ingin Melihat Seluruh Menu Lengkap Kopi Mage?</h4>
+                                                <p className="font-sans text-xs text-[#A89F91] font-light leading-relaxed mt-0.5">
+                                                    Untuk melihat seluruh pilihan menu lengkap (kopi, non-kopi, makanan berat & cemilan) serta melakukan pemesanan langsung dari meja, Anda dapat **scan Kode QR / Barcode yang terpasang di setiap meja** saat berkunjung di cabang Gading Tutuka atau Lanud Sulaiman.
+                                                </p>
+                                            </div>
                                         </div>
-
-                                        {/* Price Tag (Read-Only) */}
-                                        <div className="pt-3 border-t border-[#FFFFFF]/08 flex items-center justify-between">
-                                            <span className="font-sans text-[0.68rem] tracking-wider uppercase text-[#9E9287]">HARGA</span>
-                                            <span className="font-serif text-lg font-normal text-[#C29B7F]">
-                                                {item.price.includes('K') || item.price.includes('Rp') ? item.price : `Rp ${item.price}`}
-                                            </span>
-                                        </div>
+                                        <a
+                                            href="#experience"
+                                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#B82E2E] text-[#FFFFFF] text-xs font-sans tracking-wider uppercase font-semibold hover:bg-[#D63434] transition-colors shrink-0 w-full sm:w-auto text-center justify-center"
+                                        >
+                                            <span>SIMULASI SCAN QR MEJA</span>
+                                            <ArrowRight className="w-3.5 h-3.5" />
+                                        </a>
                                     </div>
-                                ))}
-                            </div>
 
-                            {/* Informational QR Barcode Banner */}
-                            <div className="p-5 sm:p-6 border border-[#B82E2E]/30 bg-[#161210] rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-xl bg-[#B82E2E]/15 border border-[#B82E2E]/30 flex items-center justify-center shrink-0">
-                                        <QrCode className="w-6 h-6 text-[#B82E2E]" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-serif text-lg text-[#FFFFFF] font-normal">Ingin Melihat Seluruh Menu Lengkap Kopi Mage?</h4>
-                                        <p className="font-sans text-xs text-[#A89F91] font-light leading-relaxed mt-0.5">
-                                            Untuk melihat seluruh pilihan menu lengkap (kopi, non-kopi, makanan berat & cemilan) serta melakukan pemesanan langsung dari meja, Anda dapat **scan Kode QR / Barcode yang terpasang di setiap meja** saat berkunjung di cabang Gading Tutuka atau Lanud Sulaiman.
-                                        </p>
+                                    {/* Bottom Close Button Bar */}
+                                    <div className="flex justify-center pt-2">
+                                        <button
+                                            onClick={() => setIsMenuExpanded(false)}
+                                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#FFFFFF]/20 bg-[#161210] text-[#A89F91] hover:text-[#FFFFFF] hover:border-[#B82E2E] transition-all text-xs font-sans tracking-wider uppercase font-medium cursor-pointer"
+                                        >
+                                            <span>TUTUP KATALOG BEST SELLER</span>
+                                            <ChevronUp className="w-4 h-4 text-[#B82E2E]" />
+                                        </button>
                                     </div>
                                 </div>
-                                <a
-                                    href="#experience"
-                                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#B82E2E] text-[#FFFFFF] text-xs font-sans tracking-wider uppercase font-semibold hover:bg-[#D63434] transition-colors shrink-0 w-full sm:w-auto text-center justify-center"
-                                >
-                                    <span>SIMULASI SCAN QR MEJA</span>
-                                    <ArrowRight className="w-3.5 h-3.5" />
-                                </a>
-                            </div>
-
-                            {/* Bottom Close Button Bar */}
-                            <div className="flex justify-center pt-2">
-                                <button
-                                    onClick={() => setIsMenuExpanded(false)}
-                                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#FFFFFF]/20 bg-[#161210] text-[#A89F91] hover:text-[#FFFFFF] hover:border-[#B82E2E] transition-all text-xs font-sans tracking-wider uppercase font-medium cursor-pointer"
-                                >
-                                    <span>TUTUP KATALOG BEST SELLER</span>
-                                    <ChevronUp className="w-4 h-4 text-[#B82E2E]" />
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </section>
 
