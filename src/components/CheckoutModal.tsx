@@ -18,12 +18,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
   const [mode, setMode] = useState<OrderMode>(activeTableId ? 'dine-in' : 'dine-in');
   const [selectedTable, setSelectedTable] = useState<string>(activeTableId || '01');
+  const [liveTables, setLiveTables] = useState<any[]>(VALID_TABLES_REGISTRY);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cashier');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Fetch Live Tables from /api/tables
+  React.useEffect(() => {
+    fetch('/api/tables')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.tables && data.tables.length > 0) {
+          setLiveTables(data.tables);
+        }
+      })
+      .catch((err) => console.error('Failed to fetch live tables in CheckoutModal:', err));
+  }, []);
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -255,9 +268,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   outline: 'none',
                 }}
               >
-                {VALID_TABLES_REGISTRY.map((t) => (
-                  <option key={t.id} value={t.id} style={{ background: '#161311', color: '#F7F4EF' }}>
-                    {t.name} ({t.area})
+                {liveTables.map((t) => (
+                  <option key={t.id || t.code} value={t.code || t.id} style={{ background: '#161311', color: '#F7F4EF' }}>
+                    {t.name} ({t.area || 'Indoor AC'})
                   </option>
                 ))}
               </select>

@@ -18,4 +18,12 @@ export const VALID_TABLES_REGISTRY: TableInfo[] = [
   { id: '10', name: 'Meja 10', area: 'Terrace', active: true },
   { id: '11', name: 'Meja 11', area: 'VIP', active: true },
   { id: '12', name: 'Meja 12', area: 'VIP', active: true },
+  { id: '13', name: 'Meja 13', area: 'Indoor', active: true },
+  { id: '14', name: 'Meja 14', area: 'Indoor', active: true },
+  { id: '15', name: 'Meja 15', area: 'Terrace', active: true },
+  { id: '16', name: 'Meja 16', area: 'Terrace', active: true },
+  { id: '17', name: 'Meja 17', area: 'VIP', active: true },
+  { id: '18', name: 'Meja 18', area: 'VIP', active: true },
+  { id: '19', name: 'Meja 19', area: 'Indoor', active: true },
+  { id: '20', name: 'Meja 20', area: 'Terrace', active: true },
 ];

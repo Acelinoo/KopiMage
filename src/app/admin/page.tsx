@@ -201,46 +201,28 @@ export default function AdminDashboardPage() {
     }
   };
 
-  // TABLE CRUD HANDLERS
+  // TABLE CRUD HANDLERS (Real-time DB & API Synchronized)
   const handleSaveTable = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tableCodeInput.trim()) return;
 
     try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-
       const newCode = tableCodeInput.padStart(2, '0');
       const newName = tableNameInput || `MEJA ${newCode}`;
 
-      if (editingTable) {
-        const { error } = await supabase.from('tables').update({
+      const res = await fetch('/api/tables', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           code: newCode,
           name: newName,
           area: tableAreaInput,
-        }).eq('id', editingTable.id);
+        }),
+      });
 
-        if (!error) {
-          setTablesState((prev) =>
-            prev.map((t) => (t.id === editingTable.id ? { ...t, code: newCode, name: newName, area: tableAreaInput } : t))
-          );
-        }
-      } else {
-        const { data, error } = await supabase.from('tables').insert([{
-          code: newCode,
-          name: newName,
-          area: tableAreaInput,
-          is_active: true,
-        }]).select();
-
-        if (!error && data) {
-          setTablesState((prev) => [...prev, data[0]]);
-        } else {
-          setTablesState((prev) => [
-            ...prev,
-            { id: `table_${Date.now()}`, code: newCode, name: newName, area: tableAreaInput, is_active: true },
-          ]);
-        }
+      const data = await res.json();
+      if (data.success) {
+        fetchAuxiliaryData();
       }
     } catch (err) {
       console.error('Save table error:', err);
@@ -255,10 +237,11 @@ export default function AdminDashboardPage() {
   const handleDeleteTable = async (tableId: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus nomor meja ini?')) return;
     try {
-      const { createClient } = await import('@/lib/supabase/client');
-      const supabase = createClient();
-      await supabase.from('tables').delete().eq('id', tableId);
-      setTablesState((prev) => prev.filter((t) => t.id !== tableId));
+      const res = await fetch(`/api/tables?id=${tableId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setTablesState((prev) => prev.filter((t) => t.id !== tableId && t.code !== tableId));
+      }
     } catch (err) {
       console.error('Delete table error:', err);
     }
