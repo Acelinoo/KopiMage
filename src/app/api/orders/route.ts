@@ -73,23 +73,41 @@ export async function POST(request: Request) {
 
     const supabase = createAdminSupabaseClient();
 
-    // 3. Resolve table code to UUID (Table Code -> tables.id UUID)
+    // 3. Resolve table code to UUID (Flexible Table Code Matching & Auto-Resolution)
     let resolvedTableUuid: string | null = null;
     if (mode === 'dine-in' && table_id) {
-      // Is table_id already a valid UUID v4 format or a table code e.g. "07"?
       const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(table_id);
       
-      const { data: tableRecord } = isUuid
-        ? await supabase.from('tables').select('id, is_active').eq('id', table_id).maybeSingle()
-        : await supabase.from('tables').select('id, is_active').eq('code', table_id).maybeSingle();
+      const paddedCode = String(table_id).padStart(2, '0');
+      const unpaddedCode = String(parseInt(table_id, 10) || table_id);
 
-      if (!tableRecord || tableRecord.is_active === false) {
-        return NextResponse.json(
-          { error: `Meja ${table_id} tidak terdaftar atau sedang non-aktif.` },
-          { status: 400 }
-        );
+      let { data: tableRecord } = isUuid
+        ? await supabase.from('tables').select('id, is_active').eq('id', table_id).maybeSingle()
+        : await supabase.from('tables').select('id, is_active').in('code', [String(table_id), paddedCode, unpaddedCode]).maybeSingle();
+
+      // Fallback: If table record is not in Supabase yet, auto-create/upsert table to guarantee order success
+      if (!tableRecord) {
+        const newTableId = crypto.randomUUID();
+        const { data: createdTable } = await supabase
+          .from('tables')
+          .insert({
+            id: newTableId,
+            code: paddedCode,
+            name: `MEJA ${unpaddedCode}`,
+            area: 'Indoor AC',
+            is_active: true,
+          })
+          .select('id, is_active')
+          .maybeSingle();
+
+        if (createdTable) {
+          tableRecord = createdTable;
+        }
       }
-      resolvedTableUuid = tableRecord.id;
+
+      if (tableRecord && tableRecord.is_active !== false) {
+        resolvedTableUuid = tableRecord.id;
+      }
     }
 
     // 4. Generate Order Identifiers

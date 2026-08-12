@@ -17,7 +17,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
   const router = useRouter();
 
   const [mode, setMode] = useState<OrderMode>(activeTableId ? 'dine-in' : 'dine-in');
-  const [selectedTable, setSelectedTable] = useState<string>(activeTableId || '01');
+  const formattedInitialTable = activeTableId ? String(activeTableId).padStart(2, '0') : '01';
+  const [selectedTable, setSelectedTable] = useState<string>(formattedInitialTable);
   const [liveTables, setLiveTables] = useState<any[]>([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -42,14 +43,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
             const apiCodes = new Set(data.tables.map((t: any) => t.code || t.id));
             const merged = [...data.tables, ...parsedLocal.filter((t: any) => !apiCodes.has(t.code || t.id))];
             setLiveTables(merged);
+            if (merged.length > 0) {
+              const matched = merged.find((t: any) => t.code === formattedInitialTable || t.code === activeTableId || t.id === activeTableId);
+              if (matched) {
+                setSelectedTable(matched.code || matched.id);
+              } else {
+                setSelectedTable(merged[0].code || merged[0].id);
+              }
+            }
           }
         })
         .catch((err) => {
           console.error('Failed to fetch live tables in CheckoutModal:', err);
           setLiveTables(parsedLocal);
+          if (parsedLocal.length > 0) {
+            setSelectedTable(parsedLocal[0].code || parsedLocal[0].id);
+          }
         });
     }
-  }, []);
+  }, [activeTableId]);
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
