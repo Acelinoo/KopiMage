@@ -162,7 +162,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: '22K',
     description: 'Cafe latte lembut bertabur rasa karamel manis yang seimbang',
     isBestSeller: true,
-    image: '/images/Menu-Caramel Latte.png',
+    image: '/images/Menu-Caramel Latte.webp',
     temperature: 'Hot / Cold'
   },
   {
@@ -212,7 +212,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: '22K',
     description: 'Minuman kopi kreasi dengan sensasi gula karamel bakar khas dessert',
     isBestSeller: true,
-    image: '/images/Menu-Creme BRULEE.png',
+    image: '/images/Menu-Creme BRULEE.webp',
     temperature: 'Hot / Cold'
   },
   {
@@ -326,7 +326,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: '20K / 23K',
     description: 'Cokelat dingin nikmat dengan topping es krim lembut melimpah',
     isBestSeller: true,
-    image: '/images/Menu-Chocolate Float.png',
+    image: '/images/Menu-Chocolate Float.webp',
     temperature: 'Cold'
   },
   {
@@ -491,7 +491,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: '27K',
     description: 'Mie saus chilli oil pedas berminyak ala Mage yang bikin ketagihan',
     isBestSeller: true,
-    image: '/images/Menu-Mie Julid.png',
+    image: '/images/Menu-Mie Julid.webp',
     tags: ['Chilli Oil', 'Pedas']
   },
   {
@@ -573,7 +573,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: '27K',
     description: 'Ayam katsu tebal tumis dengan siraman saus khas mongolian istimewa',
     isBestSeller: true,
-    image: '/images/Menu-Ayam Katsu.png',
+    image: '/images/Menu-Ayam Katsu.webp',
     tags: ['Katsu', 'Mongolian']
   },
   {
@@ -592,7 +592,7 @@ export const MENU_ITEMS: MenuItem[] = [
     price: '30K',
     description: 'Daging sapi tumis juicy dipadu saus khas mongolian gurih berminyak',
     isBestSeller: true,
-    image: '/images/Menu-Beef Saus Mongol.png',
+    image: '/images/Menu-Beef Saus Mongol.webp',
     tags: ['Daging Sapi']
   },
   {

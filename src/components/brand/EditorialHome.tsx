@@ -90,13 +90,13 @@ export function EditorialHome() {
 
     // Moments for React Bits CircularGallery — 7 authentic moments with custom captions
     const galleryMoments = [
-        { image: '/images/Moments-Live music.png', text: 'Live music' },
-        { image: '/images/Moments-Bukber bareng ayang bikin HAPPY.png', text: 'Bukber bareng ayang bikin HAPPY' },
-        { image: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.png', text: 'Bukber bareng teman-teman lebih asyikkk' },
-        { image: '/images/Moments-Weekend perfect with coffe in hand.png', text: 'Weekend perfect with coffe in hand' },
-        { image: '/images/Moments-Dine in atau takeaway tetap sama rasanya.png', text: 'Dine in atau takeaway tetap sama rasanya' },
-        { image: '/images/Moments-Meet the team behind your favorite cup.png', text: 'Meet the team behind your favorite cup' },
-        { image: '/images/Moments-Top coffe.png', text: 'Top coffe' },
+        { image: '/images/Moments-Live music.webp', text: 'Live music' },
+        { image: '/images/Moments-Bukber bareng ayang bikin HAPPY.webp', text: 'Bukber bareng ayang bikin HAPPY' },
+        { image: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.webp', text: 'Bukber bareng teman-teman lebih asyikkk' },
+        { image: '/images/Moments-Weekend perfect with coffe in hand.webp', text: 'Weekend perfect with coffe in hand' },
+        { image: '/images/Moments-Dine in atau takeaway tetap sama rasanya.webp', text: 'Dine in atau takeaway tetap sama rasanya' },
+        { image: '/images/Moments-Meet the team behind your favorite cup.webp', text: 'Meet the team behind your favorite cup' },
+        { image: '/images/Moments-Top coffe.webp', text: 'Top coffe' },
     ];
 
     // Row 1 ratings - animating left
@@ -239,7 +239,7 @@ export function EditorialHome() {
                         <div className="md:col-span-5 lg:col-span-6 reveal-scale-pop is-visible flex justify-center lg:justify-end" style={{ transitionDelay: '0.2s' }}>
                             <div className="relative w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[480px] aspect-square rounded-2xl overflow-hidden border border-[#B82E2E]/30 shadow-xl bg-[#161210] mx-auto lg:ml-auto">
                                 <Image
-                                    src="/images/Welcome.png"
+                                    src="/images/Welcome.webp"
                                     alt="Kopi Mage Espresso Crema & Roasted Coffee Beans"
                                     fill
                                     priority
@@ -285,7 +285,7 @@ export function EditorialHome() {
                         <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div className="editorial-img-wrapper h-[260px] sm:h-[360px] md:h-[400px] reveal-scale-pop border border-[#FFFFFF]/10 rounded-2xl">
                                 <Image
-                                    src="/images/kopimage_space_morning.png"
+                                    src="/images/kopimage_space_morning.webp"
                                     alt="Suasana Pagi Kopi Mage"
                                     fill
                                     loading="eager"
@@ -295,7 +295,7 @@ export function EditorialHome() {
                             </div>
                             <div className="editorial-img-wrapper h-[260px] sm:h-[360px] md:h-[400px] sm:mt-12 reveal-scale-pop border border-[#FFFFFF]/10 rounded-2xl" style={{ transitionDelay: '0.2s' }}>
                                 <Image
-                                    src="/images/WFC.png"
+                                    src="/images/WFC.webp"
                                     alt="Suasana Malam Kopi Mage Lanud Sulaiman"
                                     fill
                                     loading="eager"
@@ -481,7 +481,7 @@ export function EditorialHome() {
                         <div className="lg:col-span-6 reveal-slide-left">
                             <div className="relative h-[280px] sm:h-[400px] lg:h-[480px] w-full editorial-img-wrapper border border-[#B82E2E]/30 rounded-2xl overflow-hidden shadow-lg">
                                 <Image
-                                    src="/images/Moments-Live music.png"
+                                    src="/images/Moments-Live music.webp"
                                     alt="Live Music Acoustic Session di Kopi Mage"
                                     fill
                                     className="object-cover"
@@ -581,7 +581,7 @@ export function EditorialHome() {
 
                     <div className="editorial-img-wrapper h-[35vh] sm:h-[55vh] lg:h-[75vh] w-full mb-8 sm:mb-12 reveal-blur-focus border border-[#FFFFFF]/10 rounded-2xl">
                         <Image
-                            src="/images/kopimage_space_terrace_1786480961312.png"
+                            src="/images/kopimage_space_terrace_1786480961312.webp"
                             alt="Teras Kopi Mage Industrial Design"
                             fill
                             className="object-cover"
@@ -780,7 +780,7 @@ export function EditorialHome() {
                         <div className="lg:col-span-6 order-2 lg:order-1 reveal-slide-left">
                             <div className="editorial-img-wrapper h-[300px] sm:h-[450px] lg:h-[600px] border border-[#FFFFFF]/10 rounded-2xl overflow-hidden shadow-md">
                                 <Image
-                                    src="/images/kopimage_barista_pouring_1786480929425.png"
+                                    src="/images/kopimage_barista_pouring_1786480929425.webp"
                                     alt="Barista Kopi Mage menyeduh kopi manual brew"
                                     fill
                                     className="object-cover"

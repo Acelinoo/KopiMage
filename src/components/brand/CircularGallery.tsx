@@ -527,12 +527,12 @@ class App {
   }
   createMedias(items: any, bend = 0, textColor: string, borderRadius: number, font: string) {
     const defaultItems = [
-      { image: `/images/kopimage_hero_atmosphere_1786480906850.png`, text: 'Suasana Soreang' },
-      { image: `/images/kopimage_space_morning.png`, text: 'Cahaya Pagi' },
-      { image: `/images/kopimage_space_terrace_1786480961312.png`, text: 'Teras Terbuka' },
-      { image: `/images/kopimage_barista_pouring_1786480929425.png`, text: 'Penyeduhan Kopi' },
-      { image: `/images/kopimage_food_table_1786480947275.png`, text: 'Sajian Kuliner' },
-      { image: `/images/kopimage_space_night.png`, text: 'Pendar Malam' }
+      { image: `/images/kopimage_hero_atmosphere_1786480906850.webp`, text: 'Suasana Soreang' },
+      { image: `/images/kopimage_space_morning.webp`, text: 'Cahaya Pagi' },
+      { image: `/images/kopimage_space_terrace_1786480961312.webp`, text: 'Teras Terbuka' },
+      { image: `/images/kopimage_barista_pouring_1786480929425.webp`, text: 'Penyeduhan Kopi' },
+      { image: `/images/kopimage_food_table_1786480947275.webp`, text: 'Sajian Kuliner' },
+      { image: `/images/kopimage_space_night.webp`, text: 'Pendar Malam' }
     ];
     const galleryItems = items && items.length ? items : defaultItems;
     this.mediasImages = galleryItems.concat(galleryItems);
@@ -730,12 +730,12 @@ export default function CircularGallery({
   useEffect(() => {
     // Preload gallery images in parallel immediately for instant rendering
     const galleryItems = items && items.length ? items : [
-      { image: `/images/kopimage_hero_atmosphere_1786480906850.png`, text: 'Suasana Soreang' },
-      { image: `/images/kopimage_space_morning.png`, text: 'Cahaya Pagi' },
-      { image: `/images/kopimage_space_terrace_1786480961312.png`, text: 'Teras Terbuka' },
-      { image: `/images/kopimage_barista_pouring_1786480929425.png`, text: 'Penyeduhan Kopi' },
-      { image: `/images/kopimage_food_table_1786480947275.png`, text: 'Sajian Kuliner' },
-      { image: `/images/kopimage_space_night.png`, text: 'Pendar Malam' }
+      { image: `/images/kopimage_hero_atmosphere_1786480906850.webp`, text: 'Suasana Soreang' },
+      { image: `/images/kopimage_space_morning.webp`, text: 'Cahaya Pagi' },
+      { image: `/images/kopimage_space_terrace_1786480961312.webp`, text: 'Teras Terbuka' },
+      { image: `/images/kopimage_barista_pouring_1786480929425.webp`, text: 'Penyeduhan Kopi' },
+      { image: `/images/kopimage_food_table_1786480947275.webp`, text: 'Sajian Kuliner' },
+      { image: `/images/kopimage_space_night.webp`, text: 'Pendar Malam' }
     ];
     galleryItems.forEach(item => {
       if (item.image) {
