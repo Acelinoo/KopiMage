@@ -10,7 +10,8 @@ import {
   UtensilsCrossed,
   Volume2,
   VolumeX,
-  CheckSquare
+  CheckSquare,
+  XCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -415,6 +416,12 @@ export default function KitchenDisplayPage() {
                         <span className="text-[0.7rem] text-[#A89F91] block font-mono">
                           Pemesan: <strong className="text-white font-serif">{order.customer_name || 'Pelanggan'}</strong> ({order.customer_phone || '-'})
                         </span>
+                        {currentStatus === 'CANCELLATION_REQUESTED' && (
+                          <div className="mt-2 p-2.5 rounded-xl bg-orange-500/20 border border-orange-500/50 text-orange-400 text-xs font-mono font-bold flex items-center gap-1.5 animate-pulse">
+                            <XCircle className="w-4 h-4 shrink-0" />
+                            <span>⚠️ CUSTOMER MENGAJUKAN PEMBATALAN (Cek Admin)</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Items Checklist */}

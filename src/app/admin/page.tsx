@@ -25,7 +25,8 @@ import {
   Filter,
   CheckSquare,
   FileText,
-  Upload as ImageIcon
+  Upload as ImageIcon,
+  XCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
@@ -252,6 +253,69 @@ export default function AdminDashboardPage() {
       fetchAdminOrders(false);
     } finally {
       setRejectingOrder(null);
+    }
+  };
+
+  // Approve Cancellation Handler (Admin approves customer's cancellation request)
+  const handleApproveCancellation = async (orderId: string) => {
+    try {
+      // Optimistic UI update
+      setOrdersList((prev) => prev.map((o) => (o.id === orderId ? { ...o, order_status: 'CANCELLED' } : o)));
+
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          order_status: 'CANCELLED',
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Gagal menyetujui pembatalan.');
+      }
+
+      fetchAdminOrders(false);
+    } catch (err) {
+      console.error('Approve cancellation error:', err);
+      alert('Gagal menyetujui pembatalan. Silakan coba lagi.');
+      fetchAdminOrders(false);
+    }
+  };
+
+  // Reject Cancellation Handler (Admin rejects customer's cancellation request, restores order)
+  const handleRejectCancellation = async (orderId: string) => {
+    try {
+      // Optimistic UI update - restore to PREPARING
+      setOrdersList((prev) =>
+        prev.map((o) =>
+          o.id === orderId
+            ? { ...o, order_status: 'PREPARING', cancellation_reason: null }
+            : o
+        )
+      );
+
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          order_status: 'PREPARING',
+          cancellation_reason: null,
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Gagal menolak pembatalan.');
+      }
+
+      fetchAdminOrders(false);
+    } catch (err) {
+      console.error('Reject cancellation error:', err);
+      alert('Gagal menolak pembatalan. Silakan coba lagi.');
+      fetchAdminOrders(false);
     }
   };
 
@@ -501,6 +565,7 @@ export default function AdminDashboardPage() {
   ).length;
   const paidCount = ordersList.filter((o) => o.payment_status === 'PAID').length;
   const rejectedCount = ordersList.filter((o) => o.payment_status === 'REJECTED').length;
+  const cancellationRequestedCount = ordersList.filter((o) => o.order_status === 'CANCELLATION_REQUESTED').length;
   const totalOrdersCount = ordersList.length;
 
   return (
@@ -598,6 +663,19 @@ export default function AdminDashboardPage() {
               <Clock className="w-5 h-5 text-amber-400" />
             </div>
           </div>
+
+          {/* Cancellation Requested KPI */}
+          {cancellationRequestedCount > 0 && (
+            <div className="p-4 rounded-2xl bg-[#161210] border border-orange-500/40 flex items-center justify-between shadow-lg">
+              <div>
+                <span className="text-[0.62rem] tracking-widest font-mono uppercase text-[#A89F91] block mb-1">PERMINTAAN BATAL</span>
+                <span className="text-2xl font-serif font-semibold text-orange-400">{cancellationRequestedCount} Pesanan</span>
+              </div>
+              <div className="w-10 h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center">
+                <XCircle className="w-5 h-5 text-orange-400" />
+              </div>
+            </div>
+          )}
 
           <div className="p-4 rounded-2xl bg-[#161210] border border-[#FFFFFF]/10 flex items-center justify-between shadow-lg">
             <div>
@@ -767,6 +845,29 @@ export default function AdminDashboardPage() {
                               📌 <strong>Alasan Ditolak:</strong> "{order.rejection_reason}"
                             </div>
                           )}
+
+                          {/* CANCELLATION REQUESTED BADGE */}
+                          {order.order_status === 'CANCELLATION_REQUESTED' && (
+                            <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 text-[0.7rem] mt-2">
+                              <div className="flex items-center gap-1.5 mb-1">
+                                <XCircle className="w-3.5 h-3.5" />
+                                <strong className="font-mono uppercase tracking-wider">PEMBATALAN DIMINTA</strong>
+                              </div>
+                              {order.cancellation_reason && (
+                                <span className="text-orange-300">Alasan: "{order.cancellation_reason}"</span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* CANCELLED STATUS BADGE */}
+                          {order.order_status === 'CANCELLED' && (
+                            <div className="p-2.5 rounded-xl bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 text-[#888] text-[0.7rem] mt-2">
+                              <div className="flex items-center gap-1.5">
+                                <XCircle className="w-3.5 h-3.5" />
+                                <strong className="font-mono uppercase tracking-wider">PESANAN DIBATALKAN</strong>
+                              </div>
+                            </div>
+                          )}
                         </div>
 
                         {/* Payment Proof Photo Box */}
@@ -808,26 +909,48 @@ export default function AdminDashboardPage() {
 
                       {/* Action Buttons */}
                       <div className="grid grid-cols-2 gap-3">
-                        <button
-                          onClick={() => handleApprovePayment(order.id)}
-                          disabled={isPaid}
-                          className={`w-full py-2.5 rounded-xl text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer ${
-                            isPaid
-                              ? 'bg-emerald-950/50 text-emerald-600 border border-emerald-800/40 cursor-not-allowed'
-                              : 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                          }`}
-                        >
-                          <Check className="w-4 h-4" />
-                          <span>{isPaid ? 'LUNAS' : 'SETUJUI'}</span>
-                        </button>
+                        {/* CANCELLATION REQUESTED: Show Approve/Reject Cancellation */}
+                        {order.order_status === 'CANCELLATION_REQUESTED' ? (
+                          <>
+                            <button
+                              onClick={() => handleApproveCancellation(order.id)}
+                              className="w-full py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                            >
+                              <Check className="w-4 h-4" />
+                              <span>SETUJUI BATAL</span>
+                            </button>
+                            <button
+                              onClick={() => handleRejectCancellation(order.id)}
+                              className="w-full py-2.5 rounded-xl bg-[#0E0B0A] hover:bg-[#161210] border border-[#FFFFFF]/20 text-[#A89F91] text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                              <X className="w-4 h-4" />
+                              <span>TOLAK BATAL</span>
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleApprovePayment(order.id)}
+                              disabled={isPaid}
+                              className={`w-full py-2.5 rounded-xl text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer ${
+                                isPaid
+                                  ? 'bg-emerald-950/50 text-emerald-600 border border-emerald-800/40 cursor-not-allowed'
+                                  : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                              }`}
+                            >
+                              <Check className="w-4 h-4" />
+                              <span>{isPaid ? 'LUNAS' : 'SETUJUI'}</span>
+                            </button>
 
-                        <button
-                          onClick={() => setRejectingOrder(order)}
-                          className="w-full py-2.5 rounded-xl bg-[#0E0B0A] hover:bg-red-950 border border-red-500/40 text-red-400 text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                        >
-                          <X className="w-4 h-4" />
-                          <span>TOLAK</span>
-                        </button>
+                            <button
+                              onClick={() => setRejectingOrder(order)}
+                              className="w-full py-2.5 rounded-xl bg-[#0E0B0A] hover:bg-red-950 border border-red-500/40 text-red-400 text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                            >
+                              <X className="w-4 h-4" />
+                              <span>TOLAK</span>
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   );

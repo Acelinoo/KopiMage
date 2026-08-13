@@ -8,7 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create Enum Types for Dual Status System
 DO $$ BEGIN
-  CREATE TYPE order_status_type AS ENUM ('NEW_ORDER', 'PREPARING', 'READY', 'COMPLETED', 'CANCELLED');
+  CREATE TYPE order_status_type AS ENUM ('NEW_ORDER', 'PREPARING', 'READY', 'COMPLETED', 'CANCELLED', 'CANCELLATION_REQUESTED');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;
@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS orders (
   order_status order_status_type NOT NULL DEFAULT 'NEW_ORDER',
   payment_proof_url TEXT,
   rejection_reason TEXT,
+  cancellation_reason TEXT,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

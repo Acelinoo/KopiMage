@@ -128,7 +128,7 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { order_id, payment_status, order_status, rejection_reason } = body;
+    const { order_id, payment_status, order_status, rejection_reason, cancellation_reason } = body;
 
     if (!order_id) {
       return NextResponse.json(
@@ -154,6 +154,10 @@ export async function PATCH(request: Request) {
 
     if (rejection_reason !== undefined) {
       updatePayload.rejection_reason = rejection_reason;
+    }
+
+    if (cancellation_reason !== undefined) {
+      updatePayload.cancellation_reason = cancellation_reason;
     }
 
     // If approving payment and no specific order_status sent, default to PREPARING

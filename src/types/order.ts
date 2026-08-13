@@ -7,7 +7,8 @@ export type OrderStatus =
   | 'ready'             // Ready for waiter delivery / counter pickup
   | 'completed'         // Delivered / picked up
   | 'rejected'          // Payment proof rejected
-  | 'cancelled';        // Cancelled by Admin/Barista
+  | 'cancelled'         // Cancelled by Admin/Barista
+  | 'cancellation_requested'; // Customer requested cancellation, awaiting admin approval
 
 export interface SelectedModifierOption {
   modifierId: string;
