@@ -50,6 +50,7 @@ export default function KitchenDisplayPage() {
   const [statusTab, setStatusTab] = useState<'ACTIVE' | 'COMPLETED'>('ACTIVE');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const previousOrderCountRef = useRef<number>(0);
+  const recentLocalUpdatesRef = useRef<Record<string, { status: string; timestamp: number }>>({});
 
   // Live timer tick
   useEffect(() => {
@@ -65,7 +66,21 @@ export default function KitchenDisplayPage() {
       const res = await fetch('/api/admin/orders?status=ALL');
       const data = await res.json();
       if (data.success && Array.isArray(data.orders)) {
-        const fetchedOrders = data.orders;
+        // Merge recent local optimistic status overrides to prevent poll reverting
+        const fetchedOrders = data.orders.map((o: any) => {
+          const localOverride = recentLocalUpdatesRef.current[o.id];
+          if (localOverride && Date.now() - localOverride.timestamp < 15000) {
+            return { ...o, order_status: localOverride.status };
+          }
+          return o;
+        });
+
+        // Clean expired overrides (> 15 seconds)
+        Object.keys(recentLocalUpdatesRef.current).forEach((id) => {
+          if (Date.now() - recentLocalUpdatesRef.current[id].timestamp >= 15000) {
+            delete recentLocalUpdatesRef.current[id];
+          }
+        });
         
         // Play sound chime if new uncompleted order count increased
         const activeCount = fetchedOrders.filter((o: any) => o.order_status !== 'COMPLETED').length;
@@ -93,7 +108,13 @@ export default function KitchenDisplayPage() {
   // Update order kitchen status handler
   const handleUpdateOrderStatus = async (orderId: string, nextStatus: 'PREPARING' | 'READY' | 'COMPLETED') => {
     try {
-      // Optimistic UI update
+      // 1. Store local optimistic status override for 15s to block polling flip-flops
+      recentLocalUpdatesRef.current[orderId] = {
+        status: nextStatus,
+        timestamp: Date.now(),
+      };
+
+      // 2. Optimistic UI update
       setOrders((prev) =>
         prev.map((o) => (o.id === orderId ? { ...o, order_status: nextStatus } : o))
       );
@@ -112,9 +133,11 @@ export default function KitchenDisplayPage() {
         throw new Error(data.error || 'Gagal memperbarui status');
       }
 
-      fetchKitchenOrders(false);
+      // Re-fetch after 1 sec delay to let DB settle
+      setTimeout(() => fetchKitchenOrders(false), 1000);
     } catch (err) {
       console.error('Failed to update kitchen order status:', err);
+      delete recentLocalUpdatesRef.current[orderId];
       fetchKitchenOrders(false);
     }
   };
@@ -135,8 +158,14 @@ export default function KitchenDisplayPage() {
     return 'KITCHEN';
   };
 
-  // Filter orders by search & tabs
+  // Filter orders by search, approval status, & tabs
   const filteredOrders = orders.filter((o) => {
+    // KITCHEN APPROVAL POLICY:
+    // QRIS/Transfer orders only appear in kitchen after Admin approves payment (PAID).
+    // Cashier orders appear in kitchen immediately (cashier).
+    const isApprovedForKitchen = o.payment_method === 'cashier' || o.payment_status === 'PAID';
+    if (!isApprovedForKitchen) return false;
+
     const isCompleted = o.order_status === 'COMPLETED';
     if (statusTab === 'ACTIVE' && isCompleted) return false;
     if (statusTab === 'COMPLETED' && !isCompleted) return false;
@@ -161,9 +190,9 @@ export default function KitchenDisplayPage() {
     return true;
   });
 
-  const activeOrdersCount = orders.filter((o) => o.order_status !== 'COMPLETED').length;
-  const preparingCount = orders.filter((o) => o.order_status === 'PREPARING').length;
-  const readyCount = orders.filter((o) => o.order_status === 'READY').length;
+  const activeOrdersCount = orders.filter((o) => (o.payment_method === 'cashier' || o.payment_status === 'PAID') && o.order_status !== 'COMPLETED').length;
+  const preparingCount = orders.filter((o) => (o.payment_method === 'cashier' || o.payment_status === 'PAID') && o.order_status === 'PREPARING').length;
+  const readyCount = orders.filter((o) => (o.payment_method === 'cashier' || o.payment_status === 'PAID') && o.order_status === 'READY').length;
 
   return (
     <div className="min-h-screen bg-[#070605] text-[#F7F4EF] font-sans p-4 md:p-8 selection:bg-[#B82E2E] selection:text-white">

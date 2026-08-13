@@ -21,12 +21,31 @@ export async function GET(request: Request) {
     // 2. Merge database orders with in-memory shared store orders
     const memoryOrders = getOrdersFromStore();
     const dbOrderIds = new Set((dbOrders || []).map((o) => o.id));
+    const memoryMap = new Map(memoryOrders.map((o) => [o.id, o]));
 
-    // Combine DB orders with memory orders not yet in DB
-    const combinedOrders: OrderRecord[] = [
-      ...(dbOrders || []),
-      ...memoryOrders.filter((o) => !dbOrderIds.has(o.id)),
-    ];
+    // Combine DB orders with memory orders, prioritizing whichever has the newest updated_at timestamp
+    const combinedOrders: OrderRecord[] = (dbOrders || []).map((dbOrder: any) => {
+      const memOrder = memoryMap.get(dbOrder.id);
+      if (memOrder) {
+        const dbTime = new Date(dbOrder.updated_at || dbOrder.created_at || 0).getTime();
+        const memTime = new Date(memOrder.updated_at || memOrder.created_at || 0).getTime();
+        if (memTime > dbTime) {
+          return {
+            ...dbOrder,
+            ...memOrder,
+            order_items: dbOrder.order_items || memOrder.order_items || memOrder.items || [],
+          };
+        }
+      }
+      return dbOrder;
+    });
+
+    // Add memory orders not yet in DB
+    memoryOrders.forEach((memOrder) => {
+      if (!dbOrderIds.has(memOrder.id)) {
+        combinedOrders.push(memOrder);
+      }
+    });
 
     // Normalize item fields (ensure both items and order_items are set)
     let finalOrders = combinedOrders.map((order: any) => {

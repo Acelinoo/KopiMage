@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { OrderMode, PaymentMethod } from '@/types/order';
 import { VALID_TABLES_REGISTRY } from '@/types/table';
-import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle } from 'lucide-react';
+import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface CheckoutModalProps {
@@ -25,6 +25,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cashier');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionStep, setSubmissionStep] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState('');
 
   // Fetch Live Tables from /api/tables & LocalStorage fallback
@@ -43,29 +44,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
             const apiCodes = new Set(data.tables.map((t: any) => t.code || t.id));
             const merged = [...data.tables, ...parsedLocal.filter((t: any) => !apiCodes.has(t.code || t.id))];
             setLiveTables(merged);
-            if (merged.length > 0) {
-              const matched = merged.find((t: any) => t.code === formattedInitialTable || t.code === activeTableId || t.id === activeTableId);
-              if (matched) {
-                setSelectedTable(matched.code || matched.id);
-              } else {
-                setSelectedTable(merged[0].code || merged[0].id);
-              }
-            }
+          } else if (parsedLocal.length > 0) {
+            setLiveTables(parsedLocal);
           }
         })
-        .catch((err) => {
-          console.error('Failed to fetch live tables in CheckoutModal:', err);
-          setLiveTables(parsedLocal);
-          if (parsedLocal.length > 0) {
-            setSelectedTable(parsedLocal[0].code || parsedLocal[0].id);
-          }
+        .catch(() => {
+          if (parsedLocal.length > 0) setLiveTables(parsedLocal);
         });
     }
-  }, [activeTableId]);
+  }, []);
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage('');
 
     if (!customerName.trim()) {
       setErrorMessage('Harap isi Nama Pemesan.');
@@ -73,29 +63,27 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
     }
 
     if (!customerPhone.trim()) {
-      setErrorMessage('Harap masukkan Nomor WhatsApp Anda agar kasir dapat mengonfirmasi pesanan.');
+      setErrorMessage('Harap isi No. WhatsApp untuk konfirmasi pesanan.');
       return;
     }
 
     if (mode === 'dine-in' && !selectedTable) {
-      setErrorMessage('Harap pilih Nomor Meja untuk Dine-In.');
+      setErrorMessage('Harap pilih Nomor Meja Kedai.');
       return;
     }
 
     setIsSubmitting(true);
+    setErrorMessage('');
+    setSubmissionStep(1); // Step 1: Validating payload
 
     try {
+      await new Promise((r) => setTimeout(r, 400)); // Smooth animation delay
+      setSubmissionStep(2); // Step 2: Uploading data & payment proof
+
       let uploadedProofUrl: string | null = null;
 
-      // Upload payment proof if QRIS/Transfer and file selected
-      if (paymentMethod !== 'cashier' && proofFile) {
-        if (proofFile.size > 5 * 1024 * 1024) {
-          throw new Error('Ukuran foto bukti transfer maksimal 5MB.');
-        }
-        if (!proofFile.type.startsWith('image/')) {
-          throw new Error('File bukti transfer harus berupa gambar (JPG, PNG, WebP).');
-        }
-
+      // Handle payment proof upload to Supabase Storage if present
+      if (proofFile && paymentMethod !== 'cashier') {
         const { createClient } = await import('@/lib/supabase/client');
         const supabase = createClient();
 
@@ -125,6 +113,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           });
         }
       }
+
+      setSubmissionStep(3); // Step 3: Dispatching to Order API
 
       // Build order items payload
       const itemsPayload = cartItems.map((ci) => ({
@@ -166,18 +156,116 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         localStorage.setItem(`kopimage_tracking_${data.order.id}`, data.order.tracking_secret);
       }
 
-      clearCart();
-      onSuccess();
+      const targetUrl = `/order/${data.order.id}?secret=${data.order.tracking_secret}`;
 
-      // Navigate to Live Order Tracker
-      router.push(`/order/${data.order.id}?secret=${data.order.tracking_secret}`);
+      // Prefetch route immediately for instant transition
+      router.prefetch(targetUrl);
+
+      setSubmissionStep(4); // Step 4: Redirection ready
+      await new Promise((r) => setTimeout(r, 600));
+
+      clearCart();
+      router.push(targetUrl);
     } catch (err: any) {
       console.error('Checkout error:', err);
       setErrorMessage(err.message || 'Terjadi kesalahan sistem saat checkout.');
-    } finally {
+      setSubmissionStep(0);
       setIsSubmitting(false);
     }
   };
+
+  // Full-Screen Luxury Step Progress Overlay to prevent any transition gap
+  if (submissionStep > 0) {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 9999,
+          background: 'rgba(14, 11, 10, 0.96)',
+          backdropFilter: 'blur(20px)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem',
+          color: '#FFFFFF',
+          textAlign: 'center',
+        }}
+      >
+        <div style={{ position: 'relative', marginBottom: '2rem' }}>
+          <div
+            style={{
+              width: '100px',
+              height: '100px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(184, 46, 46, 0.4) 0%, rgba(212, 163, 115, 0.15) 70%, transparent 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(212, 163, 115, 0.4)',
+              boxShadow: '0 0 50px rgba(184, 46, 46, 0.4)',
+            }}
+          >
+            {submissionStep < 4 ? (
+              <Loader2 className="w-10 h-10 text-[#D4A373] animate-spin" />
+            ) : (
+              <CheckCircle className="w-12 h-12 text-[#2ECC71] animate-bounce" />
+            )}
+          </div>
+        </div>
+
+        <h3 style={{ fontFamily: 'serif', fontSize: '1.8rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.5rem' }}>
+          {submissionStep === 4 ? 'Pesanan Berhasil Dibuat!' : 'Memproses Pesanan Anda...'}
+        </h3>
+        <p style={{ fontSize: '0.88rem', color: '#D4A373', maxWidth: '420px', marginBottom: '2.5rem', lineHeight: 1.5 }}>
+          Mohon tunggu sebentar, sistem KopiMage sedang memproses dan menyambungkan pesanan Anda ke Stasiun Dapur.
+        </p>
+
+        {/* Steps Progress Checklist */}
+        <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '0.85rem', textAlign: 'left' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 1 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
+            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 1 ? '#2ECC71' : submissionStep === 1 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 1 ? '#000' : '#777', shrink: 0 }}>
+              {submissionStep > 1 ? '✓' : '1'}
+            </div>
+            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 1 ? 600 : 400, color: submissionStep >= 1 ? '#F7F4EF' : '#777' }}>
+              Memverifikasi rincian menu & nomor meja
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 2 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
+            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 2 ? '#2ECC71' : submissionStep === 2 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 2 ? '#000' : '#777', shrink: 0 }}>
+              {submissionStep > 2 ? '✓' : '2'}
+            </div>
+            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 2 ? 600 : 400, color: submissionStep >= 2 ? '#F7F4EF' : '#777' }}>
+              Mengirimkan data & bukti pembayaran
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 3 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
+            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 3 ? '#2ECC71' : submissionStep === 3 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 3 ? '#000' : '#777', shrink: 0 }}>
+              {submissionStep > 3 ? '✓' : '3'}
+            </div>
+            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 3 ? 600 : 400, color: submissionStep >= 3 ? '#F7F4EF' : '#777' }}>
+              Menyambungkan ke Stasiun Dapur KopiMage
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 4 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
+            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep === 4 ? '#2ECC71' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep === 4 ? '#000' : '#777', shrink: 0 }}>
+              {submissionStep === 4 ? '✓' : '4'}
+            </div>
+            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 4 ? 600 : 400, color: submissionStep === 4 ? '#2ECC71' : '#777' }}>
+              Membuka Halaman Pelacakan Pesanan...
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
