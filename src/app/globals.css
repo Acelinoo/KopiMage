@@ -44,21 +44,21 @@
   color-scheme: light;
   --bg-main: #9E1F1F;            /* Deep Crimson KopiMage Brand Red Primary Canvas */
   --bg-surface: #FFFFFF;         /* Pure White Cards for Menu Items & Content */
-  --bg-surface-elevated: #FFFDF9; /* Cream White Elevated Cards */
+  --bg-surface-elevated: #FFFFFF; /* Pure White Elevated Cards */
 
   --text-primary: #FFFFFF;       /* Pure White Text on Red Canvas */
-  --text-secondary: #F7EFE8;     /* Soft Warm White Secondary Text */
-  --text-muted: #F2D6C6;         /* Soft Peach Muted Text */
-  --text-subtle: #E8BCA4;
+  --text-secondary: #FFFFFF;     /* Pure White Secondary Text */
+  --text-muted: rgba(255, 255, 255, 0.75); /* Semi-transparent White */
+  --text-subtle: rgba(255, 255, 255, 0.55);
 
   --border-color: rgba(255, 255, 255, 0.22);
   --border-hover: rgba(255, 255, 255, 0.45);
   --border-brand: rgba(255, 255, 255, 0.6);
 
   --brand-red: #FFFFFF;          /* Highlight Accent in Red Mode */
-  --brand-red-hover: #FFFDF9;
+  --brand-red-hover: #FFFFFF;
   --brand-red-dark: #6B1313;
-  --brand-copper: #FFD5B8;       /* Cream Copper Accent */
+  --brand-copper: #FFFFFF;       /* NO BROWN — White Accent */
 
   --status-success: #2ECC71;
   --status-warning: #F39C12;
@@ -89,6 +89,7 @@
      B. WHITE SURFACE CARDS (Menu Cards, Modals, Drawers, Inputs, Facility Cards)
      ---------------------------------------------------- */
   .bg-\[\#14110F\],
+  .bg-\[\#161210\],
   .bg-\[\#171311\],
   .bg-\[\#1C1815\],
   .bg-\[\#1E1815\],
@@ -96,36 +97,44 @@
   .bg-bgDarkSurface,
   .bg-surface {
     background-color: #FFFFFF !important;
-    color: #1E1B18 !important;
-    border-color: rgba(184, 46, 46, 0.18) !important;
+    color: #1A1A1A !important;
+    border-color: rgba(158, 31, 31, 0.18) !important;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
   }
 
-  /* Headings & Text Inside White Cards MUST be Dark Charcoal (#1E1B18) */
+  /* Headings & Text Inside White Cards — Black Text */
   .bg-\[\#14110F\] h1, .bg-\[\#14110F\] h2, .bg-\[\#14110F\] h3, .bg-\[\#14110F\] h4, .bg-\[\#14110F\] p, .bg-\[\#14110F\] span, .bg-\[\#14110F\] div, .bg-\[\#14110F\] label,
+  .bg-\[\#161210\] h1, .bg-\[\#161210\] h2, .bg-\[\#161210\] h3, .bg-\[\#161210\] h4, .bg-\[\#161210\] p, .bg-\[\#161210\] span, .bg-\[\#161210\] div, .bg-\[\#161210\] label,
   .bg-\[\#171311\] h1, .bg-\[\#171311\] h2, .bg-\[\#171311\] h3, .bg-\[\#171311\] h4, .bg-\[\#171311\] p, .bg-\[\#171311\] span, .bg-\[\#171311\] div, .bg-\[\#171311\] label,
   .bg-\[\#1C1815\] h1, .bg-\[\#1C1815\] h2, .bg-\[\#1C1815\] h3, .bg-\[\#1C1815\] h4, .bg-\[\#1C1815\] p, .bg-\[\#1C1815\] span, .bg-\[\#1C1815\] div, .bg-\[\#1C1815\] label,
   .bg-\[\#1E1815\] h1, .bg-\[\#1E1815\] h2, .bg-\[\#1E1815\] h3, .bg-\[\#1E1815\] h4, .bg-\[\#1E1815\] p, .bg-\[\#1E1815\] span, .bg-\[\#1E1815\] div, .bg-\[\#1E1815\] label,
   .bg-bgDarkPaper h1, .bg-bgDarkPaper h2, .bg-bgDarkPaper h3, .bg-bgDarkPaper h4, .bg-bgDarkPaper p, .bg-bgDarkPaper span, .bg-bgDarkPaper div, .bg-bgDarkPaper label,
   .bg-bgDarkSurface h1, .bg-bgDarkSurface h2, .bg-bgDarkSurface h3, .bg-bgDarkSurface h4, .bg-bgDarkSurface p, .bg-bgDarkSurface span, .bg-bgDarkSurface div, .bg-bgDarkSurface label {
-    color: #1E1B18 !important;
+    color: #1A1A1A !important;
   }
 
-  /* Specific Headings & Accents Inside White Cards -> Deep Crimson Red (#9E1F1F) */
+  /* Accent Text Inside White Cards -> Deep Red — NO BROWN */
+  .bg-\[\#14110F\] .text-\[\#C29B7F\],
+  .bg-\[\#161210\] .text-\[\#C29B7F\],
   .bg-\[\#171311\] .text-\[\#C29B7F\],
   .bg-\[\#1C1815\] .text-\[\#C29B7F\],
   .bg-\[\#1E1815\] .text-\[\#C29B7F\],
+  .bg-bgDarkPaper .text-\[\#C29B7F\],
   .bg-bgDarkSurface .text-accentCopper {
     color: #9E1F1F !important;
     font-weight: 700 !important;
   }
 
-  /* Muted Paragraphs & Subtitles Inside White Cards -> Dark Slate (#4A423A) */
+  /* Muted Text Inside White Cards -> Dark Gray — NO BROWN */
   .bg-\[\#14110F\] p,
   .bg-\[\#14110F\] .text-\[\#A89F91\],
+  .bg-\[\#161210\] p,
+  .bg-\[\#161210\] .text-\[\#A89F91\],
+  .bg-\[\#171311\] p,
+  .bg-\[\#171311\] .text-\[\#A89F91\],
   .bg-\[\#1C1815\] p,
   .bg-\[\#1C1815\] .text-\[\#A89F91\] {
-    color: #4A423A !important;
+    color: #555555 !important;
   }
 
   /* ----------------------------------------------------
@@ -181,12 +190,12 @@
   .text-\[\#6E6358\],
   .text-textMuted,
   .text-textSubtle {
-    color: #F2D6C6 !important;
+    color: rgba(255, 255, 255, 0.75) !important;
   }
 
-  /* Copper Text on Red Canvas */
+  /* Accent Text on Red Canvas — WHITE (NO BROWN) */
   .text-\[\#C29B7F\] {
-    color: #FFD5B8 !important;
+    color: #FFFFFF !important;
   }
 
   /* Red Text on Red Canvas -> Bright Gold (#FFE600) or Cream */
@@ -257,6 +266,25 @@
   .border-white\/30,
   .editorial-border-b {
     border-color: rgba(255, 255, 255, 0.25) !important;
+  }
+
+  /* Badge Overrides — Red + White, NO BROWN */
+  .badge-bestseller {
+    background: rgba(158, 31, 31, 0.15) !important;
+    color: #9E1F1F !important;
+    border-color: rgba(158, 31, 31, 0.3) !important;
+  }
+
+  .badge-tag {
+    background: rgba(158, 31, 31, 0.08) !important;
+    color: #9E1F1F !important;
+    border-color: rgba(158, 31, 31, 0.2) !important;
+  }
+
+  /* Price Label Inside White Cards */
+  .bg-\[\#161210\] .text-\[\#9E9287\],
+  .bg-\[\#14110F\] .text-\[\#9E9287\] {
+    color: #777777 !important;
   }
 }
 

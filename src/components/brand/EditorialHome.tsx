@@ -195,7 +195,7 @@ export function EditorialHome() {
                                 LIVE MUSIC WEEKEND • 2 CABANG: GADING TUTUKA & LANUD SULAIMAN
                             </span>
                         </div>
-                        <span style={{ color: '#FFD5B8' }} className="font-sans text-[0.62rem] sm:text-[0.68rem] tracking-[0.18em] sm:tracking-[0.22em] uppercase font-medium">
+                        <span style={{ color: '#FFFFFF' }} className="font-sans text-[0.62rem] sm:text-[0.68rem] tracking-[0.18em] sm:tracking-[0.22em] uppercase font-medium">
                             BUKA SETIAP HARI • 07.00 - 23.00 WIB
                         </span>
                     </div>
@@ -226,7 +226,7 @@ export function EditorialHome() {
                             </h1>
 
                             {/* Description Paragraph */}
-                            <p style={{ color: '#F7EFE8' }} className="font-sans text-xs sm:text-base leading-relaxed font-light mb-6 sm:mb-8 max-w-xl">
+                            <p style={{ color: '#FFFFFF' }} className="font-sans text-xs sm:text-base leading-relaxed font-light mb-6 sm:mb-8 max-w-xl">
                                 Tempat santai untuk ngopi, nugas, dan kumpul bersama teman atau pasangan. Menyediakan pilihan kopi racikan barista, makanan hangat, dan suasana teras sejuk di 2 cabang resmi (Gading Tutuka & Lanud Sulaiman).
                             </p>
 
@@ -245,7 +245,7 @@ export function EditorialHome() {
                                     style={{ background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.3)', fontWeight: 600 }}
                                     className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl border transition-all text-xs tracking-wider uppercase text-center w-full sm:w-auto cursor-pointer"
                                 >
-                                    <Coffee className="w-4 h-4" style={{ color: '#FFD5B8' }} />
+                                    <Coffee className="w-4 h-4" style={{ color: '#FFFFFF' }} />
                                     <span>Cara Pesan</span>
                                 </a>
                             </div>
@@ -278,7 +278,7 @@ export function EditorialHome() {
                                 <span style={{ color: '#FFE600' }} className="font-serif italic text-lg block mb-2 font-bold">
                                     "Kopi Nikmat, Tempat Hangat, Live Music Asik."
                                 </span>
-                                <p style={{ color: '#F7EFE8' }} className="font-sans text-xs font-light">
+                                <p style={{ color: '#FFFFFF' }} className="font-sans text-xs font-light">
                                     Pengalaman nongkrong jujur tanpa batasan di Kopi Mage.
                                 </p>
                             </div>
@@ -538,7 +538,7 @@ export function EditorialHome() {
                         <h2 style={{ color: '#FFFFFF' }} className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light mb-3">
                             Momen-Momen Seru di KOPIMAGE
                         </h2>
-                        <p style={{ color: '#F2D6C6' }} className="font-sans text-xs sm:text-sm font-light leading-relaxed">
+                        <p style={{ color: '#FFFFFF' }} className="font-sans text-xs sm:text-sm font-light leading-relaxed">
                             Geser atau putar galeri 3D di bawah ini untuk melihat momen seru nongkrong, live music, bukber, dan kehangatan bersama teman & pasangan di Kopi Mage.
                         </p>
                     </div>
@@ -888,7 +888,7 @@ export function EditorialHome() {
                                 <div className="space-y-3 font-sans text-xs font-light mb-6">
                                     <div style={{ background: '#9E1F1F', borderColor: 'rgba(255, 255, 255, 0.25)' }} className="p-3.5 border rounded-xl shadow-sm">
                                         <span style={{ color: '#FFE600' }} className="font-bold block mb-1">Alamat Cabang</span>
-                                        <span style={{ color: '#F7EFE8' }}>
+                                        <span style={{ color: '#FFFFFF' }}>
                                             {activeOutlet === 'gading'
                                                 ? 'Jl. Gading Tutuka No. 88, Soreang, Kab. Bandung (Dekat Tol Seroja)'
                                                 : 'Kawasan Lanud Sulaiman, Margahayu, Kab. Bandung'}
@@ -896,7 +896,7 @@ export function EditorialHome() {
                                     </div>
                                     <div style={{ background: '#9E1F1F', borderColor: 'rgba(255, 255, 255, 0.25)' }} className="p-3.5 border rounded-xl shadow-sm">
                                         <span style={{ color: '#FFE600' }} className="font-bold block mb-1">Jam Operasional</span>
-                                        <span style={{ color: '#F7EFE8' }}>Buka Setiap Hari: 07.00 - 23.00 WIB</span>
+                                        <span style={{ color: '#FFFFFF' }}>Buka Setiap Hari: 07.00 - 23.00 WIB</span>
                                     </div>
                                 </div>
 
