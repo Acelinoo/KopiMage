@@ -30,21 +30,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
   const [createdOrder, setCreatedOrder] = useState<any>(null);
   const [isPolling, setIsPolling] = useState<boolean>(false);
 
-  // Auto-restore active order from LocalStorage if present
+  // Auto-restore active order from LocalStorage ONLY IF cart is empty
   useEffect(() => {
     if (typeof window !== 'undefined' && !createdOrder) {
-      try {
-        const stored = localStorage.getItem('kopimage_active_table_order');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (parsed && parsed.id) {
-            setCreatedOrder(parsed);
-            setSubmissionStep(4);
+      if (cartItems.length === 0) {
+        try {
+          const stored = localStorage.getItem('kopimage_active_table_order');
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (parsed && parsed.id) {
+              setCreatedOrder(parsed);
+              setSubmissionStep(4);
+            }
           }
-        }
-      } catch (e) {}
+        } catch (e) {}
+      }
     }
-  }, []);
+  }, [cartItems.length]);
 
   // Fetch Live Tables from /api/tables & LocalStorage fallback
   useEffect(() => {
@@ -454,22 +456,43 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           )}
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
             <button
               onClick={onClose}
               style={{
-                flex: 1,
-                padding: '0.85rem',
+                width: '100%',
+                padding: '0.9rem',
                 borderRadius: '14px',
-                background: '#D4A373',
-                color: '#0E0C0A',
+                background: 'linear-gradient(135deg, #B82E2E 0%, #8E2020 100%)',
+                color: '#FFFFFF',
                 fontWeight: 800,
-                border: 'none',
+                border: '1px solid rgba(255,255,255,0.2)',
                 cursor: 'pointer',
                 fontSize: '0.9rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                boxShadow: '0 8px 20px rgba(184, 46, 46, 0.35)',
               }}
             >
-              Tutup Popup
+              <span>➕ TAMBAH PESANAN LAIN (PILIH MENU)</span>
+            </button>
+            <button
+              onClick={onClose}
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '14px',
+                background: 'rgba(255,255,255,0.06)',
+                color: '#A89F91',
+                fontWeight: 700,
+                border: '1px solid rgba(255,255,255,0.1)',
+                cursor: 'pointer',
+                fontSize: '0.82rem',
+              }}
+            >
+              Tutup Tracker
             </button>
           </div>
         </div>
