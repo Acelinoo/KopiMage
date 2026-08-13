@@ -70,18 +70,25 @@ export default function AdminDashboardPage() {
   const [menuImg, setMenuImg] = useState('');
   const [menuTemp, setMenuTemp] = useState('Hot / Ice');
 
-  // Real-time API Fetcher
+  // Real-time API Fetcher (Always fetches ALL orders to guarantee 0 data loss across tabs)
   const fetchAdminOrders = async (showLoader = true) => {
     if (showLoader) setLoading(true);
     setIsRefreshing(true);
     try {
-      const res = await fetch(`/api/admin/orders?status=${statusFilter}`);
+      const res = await fetch('/api/admin/orders?status=ALL');
       const data = await res.json();
-      if (data.success && data.orders) {
+      if (data.success && Array.isArray(data.orders)) {
         setOrdersList(data.orders);
+        safeSetLocalStorage('kopimage_admin_orders_cache_v4', JSON.stringify(data.orders));
       }
     } catch (err) {
       console.error('Failed to fetch admin orders:', err);
+      try {
+        const cached = localStorage.getItem('kopimage_admin_orders_cache_v4');
+        if (cached) {
+          setOrdersList(JSON.parse(cached));
+        }
+      } catch (e) {}
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -138,7 +145,6 @@ export default function AdminDashboardPage() {
 
   const sanitizeMenuForStorage = (items: any[]) => {
     return items.map((item) => {
-      // Strip any Base64 data URL from localStorage to keep payload < 2KB
       const cleanImage =
         item.image && item.image.startsWith('data:')
           ? '/images/kopimage_hero_atmosphere_1786480906850.png'
@@ -151,25 +157,13 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    // Auto-clean legacy bloated localStorage keys on load to guarantee 0MB clean state
-    if (typeof window !== 'undefined') {
-      try {
-        ['kopimage_custom_menu', 'kopimage_custom_menu_v2', 'kopimage_custom_menu_v3'].forEach((k) => {
-          const raw = localStorage.getItem(k);
-          if (raw && (raw.includes('data:image') || raw.length > 10000)) {
-            localStorage.removeItem(k);
-          }
-        });
-      } catch (e) {}
-    }
-
     fetchAdminOrders(true);
     fetchAuxiliaryData();
 
-    // Auto-polling every 8 seconds for live sync
-    const interval = setInterval(() => fetchAdminOrders(false), 8000);
+    // Auto-polling every 4 seconds for live sync
+    const interval = setInterval(() => fetchAdminOrders(false), 4000);
     return () => clearInterval(interval);
-  }, [statusFilter]);
+  }, []);
 
   // Real-time Approve Handler (100% DB Persistent)
   const handleApprovePayment = async (orderId: string) => {
@@ -481,15 +475,33 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const filteredOrders = ordersList.filter((o) =>
-    (o.order_number || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (o.customer_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (o.customer_phone || '').includes(searchQuery)
-  );
+  const filteredOrders = ordersList.filter((o) => {
+    const matchesSearch =
+      (o.order_number || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (o.customer_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (o.customer_phone || '').includes(searchQuery) ||
+      (o.table_id || '').toLowerCase().includes(searchQuery.toLowerCase());
 
-  const pendingCount = ordersList.filter(
+    if (!matchesSearch) return false;
+
+    if (statusFilter === 'VERIFYING') {
+      return o.payment_status === 'VERIFYING' || o.payment_status === 'UNPAID';
+    }
+    if (statusFilter === 'PAID') {
+      return o.payment_status === 'PAID';
+    }
+    if (statusFilter === 'REJECTED') {
+      return o.payment_status === 'REJECTED';
+    }
+    return true; // ALL
+  });
+
+  const verifyingCount = ordersList.filter(
     (o) => o.payment_status === 'VERIFYING' || o.payment_status === 'UNPAID'
   ).length;
+  const paidCount = ordersList.filter((o) => o.payment_status === 'PAID').length;
+  const rejectedCount = ordersList.filter((o) => o.payment_status === 'REJECTED').length;
+  const totalOrdersCount = ordersList.length;
 
   return (
     <main className="min-h-screen bg-[#0B0908] text-[#F7F4EF] font-sans pb-20 selection:bg-[#B82E2E] selection:text-[#FFFFFF]">
@@ -580,7 +592,7 @@ export default function AdminDashboardPage() {
           <div className="p-4 rounded-2xl bg-[#161210] border border-[#B82E2E]/40 flex items-center justify-between shadow-lg">
             <div>
               <span className="text-[0.62rem] tracking-widest font-mono uppercase text-[#A89F91] block mb-1">VERIFIKASI PENDING</span>
-              <span className="text-2xl font-serif font-semibold text-white">{pendingCount} Pesanan</span>
+              <span className="text-2xl font-serif font-semibold text-white">{verifyingCount} Pesanan</span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
               <Clock className="w-5 h-5 text-amber-400" />
@@ -591,7 +603,7 @@ export default function AdminDashboardPage() {
             <div>
               <span className="text-[0.62rem] tracking-widest font-mono uppercase text-[#A89F91] block mb-1">TERVERIFIKASI LUNAS</span>
               <span className="text-2xl font-serif font-semibold text-emerald-400">
-                {ordersList.filter((o) => o.payment_status === 'PAID').length} Transaksi
+                {paidCount} Transaksi
               </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
@@ -633,19 +645,30 @@ export default function AdminDashboardPage() {
                   <button
                     key={st}
                     onClick={() => setStatusFilter(st)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
                       statusFilter === st
                         ? 'bg-[#B82E2E] text-white font-semibold shadow-md'
                         : 'bg-[#0E0B0A] text-[#A89F91] hover:text-white border border-[#FFFFFF]/10'
                     }`}
                   >
-                    {st === 'VERIFYING'
-                      ? 'PENDING'
-                      : st === 'PAID'
-                      ? 'LUNAS'
-                      : st === 'REJECTED'
-                      ? 'DITOLAK'
-                      : 'SEMUA'}
+                    <span>
+                      {st === 'VERIFYING'
+                        ? 'PENDING'
+                        : st === 'PAID'
+                        ? 'LUNAS'
+                        : st === 'REJECTED'
+                        ? 'DITOLAK'
+                        : 'SEMUA'}
+                    </span>
+                    <span className="px-1.5 py-0.2 rounded-md bg-black/40 text-[0.65rem] font-bold">
+                      {st === 'VERIFYING'
+                        ? verifyingCount
+                        : st === 'PAID'
+                        ? paidCount
+                        : st === 'REJECTED'
+                        ? rejectedCount
+                        : totalOrdersCount}
+                    </span>
                   </button>
                 ))}
               </div>

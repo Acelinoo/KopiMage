@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { OrderMode, PaymentMethod } from '@/types/order';
+import { compressImageFile } from '@/lib/imageCompressor';
 import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee, Clock, ShieldCheck, RefreshCw } from 'lucide-react';
 
 interface CheckoutModalProps {
@@ -75,7 +76,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
       } finally {
         setIsPolling(false);
       }
-    }, 3000);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, [createdOrder?.id]);
@@ -100,48 +101,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
     setIsSubmitting(true);
     setErrorMessage('');
-    setSubmissionStep(1); // Step 1: Mengecek pemesanan & meja
+    setSubmissionStep(1); // Step 1: Mengecek pemesanan
 
     try {
-      await new Promise((r) => setTimeout(r, 450)); // Smooth step delay
-      setSubmissionStep(2); // Step 2: Membuat pesanan di sistem
-
       let uploadedProofUrl: string | null = null;
 
-      // Handle payment proof upload to Supabase Storage if present
+      // Ultra-fast client-side canvas compression for payment proof
       if (proofFile && paymentMethod !== 'cashier') {
-        const { createClient } = await import('@/lib/supabase/client');
-        const supabase = createClient();
-
-        const fileExt = proofFile.name.split('.').pop() || 'jpg';
-        const fileName = `proof_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-
+        setSubmissionStep(2); // Step 2: Mengompresi & menyiapkan bukti transfer
         try {
-          const { data: uploadData, error: uploadErr } = await supabase.storage
-            .from('payment-proofs')
-            .upload(fileName, proofFile, { cacheControl: '3600', upsert: true });
-
-          if (!uploadErr && uploadData) {
-            const { data: publicData } = supabase.storage
-              .from('payment-proofs')
-              .getPublicUrl(uploadData.path);
-            uploadedProofUrl = publicData?.publicUrl || uploadData.path;
-          }
-        } catch (sErr) {
-          console.warn('Supabase storage upload fallback:', sErr);
+          uploadedProofUrl = await compressImageFile(proofFile, 800, 0.70);
+        } catch (cErr) {
+          console.warn('Image compressor fallback:', cErr);
         }
-
-        if (!uploadedProofUrl) {
-          uploadedProofUrl = await new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.readAsDataURL(proofFile);
-          });
-        }
+      } else {
+        setSubmissionStep(2);
       }
 
       setSubmissionStep(3); // Step 3: Mengirimkan pesanan ke Admin & Dapur
-      await new Promise((r) => setTimeout(r, 450));
 
       // Build order items payload
       const itemsPayload = cartItems.map((ci) => ({
