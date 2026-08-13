@@ -399,7 +399,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
           {/* REALTIME STATUS TRACKER STEPS */}
           <div style={{ marginBottom: '1.5rem', background: '#0E0C0A', padding: '1rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
-            <span style={{ fontSize: '0.7rem', color: '#A89F91', letterSpacing: '0.1em', uppercase: 'true', fontWeight: 700, display: 'block', marginBottom: '0.8rem' }}>
+            <span style={{ fontSize: '0.7rem', color: '#A89F91', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '0.8rem' }}>
               PROGRES REALTIME DAPUR & KASIR:
             </span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', textAlign: 'center' }}>
@@ -432,7 +432,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           {/* ITEM RINGKASAN */}
           {createdOrder.items && createdOrder.items.length > 0 && (
             <div style={{ marginBottom: '1.5rem', background: '#0E0C0A', padding: '1rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <span style={{ fontSize: '0.7rem', color: '#A89F91', letterSpacing: '0.1em', uppercase: 'true', fontWeight: 700, display: 'block', marginBottom: '0.6rem' }}>
+              <span style={{ fontSize: '0.7rem', color: '#A89F91', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '0.6rem' }}>
                 RINCIAN ITEM PESANAN:
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
