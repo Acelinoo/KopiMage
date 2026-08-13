@@ -32,11 +32,11 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
           {/* Menu Image Preview */}
           <div style={{ position: 'relative', width: '100%', height: '140px', borderRadius: 'var(--radius-md)', overflow: 'hidden', marginBottom: '1rem', background: '#161311', border: '1px solid rgba(255,255,255,0.08)' }}>
             <img
-              src={item.image || '/images/kopimage_hero_atmosphere_1786480906850.png'}
+              src={item.image || '/images/kopimage_hero_atmosphere_1786480906850.webp'}
               alt={item.name}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/kopimage_hero_atmosphere_1786480906850.png';
+                (e.target as HTMLImageElement).src = '/images/kopimage_hero_atmosphere_1786480906850.webp';
               }}
             />
           </div>

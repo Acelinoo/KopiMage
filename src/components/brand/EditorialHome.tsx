@@ -219,8 +219,9 @@ export function EditorialHome() {
                                         alt="Kopi Mage Espresso Crema & Roasted Coffee Beans"
                                         fill
                                         priority
+                                        quality={85}
                                         className="object-cover object-center"
-                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        sizes="(max-width: 640px) 280px, (max-width: 1024px) 420px, 480px"
                                     />
                                 </div>
                             </div>
@@ -300,9 +301,10 @@ export function EditorialHome() {
                                         src="/images/kopimage_space_morning.webp"
                                         alt="Suasana Pagi Kopi Mage"
                                         fill
-                                        loading="eager"
+                                        loading="lazy"
+                                        quality={80}
                                         className="object-cover"
-                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                                     />
                                 </div>
                                 <div className="editorial-img-wrapper h-[260px] sm:h-[360px] md:h-[400px] sm:mt-12 reveal-scale-pop border border-[#FFFFFF]/10 " style={{ transitionDelay: '0.2s' }}>
@@ -310,9 +312,10 @@ export function EditorialHome() {
                                         src="/images/WFC.webp"
                                         alt="Suasana Malam Kopi Mage Lanud Sulaiman"
                                         fill
-                                        loading="eager"
+                                        loading="lazy"
+                                        quality={80}
                                         className="object-cover"
-                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                                     />
                                 </div>
                             </div>
@@ -406,6 +409,8 @@ export function EditorialHome() {
                                                                     src={item.image}
                                                                     alt={item.name}
                                                                     fill
+                                                                    loading="lazy"
+                                                                    quality={75}
                                                                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                                                                     sizes="80px"
                                                                 />
@@ -497,6 +502,8 @@ export function EditorialHome() {
                                         src="/images/Moments-Live music.webp"
                                         alt="Live Music Acoustic Session di Kopi Mage"
                                         fill
+                                        loading="lazy"
+                                        quality={80}
                                         className="object-cover"
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
@@ -601,8 +608,10 @@ export function EditorialHome() {
                                 src="/images/kopimage_space_terrace_1786480961312.webp"
                                 alt="Teras Kopi Mage Industrial Design"
                                 fill
+                                loading="lazy"
+                                quality={80}
                                 className="object-cover"
-                                sizes="100vw"
+                                sizes="(max-width: 1024px) 100vw, 1440px"
                             />
                         </div>
 
@@ -806,6 +815,8 @@ export function EditorialHome() {
                                         src="/images/kopimage_barista_pouring_1786480929425.webp"
                                         alt="Barista Kopi Mage menyeduh kopi manual brew"
                                         fill
+                                        loading="lazy"
+                                        quality={80}
                                         className="object-cover"
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />

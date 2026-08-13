@@ -333,11 +333,17 @@ class Media {
     });
     const img = new Image();
     img.crossOrigin = 'anonymous';
+    img.decoding = 'async';
     img.src = this.image;
-    img.onload = () => {
+    if (img.complete && img.naturalWidth > 0) {
       texture.image = img;
       this.program.uniforms.uImageSizes.value = [img.naturalWidth, img.naturalHeight];
-    };
+    } else {
+      img.onload = () => {
+        texture.image = img;
+        this.program.uniforms.uImageSizes.value = [img.naturalWidth, img.naturalHeight];
+      };
+    }
   }
   createMesh() {
     this.plane = new Mesh(this.gl, {

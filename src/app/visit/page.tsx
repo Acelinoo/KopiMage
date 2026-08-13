@@ -169,11 +169,13 @@ export default function VisitPage() {
           <div className="editorial-container">
             <div className="editorial-img-wrapper h-[450px] sm:h-[600px] w-full">
               <Image
-                src="/images/kopimage_hero_atmosphere_1786480906850.png"
+                src="/images/kopimage_hero_atmosphere_1786480906850.webp"
                 alt="Kedai KOPIMAGE Gading Tutuka Soreang"
                 fill
                 className="object-cover"
-                sizes="100vw"
+                sizes="(max-width: 1024px) 100vw, 1440px"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>

@@ -6,10 +6,10 @@ import { MapPin, Clock, ArrowRight, QrCode, Sparkles, Coffee } from 'lucide-reac
 import { ScrollReveal } from './ScrollReveal';
 
 export const DigitalBrandExperience: React.FC = () => {
-  const heroImage = '/images/kopimage_hero_atmosphere_1786480906850.png';
-  const pouringImage = '/images/kopimage_barista_pouring_1786480929425.png';
-  const foodImage = '/images/kopimage_food_table_1786480947275.png';
-  const spaceImage = '/images/kopimage_space_terrace_1786480961312.png';
+  const heroImage = '/images/kopimage_hero_atmosphere_1786480906850.webp';
+  const pouringImage = '/images/kopimage_barista_pouring_1786480929425.webp';
+  const foodImage = '/images/kopimage_food_table_1786480947275.webp';
+  const spaceImage = '/images/kopimage_space_terrace_1786480961312.webp';
 
   return (
     <div style={{ background: '#0F0D0C', color: '#F7F4EF', minHeight: '100vh', fontFamily: 'var(--font-body)' }}>

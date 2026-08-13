@@ -57,7 +57,7 @@ export async function POST(request: Request) {
       price: formattedPrice,
       base_price: numPrice,
       description: description || 'Racikan khas berkualitas disajikan hangat di KOPIMAGE.',
-      image: image || '/images/kopimage_hero_atmosphere_1786480906850.png',
+      image: image || '/images/kopimage_hero_atmosphere_1786480906850.webp',
       temperature: temperature || 'Hot / Ice',
       is_available: true,
       created_at: new Date().toISOString(),
@@ -110,7 +110,7 @@ export async function PUT(request: Request) {
       price: formattedPrice,
       base_price: numPrice,
       description,
-      image: image || '/images/kopimage_hero_atmosphere_1786480906850.png',
+      image: image || '/images/kopimage_hero_atmosphere_1786480906850.webp',
       temperature,
     };
 

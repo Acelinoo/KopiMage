@@ -75,11 +75,13 @@ export default function AboutPage() {
 
             <div className="mt-16 editorial-img-wrapper h-[450px] sm:h-[600px] w-full">
               <Image
-                src="/images/kopimage_space_morning.png"
+                src="/images/kopimage_space_morning.webp"
                 alt="Suasana KOPIMAGE Soreang"
                 fill
                 className="object-cover"
                 sizes="100vw"
+                quality={80}
+                loading="lazy"
               />
             </div>
           </div>
@@ -134,11 +136,13 @@ export default function AboutPage() {
               <div className="lg:col-span-6">
                 <div className="editorial-img-wrapper h-[450px] sm:h-[550px]">
                   <Image
-                    src="/images/kopimage_barista_pouring_1786480929425.png"
+                    src="/images/kopimage_barista_pouring_1786480929425.webp"
                     alt="Tim Barista KOPIMAGE"
                     fill
                     className="object-cover"
                     sizes="(max-width: 1024px) 100vw, 50vw"
+                    quality={80}
+                    loading="lazy"
                   />
                 </div>
               </div>

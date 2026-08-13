@@ -50,11 +50,13 @@ export default function SpacePage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 editorial-img-wrapper h-[450px] sm:h-[600px]">
                 <Image
-                  src="/images/kopimage_space_morning.png"
+                  src="/images/kopimage_space_morning.webp"
                   alt="KOPIMAGE Morning Sunlight Space"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 66vw"
+                  quality={80}
+                  loading="lazy"
                 />
               </div>
               <div className="lg:col-span-4 lg:pl-4 space-y-6">
@@ -91,11 +93,13 @@ export default function SpacePage() {
 
             <div className="editorial-img-wrapper h-[550px] sm:h-[700px] w-full mb-12">
               <Image
-                src="/images/kopimage_space_terrace_1786480961312.png"
+                src="/images/kopimage_space_terrace_1786480961312.webp"
                 alt="Teras KOPIMAGE Soreang"
                 fill
                 className="object-cover"
                 sizes="100vw"
+                quality={80}
+                loading="lazy"
               />
             </div>
 
@@ -147,11 +151,13 @@ export default function SpacePage() {
               </div>
               <div className="lg:col-span-7 editorial-img-wrapper h-[450px] sm:h-[600px]">
                 <Image
-                  src="/images/kopimage_space_night.png"
+                  src="/images/kopimage_space_night.webp"
                   alt="KOPIMAGE Evening Atmosphere"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 58vw"
+                  quality={80}
+                  loading="lazy"
                 />
               </div>
             </div>

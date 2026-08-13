@@ -149,7 +149,7 @@ export default function AdminDashboardPage() {
     return items.map((item) => {
       const cleanImage =
         item.image && item.image.startsWith('data:')
-          ? '/images/kopimage_hero_atmosphere_1786480906850.png'
+          ? '/images/kopimage_hero_atmosphere_1786480906850.webp'
           : item.image;
       return {
         ...item,
@@ -474,7 +474,7 @@ export default function AdminDashboardPage() {
         price: formattedPrice,
         base_price: numPrice,
         description: menuDesc || 'Racikan khas berkualitas disajikan hangat di KOPIMAGE.',
-        image: menuImg || editingMenu?.image || '/images/kopimage_hero_atmosphere_1786480906850.png',
+        image: menuImg || editingMenu?.image || '/images/kopimage_hero_atmosphere_1786480906850.webp',
         temperature: menuTemp || 'Hot / Ice',
         is_available: true,
       };
@@ -1463,10 +1463,10 @@ export default function AdminDashboardPage() {
                     <span className="text-[0.6rem] font-mono text-[#A89F91] block mb-1.5">Atau Pilih dari Preset Foto KOPIMAGE:</span>
                     <div className="grid grid-cols-4 gap-2">
                       {[
-                        { label: '☕ Kopi', url: '/images/kopimage_hero_atmosphere_1786480906850.png' },
-                        { label: '🍵 Thai Tea', url: '/images/Moments-Top coffe.png' },
-                        { label: '🍝 Makanan', url: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.png' },
-                        { label: '🥐 Cemilan', url: '/images/Moments-Weekend perfect with coffe in hand.png' },
+                        { label: '☕ Kopi', url: '/images/kopimage_hero_atmosphere_1786480906850.webp' },
+                        { label: '🍵 Thai Tea', url: '/images/Moments-Top coffe.webp' },
+                        { label: '🍝 Makanan', url: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.webp' },
+                        { label: '🥐 Cemilan', url: '/images/Moments-Weekend perfect with coffe in hand.webp' },
                       ].map((p) => (
                         <button
                           key={p.label}
