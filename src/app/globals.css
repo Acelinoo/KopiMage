@@ -85,33 +85,71 @@
 
   /* Crisp White Surface Cards for Menu Items, Inputs & Modals */
   .bg-\[\#14110F\],
-  .bg-\[\#161210\],
-  .bg-\[\#171311\],
-  .bg-bgDarkPaper,
-  .bg-\[\#1C1815\],
-  .bg-\[\#1E1815\],
-  .bg-bgDarkSurface {
+  .bg-bgDarkPaper {
     background-color: #FFFFFF !important;
     color: #1E1B18 !important;
     border-color: rgba(184, 46, 46, 0.15) !important;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
   }
 
-  /* Text inside White Cards turns to readable Deep Charcoal (#1E1B18) */
-  .bg-\[\#161210\] .text-\[\#FFFFFF\],
-  .bg-\[\#161210\] .text-\[\#F3EFEA\],
-  .bg-\[\#161210\] .text-\[\#F7F4EF\],
-  .bg-\[\#161210\] .text-white,
-  .bg-\[\#14110F\] .text-\[\#FFFFFF\],
-  .bg-\[\#14110F\] .text-\[\#F3EFEA\],
-  .bg-bgDarkPaper .text-white {
+  /* Facility & Space White Surface Cards (#space section) */
+  .bg-\[\#161210\],
+  .bg-\[\#1C1815\],
+  .bg-\[\#1E1815\],
+  .bg-bgDarkSurface {
+    background-color: #FFFFFF !important;
     color: #1E1B18 !important;
+    border-color: rgba(184, 46, 46, 0.2) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
   }
 
+  /* Facility Card Titles inside White Cards (Teras Luas, Stopkontak, Parkir) -> Deep Red (#9E1F1F) */
+  .bg-\[\#161210\] .text-\[\#C29B7F\],
+  .bg-\[\#1C1815\] .text-\[\#C29B7F\],
+  .bg-bgDarkSurface .text-\[\#C29B7F\] {
+    color: #9E1F1F !important;
+    font-weight: 700 !important;
+  }
+
+  /* Paragraphs inside White Surface Cards -> Deep Charcoal (#4A423A) */
+  .bg-\[\#161210\] p,
   .bg-\[\#161210\] .text-\[\#A89F91\],
   .bg-\[\#161210\] .text-\[\#9E9287\],
-  .bg-\[\#14110F\] .text-\[\#A89F91\] {
-    color: #5C5248 !important;
+  .bg-\[\#14110F\] .text-\[\#A89F91\],
+  .bg-\[\#1C1815\] p,
+  .bg-\[\#1C1815\] .text-\[\#A89F91\] {
+    color: #4A423A !important;
+  }
+
+  /* ----------------------------------------------------
+     STEP CARDS (#experience section: 01 DUDUK, 02 SCAN QR, 03 PILIH MENU, 04 NIKMATI)
+     Deep Red Card (#7A1414) + Pure White Text (#FFFFFF) + Gold Step Numbers (#FFE600)
+     ---------------------------------------------------- */
+  .bg-\[\#0E0B0A\].reveal-step-card,
+  .bg-\[\#0E0B0A\].rounded-xl {
+    background-color: #7A1414 !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  /* Step Number (01, 02, 03, 04) -> Bright Gold (#FFE600) */
+  .bg-\[\#0E0B0A\].reveal-step-card .text-\[\#B82E2E\],
+  .bg-\[\#0E0B0A\].reveal-step-card span.font-serif {
+    color: #FFE600 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Step Card Headings (DUDUK, SCAN QR, PILIH MENU, NIKMATI) -> Pure White (#FFFFFF) */
+  .bg-\[\#0E0B0A\].reveal-step-card h3,
+  .bg-\[\#0E0B0A\].reveal-step-card .text-\[\#FFFFFF\] {
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+  }
+
+  /* Step Card Descriptions -> Light Warm Peach (#F7EFE8) */
+  .bg-\[\#0E0B0A\].reveal-step-card p,
+  .bg-\[\#0E0B0A\].reveal-step-card .text-\[\#A89F91\] {
+    color: #F7EFE8 !important;
   }
 
   /* Typography Colors on Main Red Canvas */
