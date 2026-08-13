@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
 import { VALID_TABLES_REGISTRY as defaultTables } from '@/types/table';
 
+export const dynamic = 'force-dynamic';
+
 let inMemoryTablesStore: any[] = [];
 
 export async function GET() {

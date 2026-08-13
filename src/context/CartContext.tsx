@@ -69,6 +69,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
+  // Sync activeTableId when window location search changes
+  useEffect(() => {
+    const handleUrlChange = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tableParam = urlParams.get('table');
+      if (tableParam) {
+        setActiveTableId(tableParam);
+        localStorage.setItem('kopimage_table_id', tableParam);
+      }
+    };
+    window.addEventListener('popstate', handleUrlChange);
+    return () => window.removeEventListener('popstate', handleUrlChange);
+  }, []);
+
   // Save cart to localStorage only after initial load
   useEffect(() => {
     if (!isLoaded) return;

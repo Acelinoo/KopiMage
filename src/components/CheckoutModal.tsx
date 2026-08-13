@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { OrderMode, PaymentMethod } from '@/types/order';
 import { compressImageFile } from '@/lib/imageCompressor';
+import { isSameTable, isActiveCustomerOrder, isCompletedOrCancelledOrder } from '@/lib/tableUtils';
 import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee, Clock, ShieldCheck, RefreshCw, XCircle, Heart, Sparkles } from 'lucide-react';
 
 interface CheckoutModalProps {
@@ -36,7 +37,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
   const [customCancelReason, setCustomCancelReason] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
 
-  // Auto-restore active order from LocalStorage ONLY IF cart is empty
+  // Auto-restore active order from LocalStorage ONLY IF cart is empty AND table_id matches AND status is ACTIVE
   useEffect(() => {
     if (typeof window !== 'undefined' && !createdOrder) {
       if (cartItems.length === 0) {
@@ -44,15 +45,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           const stored = localStorage.getItem('kopimage_active_table_order');
           if (stored) {
             const parsed = JSON.parse(stored);
-            if (parsed && parsed.id) {
+            const storedTableId = parsed?.table_id || parsed?.tableNumber || parsed?.table_code;
+            const currentTableId = selectedTable || activeTableId;
+
+            // 1. Strict Table Isolation Check
+            // 2. Active Customer Order Check (DO NOT restore COMPLETED / CANCELLED as active modal on page load!)
+            if (parsed && parsed.id && isSameTable(storedTableId, currentTableId) && isActiveCustomerOrder(parsed)) {
               setCreatedOrder(parsed);
               setSubmissionStep(4);
+            } else if (parsed && isCompletedOrCancelledOrder(parsed)) {
+              // Expired completed order -> Clean localStorage
+              localStorage.removeItem('kopimage_active_table_order');
             }
           }
         } catch (e) {}
       }
     }
-  }, [cartItems.length]);
+  }, [cartItems.length, selectedTable, activeTableId]);
 
   // Fetch Live Tables from /api/tables & LocalStorage fallback
   useEffect(() => {
@@ -80,9 +89,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
     }
   }, []);
 
-  // Real-time Polling for Order Status Updates inside 1 Single Popup
+  // Real-time Polling for Order Status Updates & 12s Auto-Dismiss for COMPLETED/CANCELLED
   useEffect(() => {
     if (!createdOrder?.id) return;
+
+    // Auto-dismiss after 12s if status is COMPLETED or CANCELLED
+    if (isCompletedOrCancelledOrder(createdOrder)) {
+      const timer = setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.removeItem('kopimage_active_table_order');
+          } catch (e) {}
+        }
+        onClose();
+      }, 12000);
+      return () => clearTimeout(timer);
+    }
 
     const interval = setInterval(async () => {
       try {
@@ -95,7 +117,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
             setCreatedOrder(matched);
             if (typeof window !== 'undefined') {
               try {
-                localStorage.setItem('kopimage_active_table_order', JSON.stringify(matched));
+                if (isActiveCustomerOrder(matched)) {
+                  localStorage.setItem('kopimage_active_table_order', JSON.stringify(matched));
+                } else if (isCompletedOrCancelledOrder(matched)) {
+                  // Keep temporarily for 12s, then will auto-clear
+                  localStorage.setItem('kopimage_active_table_order', JSON.stringify(matched));
+                }
               } catch (e) {}
             }
           }
@@ -108,7 +135,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [createdOrder?.id]);
+  }, [createdOrder?.id, createdOrder?.order_status, onClose]);
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
