@@ -500,6 +500,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               Tutup Tracker
             </button>
           </div>
+          </div>
         </div>
       </div>
     );
@@ -536,6 +537,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           display: 'flex',
           flexDirection: 'column',
           boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
+        }}
+      >
         {/* Header (Fixed at Top - Never cut off) */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.85rem', flexShrink: 0 }}>
           <div>
