@@ -228,7 +228,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         {/* Steps Progress Checklist */}
         <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '0.85rem', textAlign: 'left' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 1 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 1 ? '#2ECC71' : submissionStep === 1 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 1 ? '#000' : '#777', shrink: 0 }}>
+            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 1 ? '#2ECC71' : submissionStep === 1 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 1 ? '#000' : '#777', flexShrink: 0 }}>
               {submissionStep > 1 ? '✓' : '1'}
             </div>
             <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 1 ? 600 : 400, color: submissionStep >= 1 ? '#F7F4EF' : '#777' }}>
@@ -237,7 +237,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 2 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 2 ? '#2ECC71' : submissionStep === 2 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 2 ? '#000' : '#777', shrink: 0 }}>
+            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 2 ? '#2ECC71' : submissionStep === 2 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 2 ? '#000' : '#777', flexShrink: 0 }}>
               {submissionStep > 2 ? '✓' : '2'}
             </div>
             <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 2 ? 600 : 400, color: submissionStep >= 2 ? '#F7F4EF' : '#777' }}>
@@ -246,7 +246,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 3 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 3 ? '#2ECC71' : submissionStep === 3 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 3 ? '#000' : '#777', shrink: 0 }}>
+            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 3 ? '#2ECC71' : submissionStep === 3 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 3 ? '#000' : '#777', flexShrink: 0 }}>
               {submissionStep > 3 ? '✓' : '3'}
             </div>
             <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 3 ? 600 : 400, color: submissionStep >= 3 ? '#F7F4EF' : '#777' }}>
@@ -255,7 +255,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 4 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep === 4 ? '#2ECC71' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep === 4 ? '#000' : '#777', shrink: 0 }}>
+            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep === 4 ? '#2ECC71' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep === 4 ? '#000' : '#777', flexShrink: 0 }}>
               {submissionStep === 4 ? '✓' : '4'}
             </div>
             <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 4 ? 600 : 400, color: submissionStep === 4 ? '#2ECC71' : '#777' }}>
