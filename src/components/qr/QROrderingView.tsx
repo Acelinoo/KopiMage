@@ -341,3 +341,5 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
     </div>
   );
 };
+
+export default QROrderingView;

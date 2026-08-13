@@ -89,3 +89,5 @@ export function EditorialFooter() {
     </footer>
   );
 }
+
+export default EditorialFooter;

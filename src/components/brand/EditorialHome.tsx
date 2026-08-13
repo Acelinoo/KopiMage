@@ -948,3 +948,5 @@ export function EditorialHome() {
         </div>
     );
 }
+
+export default EditorialHome;

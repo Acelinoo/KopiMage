@@ -187,3 +187,5 @@ export function EditorialHeader() {
     </Suspense>
   );
 }
+
+export default EditorialHeader;

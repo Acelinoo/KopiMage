@@ -4,11 +4,6 @@ import { EditorialHome } from '@/components/brand/EditorialHome';
 import { EditorialFooter } from '@/components/brand/EditorialFooter';
 import { QROrderingView } from '@/components/qr/QROrderingView';
 
-export const metadata = {
-  title: 'KOPIMAGE Soreang — Luxury Hospitality & Coffee Brand',
-  description: 'Ruang berteduh & kedai kopi pilihan di Gading Tutuka, Soreang. Menyajikan kopi pilihan, cemilan khas, dan pengalaman table ordering digital.',
-};
-
 export default function HomePage({
   searchParams,
 }: {
