@@ -12,6 +12,30 @@ function EditorialHeaderContent() {
   const tableId = searchParams.get('table');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Di dekat bagian paling atas, navbar selalu terlihat
+      if (currentScrollY < 50) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY && currentScrollY - lastScrollY > 8) {
+        // Scroll KE BAWAH -> Sembunyikan navbar
+        setIsVisible(false);
+      } else if (currentScrollY < lastScrollY && lastScrollY - currentScrollY > 6) {
+        // Scroll SEDIKIT KE ATAS -> Langsung tampilkan navbar
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const navItems = [
     { label: 'ABOUT', href: '#about' },
@@ -23,7 +47,12 @@ function EditorialHeaderContent() {
 
   return (
     <>
-      <header style={{ background: 'var(--bg-main)', borderColor: 'var(--border-color)' }} className="sticky top-0 z-40 backdrop-blur-md editorial-border-b transition-all duration-300 border-b">
+      <header
+        style={{ background: 'var(--bg-main)', borderColor: 'var(--border-color)' }}
+        className={`sticky top-0 z-40 backdrop-blur-md editorial-border-b transition-transform duration-300 ease-in-out border-b ${
+          isVisible || mobileMenuOpen ? 'translate-y-0 shadow-md' : '-translate-y-full'
+        }`}
+      >
         <div className="editorial-container flex items-center justify-between h-20">
           {/* Logo & Brand Identity */}
           <Link href={tableId ? `/?table=${tableId}` : '/'} className="flex flex-col group">

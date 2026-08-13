@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedList from './AnimatedList';
 import MenuDetailModal from './MenuDetailModal';
 import { MenuItem } from '../../types/menu';
+import { useTheme } from '@/context/ThemeContext';
 
 // Dynamic import for WebGL CircularGallery component with explicit .default unwrapping
 const CircularGallery = dynamic(() => import('./CircularGallery').then(mod => mod.default), {
@@ -44,6 +45,8 @@ const CircularGallery = dynamic(() => import('./CircularGallery').then(mod => mo
 });
 
 export function EditorialHome() {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark';
     const [activeOutlet, setActiveOutlet] = useState<'gading' | 'lanud'>('gading');
     const [activeMenuCategory, setActiveMenuCategory] = useState<string>('all');
     const [isMenuExpanded, setIsMenuExpanded] = useState<boolean>(false);
@@ -285,11 +288,11 @@ export function EditorialHome() {
                                 <p className="font-sans text-sm sm:text-base text-[#A89F91] leading-relaxed mb-8 font-light">
                                     Kini Kopi Mage makin deket sama kamu di <strong className="text-[#FFFFFF] font-semibold">2 cabang utama</strong>: cabang Gading Tutuka (Soreang) dan cabang Lanud Sulaiman (Margahayu).
                                 </p>
-                                <div style={{ background: '#7A1414', borderColor: 'rgba(255,255,255,0.3)' }} className="p-6 border max-w-md rounded shadow-lg">
-                                    <span style={{ color: '#FFE600' }} className="font-serif italic text-lg block mb-2 font-bold">
+                                <div style={{ background: '#7A1414', borderColor: 'rgba(255,255,255,0.3)' }} className="p-6 border max-w-md rounded shadow-lg quote-highlight-card">
+                                    <span style={{ color: '#FFE600' }} className="font-serif italic text-lg block mb-2 font-bold quote-title">
                                         "Kopi Enak, Suasana Nyaman, Live Music Asik."
                                     </span>
-                                    <p style={{ color: '#FFFFFF' }} className="font-sans text-xs font-light">
+                                    <p style={{ color: '#FFFFFF' }} className="font-sans text-xs font-light quote-desc">
                                         Tempat nongkrong jujur buat nikmatin setiap harimu di Kopi Mage.
                                     </p>
                                 </div>

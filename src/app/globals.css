@@ -144,6 +144,7 @@
   .bg-\[\#0E0B0A\].reveal-step-card,
   .bg-\[\#0E0B0A\].rounded-xl,
   .bg-\[\#7A1414\],
+  .quote-highlight-card,
   div[style*="#7A1414"],
   div[style*="7A1414"] {
     background-color: #7A1414 !important;
@@ -152,6 +153,7 @@
   }
 
   .bg-\[\#0E0B0A\].reveal-step-card *,
+  .quote-highlight-card *,
   div[style*="#7A1414"] *,
   div[style*="7A1414"] * {
     color: #FFFFFF !important;
@@ -159,6 +161,9 @@
 
   .bg-\[\#0E0B0A\].reveal-step-card span,
   .bg-\[\#0E0B0A\].reveal-step-card .text-\[\#B82E2E\],
+  .quote-highlight-card span,
+  .quote-highlight-card .quote-title,
+  .quote-title,
   div[style*="#7A1414"] span,
   div[style*="7A1414"] span {
     color: #FFE600 !important;
@@ -166,9 +171,12 @@
   }
 
   .bg-\[\#0E0B0A\].reveal-step-card p,
+  .quote-highlight-card p,
+  .quote-highlight-card .quote-desc,
+  .quote-desc,
   div[style*="#7A1414"] p,
   div[style*="7A1414"] p {
-    color: #F7EFE8 !important;
+    color: #FFFFFF !important;
   }
 
   /* ----------------------------------------------------
