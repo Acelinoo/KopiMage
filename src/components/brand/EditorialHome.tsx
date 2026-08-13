@@ -185,17 +185,17 @@ export function EditorialHome() {
             {/* ----------------------------------------------------
           1. HERO SECTION (#home) — INDUSTRIAL COKLAT & DARK MATTE
          ---------------------------------------------------- */}
-            <section id="home" style={{ background: 'var(--bg-main)' }} className="relative pt-6 pb-12 lg:pb-16 editorial-border-b">
+            <section id="home" style={{ background: '#9E1F1F' }} className="relative pt-6 pb-12 lg:pb-16 editorial-border-b">
                 <div className="editorial-container">
                     {/* Sub-header Bar (Operating Hours & Live Music Info) */}
                     <div className="flex flex-wrap items-center justify-between border-b border-[#FFFFFF]/10 pb-4 mb-8 gap-3 reveal-fade-up is-visible">
                         <div className="flex items-center gap-2.5">
-                            <span className="w-2 h-2 rounded-full bg-[#B82E2E] animate-pulse" />
-                            <span className="font-sans text-[0.62rem] sm:text-[0.68rem] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#B82E2E] font-semibold">
+                            <span className="w-2 h-2 rounded-full bg-[#FFE600] animate-pulse" />
+                            <span style={{ color: '#FFE600' }} className="font-sans text-[0.62rem] sm:text-[0.68rem] tracking-[0.18em] sm:tracking-[0.22em] uppercase font-bold">
                                 LIVE MUSIC WEEKEND • 2 CABANG: GADING TUTUKA & LANUD SULAIMAN
                             </span>
                         </div>
-                        <span className="font-sans text-[0.62rem] sm:text-[0.68rem] tracking-[0.18em] sm:tracking-[0.22em] uppercase text-[#C29B7F] font-medium">
+                        <span style={{ color: '#FFD5B8' }} className="font-sans text-[0.62rem] sm:text-[0.68rem] tracking-[0.18em] sm:tracking-[0.22em] uppercase font-medium">
                             BUKA SETIAP HARI • 07.00 - 23.00 WIB
                         </span>
                     </div>
@@ -221,12 +221,12 @@ export function EditorialHome() {
                         <div className="order-2 md:order-1 md:col-span-7 lg:col-span-6 reveal-fade-up is-visible" style={{ transitionDelay: '0.2s' }}>
 
                             {/* Main Headline Text */}
-                            <h1 className="font-serif text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-light text-[#FFFFFF] leading-[1.15] mb-4 sm:mb-5">
+                            <h1 style={{ color: '#FFFFFF' }} className="font-serif text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-light leading-[1.15] mb-4 sm:mb-5">
                                 Kedai Kopi Berkonsep Industrial di Soreang & Margahayu
                             </h1>
 
                             {/* Description Paragraph */}
-                            <p className="font-sans text-xs sm:text-base text-[#A89F91] leading-relaxed font-light mb-6 sm:mb-8 max-w-xl">
+                            <p style={{ color: '#F7EFE8' }} className="font-sans text-xs sm:text-base leading-relaxed font-light mb-6 sm:mb-8 max-w-xl">
                                 Tempat santai untuk ngopi, nugas, dan kumpul bersama teman atau pasangan. Menyediakan pilihan kopi racikan barista, makanan hangat, dan suasana teras sejuk di 2 cabang resmi (Gading Tutuka & Lanud Sulaiman).
                             </p>
 
@@ -234,16 +234,18 @@ export function EditorialHome() {
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
                                 <a
                                     href="#menu"
-                                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#B82E2E] text-[#FFFFFF] hover:bg-[#D63434] transition-colors text-xs tracking-wider uppercase font-semibold border border-[#B82E2E] shadow-sm text-center w-full sm:w-auto"
+                                    style={{ background: '#FFFFFF', color: '#8C1C1C', borderColor: '#FFFFFF', fontWeight: 700 }}
+                                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl transition-all text-xs tracking-wider uppercase border shadow-md text-center w-full sm:w-auto cursor-pointer"
                                 >
                                     <span>Menu Best Seller</span>
-                                    <ArrowRight className="w-4 h-4" />
+                                    <ArrowRight className="w-4 h-4" style={{ color: '#8C1C1C' }} />
                                 </a>
                                 <a
                                     href="#experience"
-                                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl border border-[#FFFFFF]/30 bg-transparent text-[#FFFFFF] hover:border-[#FFFFFF] hover:bg-[#FFFFFF]/10 transition-colors text-xs tracking-wider uppercase font-semibold text-center w-full sm:w-auto"
+                                    style={{ background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.3)', fontWeight: 600 }}
+                                    className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl border transition-all text-xs tracking-wider uppercase text-center w-full sm:w-auto cursor-pointer"
                                 >
-                                    <Coffee className="w-4 h-4 text-[#C29B7F]" />
+                                    <Coffee className="w-4 h-4" style={{ color: '#FFD5B8' }} />
                                     <span>Cara Pesan</span>
                                 </a>
                             </div>
