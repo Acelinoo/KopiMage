@@ -272,11 +272,11 @@ export function EditorialHome() {
                             <p className="font-sans text-sm sm:text-base text-[#A89F91] leading-relaxed mb-8 font-light">
                                 Kini Kopi Mage makin dekat dengan Anda melalui <strong className="text-[#FFFFFF] font-semibold">2 cabang utama</strong>: cabang Gading Tutuka (Soreang) dan cabang Lanud Sulaiman (Margahayu).
                             </p>
-                            <div className="p-6 border border-[#B82E2E]/30 bg-[#0E0B0A] max-w-md rounded-xl">
-                                <span className="font-serif italic text-lg text-[#C29B7F] block mb-2 font-medium">
+                            <div style={{ background: '#7A1414', borderColor: 'rgba(255,255,255,0.3)' }} className="p-6 border max-w-md rounded-xl shadow-lg">
+                                <span style={{ color: '#FFE600' }} className="font-serif italic text-lg block mb-2 font-bold">
                                     "Kopi Nikmat, Tempat Hangat, Live Music Asik."
                                 </span>
-                                <p className="font-sans text-xs text-[#A89F91]">
+                                <p style={{ color: '#F7EFE8' }} className="font-sans text-xs font-light">
                                     Pengalaman nongkrong jujur tanpa batasan di Kopi Mage.
                                 </p>
                             </div>
@@ -316,9 +316,6 @@ export function EditorialHome() {
                     {/* Collapsible Header Block */}
                     <div className="p-5 sm:p-8 border border-[#B82E2E]/30 bg-[#161210] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-lg reveal-fade-up">
                         <div className="flex items-start sm:items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-[#B82E2E]/15 border border-[#B82E2E]/40 flex items-center justify-center shrink-0">
-                                <Coffee className="w-6 h-6 text-[#B82E2E]" />
-                            </div>
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className="font-sans text-[0.68rem] tracking-[0.22em] uppercase text-[#B82E2E] font-semibold">
@@ -530,16 +527,16 @@ export function EditorialHome() {
             {/* ----------------------------------------------------
           2.8. CIRCULAR GALLERY 3D (MOMEN SERU COPY)
          ---------------------------------------------------- */}
-            <section id="moments" className="py-16 lg:py-24 editorial-border-b bg-[#161210]">
+            <section id="moments" style={{ background: '#0E0B0A' }} className="py-16 lg:py-24 editorial-border-b">
                 <div className="editorial-container mb-8 sm:mb-12 reveal-fade-up">
                     <div className="flex flex-col text-left border-b border-[#FFFFFF]/10 pb-6 max-w-2xl">
-                        <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#C29B7F] font-semibold block mb-2">
+                        <span style={{ color: '#FFE600' }} className="font-sans text-[0.7rem] tracking-[0.25em] uppercase font-bold block mb-2">
                             GALERI & MOMEN SERU
                         </span>
-                        <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[#FFFFFF] mb-3">
+                        <h2 style={{ color: '#FFFFFF' }} className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light mb-3">
                             Momen-Momen Seru di KOPIMAGE
                         </h2>
-                        <p className="font-sans text-xs sm:text-sm text-[#A89F91] font-light leading-relaxed">
+                        <p style={{ color: '#F2D6C6' }} className="font-sans text-xs sm:text-sm font-light leading-relaxed">
                             Geser atau putar galeri 3D di bawah ini untuk melihat momen seru nongkrong, live music, bukber, dan kehangatan bersama teman & pasangan di Kopi Mage.
                         </p>
                     </div>
@@ -836,19 +833,21 @@ export function EditorialHome() {
                     <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-8 reveal-fade-up">
                         <button
                             onClick={() => setActiveOutlet('gading')}
-                            className={`py-3.5 px-5 sm:px-6 w-full sm:w-auto font-sans text-xs tracking-[0.18em] uppercase transition-colors border rounded-xl ${activeOutlet === 'gading'
-                                ? 'bg-[#B82E2E] text-[#FFFFFF] border-[#B82E2E] font-semibold shadow-sm'
-                                : 'bg-[#161210] text-[#FFFFFF] border-[#FFFFFF]/15 hover:border-[#B82E2E]'
-                                }`}
+                            style={activeOutlet === 'gading'
+                                ? { background: '#FFFFFF', color: '#8C1C1C', borderColor: '#FFFFFF', fontWeight: 'bold' }
+                                : { background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.3)' }
+                            }
+                            className="py-3.5 px-5 sm:px-6 w-full sm:w-auto font-sans text-xs tracking-[0.18em] uppercase transition-all border rounded-xl shadow-sm cursor-pointer"
                         >
                             1. Cabang Gading Tutuka (Soreang)
                         </button>
                         <button
                             onClick={() => setActiveOutlet('lanud')}
-                            className={`py-3.5 px-5 sm:px-6 w-full sm:w-auto font-sans text-xs tracking-[0.18em] uppercase transition-colors border rounded-xl ${activeOutlet === 'lanud'
-                                ? 'bg-[#B82E2E] text-[#FFFFFF] border-[#B82E2E] font-semibold shadow-sm'
-                                : 'bg-[#161210] text-[#FFFFFF] border-[#FFFFFF]/15 hover:border-[#B82E2E]'
-                                }`}
+                            style={activeOutlet === 'lanud'
+                                ? { background: '#FFFFFF', color: '#8C1C1C', borderColor: '#FFFFFF', fontWeight: 'bold' }
+                                : { background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.3)' }
+                            }
+                            className="py-3.5 px-5 sm:px-6 w-full sm:w-auto font-sans text-xs tracking-[0.18em] uppercase transition-all border rounded-xl shadow-sm cursor-pointer"
                         >
                             2. Cabang Lanud Sulaiman (Margahayu)
                         </button>
@@ -889,18 +888,18 @@ export function EditorialHome() {
                                     {activeOutlet === 'gading' ? 'INFORMASI CABANG GADING TUTUKA' : 'INFORMASI CABANG LANUD SULAIMAN'}
                                 </span>
 
-                                <div className="space-y-3 font-sans text-xs text-[#A89F91] font-light mb-6">
-                                    <div className="p-3.5 border border-[#FFFFFF]/10 bg-[#0E0B0A] rounded-xl">
-                                        <span className="font-semibold text-[#FFFFFF] block mb-1">Alamat Cabang</span>
-                                        <span>
+                                <div className="space-y-3 font-sans text-xs font-light mb-6">
+                                    <div style={{ background: 'rgba(184, 46, 46, 0.08)', borderColor: 'rgba(184, 46, 46, 0.25)' }} className="p-3.5 border rounded-xl shadow-sm">
+                                        <span style={{ color: '#9E1F1F' }} className="font-bold block mb-1">Alamat Cabang</span>
+                                        <span style={{ color: '#1E1B18' }}>
                                             {activeOutlet === 'gading'
                                                 ? 'Jl. Gading Tutuka No. 88, Soreang, Kab. Bandung (Dekat Tol Seroja)'
                                                 : 'Kawasan Lanud Sulaiman, Margahayu, Kab. Bandung'}
                                         </span>
                                     </div>
-                                    <div className="p-3.5 border border-[#FFFFFF]/10 bg-[#0E0B0A] rounded-xl">
-                                        <span className="font-semibold text-[#FFFFFF] block mb-1">Jam Operasional</span>
-                                        <span>Buka Setiap Hari: 07.00 - 23.00 WIB</span>
+                                    <div style={{ background: 'rgba(184, 46, 46, 0.08)', borderColor: 'rgba(184, 46, 46, 0.25)' }} className="p-3.5 border rounded-xl shadow-sm">
+                                        <span style={{ color: '#9E1F1F' }} className="font-bold block mb-1">Jam Operasional</span>
+                                        <span style={{ color: '#1E1B18' }}>Buka Setiap Hari: 07.00 - 23.00 WIB</span>
                                     </div>
                                 </div>
 
