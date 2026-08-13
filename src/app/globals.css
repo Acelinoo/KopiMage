@@ -65,58 +65,6 @@
   --status-error: #C0392B;
 }
 
-/* ----------------------------------------------------
-   LIGHT MODE AUTOMATIC THEME MAPPING & OVERRIDES
-   Ensures hardcoded container classes map smoothly to Light Mode
-   ---------------------------------------------------- */
-[data-theme="light"] .bg-\[\#0C0A09\],
-[data-theme="light"] .bg-\[\#0E0B0A\],
-[data-theme="light"] .bg-\[\#090807\],
-[data-theme="light"] .bg-\[\#070605\],
-[data-theme="light"] .bg-\[\#0B0908\],
-[data-theme="light"] .bg-bgDark {
-  background-color: var(--bg-main) !important;
-  color: var(--text-primary) !important;
-}
-
-[data-theme="light"] .bg-\[\#14110F\],
-[data-theme="light"] .bg-\[\#161210\],
-[data-theme="light"] .bg-\[\#120F0D\],
-[data-theme="light"] .bg-\[\#171311\],
-[data-theme="light"] .bg-bgDarkPaper {
-  background-color: var(--bg-surface) !important;
-  color: var(--text-primary) !important;
-}
-
-[data-theme="light"] .bg-\[\#1C1815\],
-[data-theme="light"] .bg-\[\#1E1815\],
-[data-theme="light"] .bg-bgDarkSurface {
-  background-color: var(--bg-surface-elevated) !important;
-  color: var(--text-primary) !important;
-}
-
-[data-theme="light"] .text-\[\#F3EFEA\],
-[data-theme="light"] .text-\[\#F7F4EF\],
-[data-theme="light"] .text-\[\#FFFFFF\],
-[data-theme="light"] .text-white,
-[data-theme="light"] .text-textLight {
-  color: var(--text-primary) !important;
-}
-
-[data-theme="light"] .text-\[\#A89F91\],
-[data-theme="light"] .text-\[\#9E9287\],
-[data-theme="light"] .text-\[\#C4BBB4\],
-[data-theme="light"] .text-textMuted {
-  color: var(--text-muted) !important;
-}
-
-[data-theme="light"] .border-\[\#FFFFFF\]\/10,
-[data-theme="light"] .border-\[\#FFFFFF\]\/15,
-[data-theme="light"] .border-\[\#FFFFFF\]\/20,
-[data-theme="light"] .border-\[\#FFFFFF\]\/30 {
-  border-color: var(--border-color) !important;
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
