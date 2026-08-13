@@ -256,7 +256,7 @@ export function EditorialHome() {
             {/* ----------------------------------------------------
           2. ABOUT KOPI MAGE (#about) — INDUSTRIAL PAPER SURFACE
          ---------------------------------------------------- */}
-            <section id="about" className="py-16 lg:py-24 editorial-border-b bg-[#161210]">
+            <section id="about" style={{ background: 'var(--bg-main)' }} className="py-12 sm:py-16 lg:py-24 editorial-border-b">
                 <div className="editorial-container">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-12 sm:mb-16">
                         <div className="lg:col-span-5 reveal-slide-left">

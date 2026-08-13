@@ -89,7 +89,6 @@
      B. WHITE SURFACE CARDS (Menu Cards, Modals, Drawers, Inputs, Facility Cards)
      ---------------------------------------------------- */
   .bg-\[\#14110F\],
-  .bg-\[\#161210\],
   .bg-\[\#171311\],
   .bg-\[\#1C1815\],
   .bg-\[\#1E1815\],
@@ -104,7 +103,7 @@
 
   /* Headings & Text Inside White Cards MUST be Dark Charcoal (#1E1B18) */
   .bg-\[\#14110F\] h1, .bg-\[\#14110F\] h2, .bg-\[\#14110F\] h3, .bg-\[\#14110F\] h4, .bg-\[\#14110F\] p, .bg-\[\#14110F\] span, .bg-\[\#14110F\] div, .bg-\[\#14110F\] label,
-  .bg-\[\#161210\] h1, .bg-\[\#161210\] h2, .bg-\[\#161210\] h3, .bg-\[\#161210\] h4, .bg-\[\#161210\] p, .bg-\[\#161210\] span, .bg-\[\#161210\] div, .bg-\[\#161210\] label,
+  .bg-\[\#171311\] h1, .bg-\[\#171311\] h2, .bg-\[\#171311\] h3, .bg-\[\#171311\] h4, .bg-\[\#171311\] p, .bg-\[\#171311\] span, .bg-\[\#171311\] div, .bg-\[\#171311\] label,
   .bg-\[\#1C1815\] h1, .bg-\[\#1C1815\] h2, .bg-\[\#1C1815\] h3, .bg-\[\#1C1815\] h4, .bg-\[\#1C1815\] p, .bg-\[\#1C1815\] span, .bg-\[\#1C1815\] div, .bg-\[\#1C1815\] label,
   .bg-\[\#1E1815\] h1, .bg-\[\#1E1815\] h2, .bg-\[\#1E1815\] h3, .bg-\[\#1E1815\] h4, .bg-\[\#1E1815\] p, .bg-\[\#1E1815\] span, .bg-\[\#1E1815\] div, .bg-\[\#1E1815\] label,
   .bg-bgDarkPaper h1, .bg-bgDarkPaper h2, .bg-bgDarkPaper h3, .bg-bgDarkPaper h4, .bg-bgDarkPaper p, .bg-bgDarkPaper span, .bg-bgDarkPaper div, .bg-bgDarkPaper label,
@@ -113,8 +112,7 @@
   }
 
   /* Specific Headings & Accents Inside White Cards -> Deep Crimson Red (#9E1F1F) */
-  .bg-\[\#161210\] .text-\[\#C29B7F\],
-  .bg-\[\#161210\] .text-accentCopper,
+  .bg-\[\#171311\] .text-\[\#C29B7F\],
   .bg-\[\#1C1815\] .text-\[\#C29B7F\],
   .bg-\[\#1E1815\] .text-\[\#C29B7F\],
   .bg-bgDarkSurface .text-accentCopper {
@@ -123,9 +121,6 @@
   }
 
   /* Muted Paragraphs & Subtitles Inside White Cards -> Dark Slate (#4A423A) */
-  .bg-\[\#161210\] p,
-  .bg-\[\#161210\] .text-\[\#A89F91\],
-  .bg-\[\#161210\] .text-\[\#9E9287\],
   .bg-\[\#14110F\] p,
   .bg-\[\#14110F\] .text-\[\#A89F91\],
   .bg-\[\#1C1815\] p,
@@ -134,27 +129,36 @@
   }
 
   /* ----------------------------------------------------
-     C. STEP CARDS (#experience section: 01 DUDUK, 02 SCAN QR)
-     Deep Crimson Card (#7A1414) + Pure White Text (#FFFFFF) + Gold Step Numbers (#FFE600)
+     C. DEEP RED CARDS & STEP CARDS (#7A1414 / #0E0B0A quote cards)
+     FORCIBLY PRESERVE GOLD (#FFE600) & WHITE (#FFFFFF) TEXT INSIDE RED CARDS
      ---------------------------------------------------- */
   .bg-\[\#0E0B0A\].reveal-step-card,
-  .bg-\[\#0E0B0A\].rounded-xl {
+  .bg-\[\#0E0B0A\].rounded-xl,
+  .bg-\[\#7A1414\],
+  div[style*="#7A1414"],
+  div[style*="7A1414"] {
     background-color: #7A1414 !important;
     border-color: rgba(255, 255, 255, 0.25) !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
   }
 
-  .bg-\[\#0E0B0A\].reveal-step-card * {
+  .bg-\[\#0E0B0A\].reveal-step-card *,
+  div[style*="#7A1414"] *,
+  div[style*="7A1414"] * {
     color: #FFFFFF !important;
   }
 
+  .bg-\[\#0E0B0A\].reveal-step-card span,
   .bg-\[\#0E0B0A\].reveal-step-card .text-\[\#B82E2E\],
-  .bg-\[\#0E0B0A\].reveal-step-card span.font-serif {
+  div[style*="#7A1414"] span,
+  div[style*="7A1414"] span {
     color: #FFE600 !important;
     font-weight: 700 !important;
   }
 
-  .bg-\[\#0E0B0A\].reveal-step-card p {
+  .bg-\[\#0E0B0A\].reveal-step-card p,
+  div[style*="#7A1414"] p,
+  div[style*="7A1414"] p {
     color: #F7EFE8 !important;
   }
 
