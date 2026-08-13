@@ -17,6 +17,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   useEffect(() => {
     try {
+      const THEME_VERSION = '2';
+      const storedVersion = localStorage.getItem('kopimage_theme_v');
+      if (storedVersion !== THEME_VERSION) {
+        localStorage.setItem('kopimage_theme', 'light');
+        localStorage.setItem('kopimage_theme_v', THEME_VERSION);
+      }
       const stored = localStorage.getItem('kopimage_theme') as Theme | null;
       if (stored === 'light' || stored === 'dark') {
         setThemeState(stored);
@@ -54,7 +60,7 @@ export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
     return {
-      theme: 'dark' as Theme,
+      theme: 'light' as Theme,
       toggleTheme: () => {},
       setTheme: () => {},
     };

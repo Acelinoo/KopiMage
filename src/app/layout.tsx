@@ -22,15 +22,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="id" data-theme="light">
       <head>
         <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
                 try {
+                  var THEME_VERSION = '2';
+                  var storedVersion = localStorage.getItem('kopimage_theme_v');
+                  if (storedVersion !== THEME_VERSION) {
+                    localStorage.setItem('kopimage_theme', 'light');
+                    localStorage.setItem('kopimage_theme_v', THEME_VERSION);
+                  }
                   var stored = localStorage.getItem('kopimage_theme');
-                  var theme = stored || 'light';
+                  var theme = (stored === 'light' || stored === 'dark') ? stored : 'light';
                   document.documentElement.setAttribute('data-theme', theme);
                 } catch (e) {
                   document.documentElement.setAttribute('data-theme', 'light');
