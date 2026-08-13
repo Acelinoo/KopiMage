@@ -10,6 +10,8 @@ import { useCart } from '@/context/CartContext';
 import { Search, Filter, X, ArrowRight, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { FloatingOrderStatusWidget } from '@/components/FloatingOrderStatusWidget';
+
 interface QROrderingViewProps {
   tableId: string;
 }
@@ -331,6 +333,9 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
           </motion.div>
         </div>
       )}
+
+      {/* Persistent Customer Order Status Floating Widget */}
+      <FloatingOrderStatusWidget />
 
       <Footer />
     </div>

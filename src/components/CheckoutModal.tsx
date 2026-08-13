@@ -30,6 +30,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
   const [createdOrder, setCreatedOrder] = useState<any>(null);
   const [isPolling, setIsPolling] = useState<boolean>(false);
 
+  // Auto-restore active order from LocalStorage if present
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !createdOrder) {
+      try {
+        const stored = localStorage.getItem('kopimage_active_table_order');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.id) {
+            setCreatedOrder(parsed);
+            setSubmissionStep(4);
+          }
+        }
+      } catch (e) {}
+    }
+  }, []);
+
   // Fetch Live Tables from /api/tables & LocalStorage fallback
   useEffect(() => {
     const isCleared = typeof window !== 'undefined' && localStorage.getItem('kopimage_tables_cleared') === 'true';
@@ -69,6 +85,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           const matched = data.orders.find((o: any) => o.id === createdOrder.id);
           if (matched) {
             setCreatedOrder(matched);
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem('kopimage_active_table_order', JSON.stringify(matched));
+              } catch (e) {}
+            }
           }
         }
       } catch (err) {
@@ -156,6 +177,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
       }
 
       setCreatedOrder(data.order);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('kopimage_active_table_order', JSON.stringify(data.order));
+        } catch (e) {}
+      }
       setSubmissionStep(4); // Step 4: Selesai -> Tampilkan Live Popup Status
       clearCart();
       onSuccess();
