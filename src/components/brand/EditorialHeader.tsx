@@ -23,7 +23,7 @@ function EditorialHeaderContent() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-[#0C0A09]/90 backdrop-blur-md editorial-border-b transition-all duration-300 border-b border-[#FFFFFF]/10">
+      <header style={{ background: 'var(--bg-main)', borderColor: 'var(--border-color)' }} className="sticky top-0 z-40 backdrop-blur-md editorial-border-b transition-all duration-300 border-b">
         <div className="editorial-container flex items-center justify-between h-20">
           {/* Logo & Brand Identity */}
           <Link href={tableId ? `/?table=${tableId}` : '/'} className="flex flex-col group">
