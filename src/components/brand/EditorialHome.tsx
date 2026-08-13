@@ -256,7 +256,7 @@ export function EditorialHome() {
             {/* ----------------------------------------------------
           2. ABOUT KOPI MAGE (#about) — INDUSTRIAL PAPER SURFACE
          ---------------------------------------------------- */}
-            <section id="about" style={{ background: 'var(--bg-main)' }} className="py-12 sm:py-16 lg:py-24 editorial-border-b">
+            <section id="about" className="py-16 lg:py-24 editorial-border-b bg-[#161210]">
                 <div className="editorial-container">
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-12 sm:mb-16">
                         <div className="lg:col-span-5 reveal-slide-left">
@@ -884,17 +884,17 @@ export function EditorialHome() {
                                 </span>
 
                                 <div className="space-y-3 font-sans text-xs font-light mb-6">
-                                    <div style={{ background: 'rgba(184, 46, 46, 0.08)', borderColor: 'rgba(184, 46, 46, 0.25)' }} className="p-3.5 border rounded-xl shadow-sm">
-                                        <span style={{ color: '#9E1F1F' }} className="font-bold block mb-1">Alamat Cabang</span>
-                                        <span style={{ color: '#1E1B18' }}>
+                                    <div style={{ background: '#9E1F1F', borderColor: 'rgba(255, 255, 255, 0.25)' }} className="p-3.5 border rounded-xl shadow-sm">
+                                        <span style={{ color: '#FFE600' }} className="font-bold block mb-1">Alamat Cabang</span>
+                                        <span style={{ color: '#F7EFE8' }}>
                                             {activeOutlet === 'gading'
                                                 ? 'Jl. Gading Tutuka No. 88, Soreang, Kab. Bandung (Dekat Tol Seroja)'
                                                 : 'Kawasan Lanud Sulaiman, Margahayu, Kab. Bandung'}
                                         </span>
                                     </div>
-                                    <div style={{ background: 'rgba(184, 46, 46, 0.08)', borderColor: 'rgba(184, 46, 46, 0.25)' }} className="p-3.5 border rounded-xl shadow-sm">
-                                        <span style={{ color: '#9E1F1F' }} className="font-bold block mb-1">Jam Operasional</span>
-                                        <span style={{ color: '#1E1B18' }}>Buka Setiap Hari: 07.00 - 23.00 WIB</span>
+                                    <div style={{ background: '#9E1F1F', borderColor: 'rgba(255, 255, 255, 0.25)' }} className="p-3.5 border rounded-xl shadow-sm">
+                                        <span style={{ color: '#FFE600' }} className="font-bold block mb-1">Jam Operasional</span>
+                                        <span style={{ color: '#F7EFE8' }}>Buka Setiap Hari: 07.00 - 23.00 WIB</span>
                                     </div>
                                 </div>
 
