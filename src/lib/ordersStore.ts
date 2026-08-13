@@ -14,7 +14,9 @@ export interface OrderItemPayload {
 
 export interface OrderRecord {
   id: string;
+  client_order_id?: string | null;
   order_number: string;
+  order_display_number?: string | null;
   tracking_secret: string;
   mode: 'dine-in' | 'takeaway';
   table_id: string | null;
@@ -25,7 +27,7 @@ export interface OrderRecord {
   subtotal: number;
   total_amount: number;
   order_status: 'NEW_ORDER' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED' | 'CANCELLATION_REQUESTED';
-  payment_status: 'UNPAID' | 'VERIFYING' | 'PAID' | 'REJECTED';
+  payment_status: 'UNPAID' | 'VERIFYING' | 'PAID' | 'REJECTED' | 'REFUND_REQUIRED' | 'REFUNDED';
   rejection_reason?: string | null;
   cancellation_reason?: string | null;
   created_at: string;

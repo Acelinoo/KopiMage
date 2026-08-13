@@ -31,6 +31,8 @@ export interface OrderItemPayload {
 
 export interface OrderPayload {
   orderId: string; // e.g. "KOP-20260812-007"
+  clientOrderId?: string; // Idempotency key
+  orderDisplayNumber?: string; // e.g. "#A127"
   mode: OrderMode;
   tableNumber?: string; // Validated table number for Dine-In
   customerName: string;

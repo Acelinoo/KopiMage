@@ -139,6 +139,23 @@ export async function PATCH(request: Request) {
 
     const supabase = createAdminSupabaseClient();
 
+    // 1. Fetch current order state to enforce strict cancellation & transition rules
+    const { data: currentOrder } = await supabase
+      .from('orders')
+      .select('order_status, payment_status')
+      .eq('id', order_id)
+      .maybeSingle();
+
+    if (currentOrder) {
+      // Rule 1: COMPLETED orders CANNOT be directly cancelled
+      if (order_status === 'CANCELLED' && currentOrder.order_status === 'COMPLETED') {
+        return NextResponse.json(
+          { error: 'Pesanan yang sudah selesai disajikan (COMPLETED) tidak dapat langsung dibatalkan.' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Update payload
     const updatePayload: any = {
       updated_at: new Date().toISOString(),
@@ -150,6 +167,11 @@ export async function PATCH(request: Request) {
 
     if (order_status) {
       updatePayload.order_status = order_status;
+
+      // Rule 2: If a PAID order is cancelled, set payment_status to REFUND_REQUIRED
+      if (order_status === 'CANCELLED' && (currentOrder?.payment_status === 'PAID' || payment_status === 'PAID')) {
+        updatePayload.payment_status = 'REFUND_REQUIRED';
+      }
     }
 
     if (rejection_reason !== undefined) {
@@ -158,11 +180,6 @@ export async function PATCH(request: Request) {
 
     if (cancellation_reason !== undefined) {
       updatePayload.cancellation_reason = cancellation_reason;
-    }
-
-    // If approving payment and no specific order_status sent, default to PREPARING
-    if (payment_status === 'PAID' && !order_status) {
-      updatePayload.order_status = 'PREPARING';
     }
 
     const { data: updatedDb, error } = await supabase

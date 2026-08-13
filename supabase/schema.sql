@@ -69,10 +69,15 @@ CREATE TABLE IF NOT EXISTS tables (
   is_active BOOLEAN DEFAULT true
 );
 
+-- Sequence Generator untuk Nomor Pesanan Manusia Harian (#A101, #A102, dst)
+CREATE SEQUENCE IF NOT EXISTS daily_order_seq START 101;
+
 -- 6. Orders Table
 CREATE TABLE IF NOT EXISTS orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_number TEXT UNIQUE NOT NULL,
+  client_order_id TEXT UNIQUE,        -- Idempotency Key dari browser client
+  order_number TEXT UNIQUE NOT NULL,  -- Internal System Ref e.g. "KOP-20260813-921"
+  order_display_number TEXT,          -- Nomor Antrean Manusia e.g. "#A127"
   tracking_secret UUID DEFAULT gen_random_uuid(),
   mode TEXT NOT NULL,                -- 'dine-in', 'takeaway'
   table_id UUID REFERENCES tables(id),

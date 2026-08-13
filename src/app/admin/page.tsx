@@ -799,8 +799,8 @@ export default function AdminDashboardPage() {
                         {/* Order Header Card */}
                         <div className="flex items-center justify-between mb-4 border-b border-[#FFFFFF]/10 pb-3">
                           <div>
-                            <span className="font-serif text-lg font-bold text-white block leading-none mb-1">
-                              {order.order_number}
+                            <span className="font-serif text-lg font-bold text-[#D4A373] block leading-none mb-1">
+                              {order.order_display_number ? `${order.order_display_number} (${order.order_number})` : order.order_number}
                             </span>
                             <span className="text-[0.68rem] text-[#C29B7F] font-mono">
                               {order.mode === 'dine-in' ? `DINE-IN • MEJA ${order.table_id || '01'}` : 'TAKEAWAY'}
@@ -939,7 +939,7 @@ export default function AdminDashboardPage() {
                               }`}
                             >
                               <Check className="w-4 h-4" />
-                              <span>{isPaid ? 'LUNAS' : 'SETUJUI'}</span>
+                              <span>{isPaid ? 'LUNAS ✓' : '💵 TANDAI LUNAS'}</span>
                             </button>
 
                             <button

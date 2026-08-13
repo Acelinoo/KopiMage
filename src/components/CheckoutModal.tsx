@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { OrderMode, PaymentMethod } from '@/types/order';
 import { compressImageFile } from '@/lib/imageCompressor';
-import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee, Clock, ShieldCheck, RefreshCw, XCircle } from 'lucide-react';
+import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee, Clock, ShieldCheck, RefreshCw, XCircle, Heart, Sparkles } from 'lucide-react';
 
 interface CheckoutModalProps {
   onClose: () => void;
@@ -163,11 +163,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         })),
       }));
 
-      // Call Server-Side Zero-Trust Order API
+      // Call Server-Side Zero-Trust Order API (with Idempotency Key)
+      const clientOrderId = crypto.randomUUID();
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          client_order_id: clientOrderId,
           mode,
           table_id: mode === 'dine-in' ? selectedTable : null,
           customer_name: customerName,
@@ -410,7 +412,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 )}
               </div>
               <h3 style={{ fontSize: '1.35rem', color: isCancelled ? '#666' : '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif', textDecoration: isCancelled ? 'line-through' : 'none' }}>
-                {createdOrder.order_number}
+                {createdOrder.order_display_number ? `${createdOrder.order_display_number} (${createdOrder.order_number})` : createdOrder.order_number}
               </h3>
               <p style={{ fontSize: '0.78rem', color: '#A89F91', marginTop: '0.15rem', margin: 0 }}>
                 {createdOrder.mode === 'dine-in' ? `Dine-In • MEJA ${createdOrder.table_id || '01'}` : 'Takeaway'} ({createdOrder.customer_name})
@@ -499,20 +501,37 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 padding: '1.2rem',
                 borderRadius: '16px',
                 marginBottom: '1.5rem',
-                background: isReady
+                background: isCompleted
+                  ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(212, 163, 115, 0.2) 100%)'
+                  : isReady
                   ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(39, 174, 96, 0.1) 100%)'
                   : isApproved
                   ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.18) 0%, rgba(212, 163, 115, 0.1) 100%)'
                   : 'linear-gradient(135deg, rgba(212, 163, 115, 0.2) 0%, rgba(184, 46, 46, 0.1) 100%)',
-                border: isReady
+                border: isCompleted || isReady
                   ? '1px solid #2ECC71'
                   : isApproved
                   ? '1px solid rgba(46, 204, 113, 0.4)'
                   : '1px solid rgba(212, 163, 115, 0.5)',
                 textAlign: 'center',
+                boxShadow: isCompleted ? '0 10px 30px rgba(46, 204, 113, 0.2)' : 'none',
               }}
             >
-              {isReady ? (
+              {isCompleted ? (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
+                    <Sparkles className="w-6 h-6 text-[#D4A373] animate-pulse" />
+                    <Heart className="w-9 h-9 text-[#2ECC71] animate-bounce" />
+                    <Sparkles className="w-6 h-6 text-[#D4A373] animate-pulse" />
+                  </div>
+                  <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.35rem', fontFamily: 'serif' }}>
+                    🙏 TERIMA KASIH TELAH MEMESAN!
+                  </h4>
+                  <p style={{ fontSize: '0.85rem', color: '#F7F4EF', lineHeight: 1.5 }}>
+                    Pesanan Anda telah 100% selesai disajikan oleh Dapur & Barista KOPIMAGE. Selamat menikmati sajian kopi & hidangan terbaik kami! ☕✨
+                  </p>
+                </div>
+              ) : isReady ? (
                 <div>
                   <Coffee className="w-10 h-10 text-[#2ECC71] mx-auto mb-2 animate-bounce" />
                   <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.3rem', fontFamily: 'serif' }}>
@@ -562,9 +581,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 </div>
 
                 {/* Step 2: Diproses Dapur */}
-                <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: isCancellationRequested ? '1px solid #E67E22' : '1px solid #D4A373' }}>
-                  <span style={{ fontSize: '0.65rem', display: 'block', color: isCancellationRequested ? '#E67E22' : '#D4A373', fontWeight: 700 }}>
-                    {isCancellationRequested ? '⏳ BATAL?' : '👨‍🍳 DIPROSES'}
+                <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: isCompleted ? '1px solid #2ECC71' : isCancellationRequested ? '1px solid #E67E22' : '1px solid #D4A373' }}>
+                  <span style={{ fontSize: '0.65rem', display: 'block', color: isCompleted ? '#2ECC71' : isCancellationRequested ? '#E67E22' : '#D4A373', fontWeight: 700 }}>
+                    {isCompleted ? '✓ SELESAI' : isCancellationRequested ? '⏳ BATAL?' : '👨‍🍳 DIPROSES'}
                   </span>
                   <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FFF' }}>
                     {isCancellationRequested ? 'Menunggu Admin' : 'Dapur & Barista'}
@@ -574,9 +593,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 {/* Step 3: Siap Hidangkan */}
                 <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: isReady || isCompleted ? '1px solid #2ECC71' : '1px solid rgba(255,255,255,0.1)' }}>
                   <span style={{ fontSize: '0.65rem', display: 'block', color: isReady || isCompleted ? '#2ECC71' : '#666', fontWeight: 700 }}>
-                    {isReady ? '☕ SIAP' : isCompleted ? '✓ SELESAI' : 'TUNGGU'}
+                    {isCompleted ? '✓ SELESAI' : isReady ? '☕ SIAP' : 'TUNGGU'}
                   </span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: isReady || isCompleted ? '#FFF' : '#666' }}>Siap Meja</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: isReady || isCompleted ? '#FFF' : '#666' }}>
+                    {isCompleted ? 'Sudah Disajikan' : 'Siap Meja'}
+                  </span>
                 </div>
               </div>
             </div>

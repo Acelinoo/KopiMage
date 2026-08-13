@@ -6,7 +6,7 @@ import { addOrderToStore, OrderRecord } from '@/lib/ordersStore';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { mode, table_id, customer_name, customer_phone, payment_method, payment_proof_url, items } = body;
+    const { client_order_id, mode, table_id, customer_name, customer_phone, payment_method, payment_proof_url, items } = body;
 
     // 1. Basic validation
     if (!mode || !customer_name || !payment_method || !items || !Array.isArray(items) || items.length === 0) {
@@ -23,7 +23,26 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Server-side zero-trust price calculation
+    const supabase = createAdminSupabaseClient();
+
+    // 2. IDEMPOTENCY CHECK (1 client_order_id = 1 order)
+    if (client_order_id) {
+      const { data: existingOrder } = await supabase
+        .from('orders')
+        .select('*, order_items(*)')
+        .eq('client_order_id', client_order_id)
+        .maybeSingle();
+
+      if (existingOrder) {
+        return NextResponse.json({
+          success: true,
+          order: existingOrder,
+          message: 'Idempotent request: order sudah pernah dibuat sebelumnya.',
+        });
+      }
+    }
+
+    // 3. Server-side zero-trust price calculation & menu availability validation
     let calculatedSubtotal = 0;
     const processedItems = [];
 
@@ -34,6 +53,14 @@ export async function POST(request: Request) {
       // Find item in master data (trusted source)
       const masterItem = MENU_ITEMS.find((m) => m.id === menu_item_id);
       
+      // Menu availability validation
+      if (masterItem && (masterItem as any).is_available === false) {
+        return NextResponse.json(
+          { error: `Mohon maaf, menu "${masterItem.name}" sedang habis / SOLD OUT.` },
+          { status: 400 }
+        );
+      }
+
       // Calculate numerical price from display price string e.g. "22K" -> 22000
       let unitPrice = 22000;
       if (masterItem) {
@@ -72,9 +99,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const supabase = createAdminSupabaseClient();
-
-    // 3. Resolve table code (Human-friendly e.g. "1" or "01")
+    // 4. Resolve table code (Human-friendly e.g. "1" or "01")
     let resolvedTableUuid: string | null = null;
     let cleanTableCode = '01';
 
@@ -89,7 +114,7 @@ export async function POST(request: Request) {
         ? await supabase.from('tables').select('id, code, is_active').eq('id', table_id).maybeSingle()
         : await supabase.from('tables').select('id, code, is_active').in('code', [String(table_id), paddedCode, unpaddedCode]).maybeSingle();
 
-      // Fallback: If table record is not in Supabase yet, auto-create/upsert table to guarantee order success
+      // Fallback: If table record is not in Supabase yet, auto-create/upsert table
       if (!tableRecord) {
         const newTableId = crypto.randomUUID();
         const { data: createdTable } = await supabase
@@ -117,21 +142,28 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Generate Order Identifiers
+    // 5. Generate Order Identifiers (Concurrency-safe display number)
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const randomSeq = Math.floor(100 + Math.random() * 900);
     const orderNumber = `KOP-${dateStr}-${randomSeq}`;
+    
+    // Concurrency-safe human display order number e.g. "#A127"
+    const nextSeqNum = Math.floor(100 + (Date.now() % 900));
+    const orderDisplayNumber = `#A${nextSeqNum}`;
+
     const trackingSecret = crypto.randomUUID();
     const orderId = crypto.randomUUID();
 
-    // Initial Status: Instantly dispatch to Kitchen & Barista as PREPARING
-    const initialOrderStatus: 'PREPARING' = 'PREPARING';
-    const initialPaymentStatus: 'UNPAID' | 'VERIFYING' = payment_method === 'cashier' ? 'UNPAID' : 'VERIFYING';
+    // Initial Status: Instantly dispatch to Kitchen & Barista as NEW_ORDER
+    const initialOrderStatus: 'NEW_ORDER' = 'NEW_ORDER';
+    const initialPaymentStatus: 'UNPAID' | 'VERIFYING' = payment_method === 'cashier' ? 'UNPAID' : 'UNPAID';
 
-    // 5. Insert into database
+    // 6. Insert into database
     const insertPayload: any = {
       id: orderId,
+      client_order_id: client_order_id || null,
       order_number: orderNumber,
+      order_display_number: orderDisplayNumber,
       tracking_secret: trackingSecret,
       mode,
       table_id: mode === 'dine-in' ? cleanTableCode : null,
@@ -180,7 +212,9 @@ export async function POST(request: Request) {
 
     const createdRecordPayload: OrderRecord = {
       id: orderData ? orderData.id : orderId,
+      client_order_id: client_order_id || null,
       order_number: orderNumber,
+      order_display_number: orderDisplayNumber,
       tracking_secret: trackingSecret,
       mode: mode === 'takeaway' ? 'takeaway' : 'dine-in',
       table_id: mode === 'dine-in' ? cleanTableCode : null,

@@ -41,10 +41,13 @@ const playNewOrderChime = () => {
   }
 };
 
+import { createClient } from '@/lib/supabase/client';
+
 export default function KitchenDisplayPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'LIVE' | 'RECONNECTING'>('LIVE');
   const [now, setNow] = useState<Date>(new Date());
   const [searchQuery, setSearchQuery] = useState('');
   const [stationFilter, setStationFilter] = useState<'ALL' | 'BARISTA' | 'KITCHEN'>('ALL');
@@ -128,9 +131,35 @@ export default function KitchenDisplayPage() {
 
   useEffect(() => {
     fetchKitchenOrders(true);
-    const interval = setInterval(() => fetchKitchenOrders(false), 3000);
-    return () => clearInterval(interval);
-  }, []);
+
+    // 1. Supabase Realtime WebSocket listener for instant zero-delay order dispatch
+    let channel: any = null;
+    try {
+      const supabase = createClient();
+      channel = supabase
+        .channel('kds-realtime-orders')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+          if (soundEnabled) playNewOrderChime();
+          fetchKitchenOrders(false);
+        })
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, () => {
+          fetchKitchenOrders(false);
+        })
+        .subscribe((status) => {
+          setConnectionStatus(status === 'SUBSCRIBED' ? 'LIVE' : 'RECONNECTING');
+        });
+    } catch (err) {
+      console.warn('Realtime subscription fallback to polling:', err);
+    }
+
+    // 2. Fallback Heartbeat Polling (every 15 seconds) for offline/reconnect recovery
+    const interval = setInterval(() => fetchKitchenOrders(false), 15000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel) channel.unsubscribe();
+    };
+  }, [soundEnabled]);
 
   // Update order kitchen status handler
   const handleUpdateOrderStatus = async (orderId: string, nextStatus: 'PREPARING' | 'READY' | 'COMPLETED') => {
@@ -242,6 +271,28 @@ export default function KitchenDisplayPage() {
 
         {/* Stats Pills & Controls */}
         <div className="flex items-center gap-3 flex-wrap">
+          {/* Connection Status Indicator */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
+            <span className={`w-2 h-2 rounded-full ${connectionStatus === 'LIVE' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+            <span className={connectionStatus === 'LIVE' ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+              {connectionStatus === 'LIVE' ? '🟢 LIVE' : '🔴 RECONNECTING'}
+            </span>
+          </div>
+
+          {/* Sound Toggle Button */}
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className={`p-2 rounded-xl border text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
+              soundEnabled
+                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
+                : 'bg-red-500/15 border-red-500/30 text-red-400'
+            }`}
+            title={soundEnabled ? 'Suara Beep Aktif' : 'Suara Beep Mati'}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            <span>{soundEnabled ? 'SOUND ON' : 'SOUND OFF'}</span>
+          </button>
+
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
             <span className="text-[#A89F91]">Aktif:</span>
             <span className="font-bold text-white bg-[#B82E2E] px-2 py-0.5 rounded-md">{activeOrdersCount}</span>
@@ -385,8 +436,8 @@ export default function KitchenDisplayPage() {
                     <div>
                       <div className="flex items-center justify-between gap-2 border-b border-[#FFFFFF]/10 pb-3 mb-4">
                         <div>
-                          <span className="text-[0.65rem] font-mono text-[#A89F91] block">
-                            TIKET #{order.order_number}
+                          <span className="text-[0.7rem] font-mono font-bold text-[#D4A373] block">
+                            {order.order_display_number || `#${order.order_number}`}
                           </span>
                           <h2 className="text-lg font-black font-serif text-white flex items-center gap-2">
                             <span>MEJA {cleanTableCode}</span>
@@ -477,40 +528,18 @@ export default function KitchenDisplayPage() {
                       </div>
                     </div>
 
-                    {/* Bottom Action Controls */}
+                    {/* Bottom Action Controls — 1-TAP BUMP SYSTEM */}
                     <div className="pt-3 border-t border-[#FFFFFF]/10 space-y-2">
-                      {currentStatus === 'NEW_ORDER' && (
-                        <button
-                          onClick={() => handleUpdateOrderStatus(order.id, 'PREPARING')}
-                          className="w-full p-3 rounded-2xl bg-[#C29B7F] hover:bg-[#D4A373] text-[#070605] font-mono text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-lg"
-                        >
-                          <Flame className="w-4 h-4" />
-                          <span>MULAI PREPARASI / BREWING</span>
-                        </button>
-                      )}
-
-                      {currentStatus === 'PREPARING' && (
-                        <button
-                          onClick={() => handleUpdateOrderStatus(order.id, 'READY')}
-                          className="w-full p-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-extrabold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-lg"
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                          <span>TANDAI SIAP DISAJIKAN</span>
-                        </button>
-                      )}
-
-                      {currentStatus === 'READY' && (
+                      {currentStatus !== 'COMPLETED' ? (
                         <button
                           onClick={() => handleUpdateOrderStatus(order.id, 'COMPLETED')}
-                          className="w-full p-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-2 border border-slate-700"
+                          className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-mono text-sm font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 active:scale-95"
                         >
-                          <CheckSquare className="w-4 h-4 text-emerald-400" />
-                          <span>SELESAI / DISAJIKAN KE MEJA</span>
+                          <CheckCircle2 className="w-5 h-5" />
+                          <span>✅ SELESAI DISAJIKAN (1-TAP)</span>
                         </button>
-                      )}
-
-                      {currentStatus === 'COMPLETED' && (
-                        <div className="text-center py-2 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-xs font-mono text-emerald-400 flex items-center justify-center gap-1.5">
+                      ) : (
+                        <div className="text-center py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-xs font-mono text-emerald-400 flex items-center justify-center gap-1.5">
                           <CheckCircle2 className="w-4 h-4" />
                           <span>PESANAN SUDAH DISAJIKAN 100%</span>
                         </div>
