@@ -139,6 +139,64 @@
     color: #FFD5B8 !important;
   }
 
+  /* Red Text on Red Canvas -> Bright Gold (#FFE600) or Cream */
+  .text-\[\#B82E2E\] {
+    color: #FFE600 !important;
+  }
+
+  .bg-\[\#B82E2E\].rounded-full,
+  .bg-\[\#B82E2E\].w-2,
+  .bg-\[\#B82E2E\].w-3 {
+    background-color: #FFE600 !important;
+  }
+
+  /* ----------------------------------------------------
+     BUTTON CONTRAST FOR RED-DOMINANT CANVAS
+     Transform red-on-red buttons into Crisp White Buttons (#FFFFFF) with Deep Crimson Text (#8C1C1C)
+     ---------------------------------------------------- */
+  a.bg-\[\#B82E2E\],
+  button.bg-\[\#B82E2E\],
+  .bg-\[\#B82E2E\]:not(.w-2):not(.w-3):not(.w-11):not(.w-12):not(.rounded-full),
+  .bg-\[\#D63434\],
+  .bg-brandRed {
+    background-color: #FFFFFF !important;
+    color: #8C1C1C !important;
+    border-color: #FFFFFF !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  a.bg-\[\#B82E2E\]:hover,
+  button.bg-\[\#B82E2E\]:hover,
+  .bg-\[\#B82E2E\]:hover,
+  .bg-brandRed:hover {
+    background-color: #FFF5EE !important;
+    color: #6E1212 !important;
+  }
+
+  /* SVGs inside Red Canvas Buttons */
+  a.bg-\[\#B82E2E\] svg,
+  button.bg-\[\#B82E2E\] svg,
+  .bg-\[\#B82E2E\] svg,
+  .bg-brandRed svg {
+    color: #8C1C1C !important;
+  }
+
+  /* Buttons INSIDE White Surface Cards (Menu Items, Modals) stay Deep Red (#9E1F1F) with White Text */
+  .bg-\[\#161210\] a.bg-\[\#B82E2E\],
+  .bg-\[\#161210\] button.bg-\[\#B82E2E\],
+  .bg-\[\#14110F\] button.bg-\[\#B82E2E\],
+  .bg-bgDarkPaper .bg-brandRed {
+    background-color: #9E1F1F !important;
+    color: #FFFFFF !important;
+    border-color: #9E1F1F !important;
+  }
+
+  .bg-\[\#161210\] button.bg-\[\#B82E2E\] svg,
+  .bg-\[\#14110F\] button.bg-\[\#B82E2E\] svg {
+    color: #FFFFFF !important;
+  }
+
   /* Borders on Main Red Canvas */
   .border-\[\#FFFFFF\]\/10,
   .border-\[\#FFFFFF\]\/15,
