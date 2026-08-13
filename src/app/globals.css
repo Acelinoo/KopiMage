@@ -70,7 +70,9 @@
    Red Canvas (#9E1F1F) + White Surface Cards + Crisp White Typography
    ---------------------------------------------------- */
 [data-theme="light"] {
-  /* Primary Red Canvas for Main Containers & Headers */
+  /* ----------------------------------------------------
+     A. RED MAIN CANVAS (Page Containers, Headers, Footers)
+     ---------------------------------------------------- */
   .bg-\[\#0C0A09\],
   .bg-\[\#0E0B0A\],
   .bg-\[\#0E0C0A\],
@@ -83,38 +85,48 @@
     color: #FFFFFF !important;
   }
 
-  /* Crisp White Surface Cards for Menu Items, Inputs & Modals */
+  /* ----------------------------------------------------
+     B. WHITE SURFACE CARDS (Menu Cards, Modals, Drawers, Inputs, Facility Cards)
+     ---------------------------------------------------- */
   .bg-\[\#14110F\],
-  .bg-bgDarkPaper {
-    background-color: #FFFFFF !important;
-    color: #1E1B18 !important;
-    border-color: rgba(184, 46, 46, 0.15) !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
-  }
-
-  /* Facility & Space White Surface Cards (#space section) */
   .bg-\[\#161210\],
+  .bg-\[\#171311\],
   .bg-\[\#1C1815\],
   .bg-\[\#1E1815\],
-  .bg-bgDarkSurface {
+  .bg-bgDarkPaper,
+  .bg-bgDarkSurface,
+  .bg-surface {
     background-color: #FFFFFF !important;
     color: #1E1B18 !important;
-    border-color: rgba(184, 46, 46, 0.2) !important;
+    border-color: rgba(184, 46, 46, 0.18) !important;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
   }
 
-  /* Facility Card Titles inside White Cards (Teras Luas, Stopkontak, Parkir) -> Deep Red (#9E1F1F) */
+  /* Headings & Text Inside White Cards MUST be Dark Charcoal (#1E1B18) */
+  .bg-\[\#14110F\] h1, .bg-\[\#14110F\] h2, .bg-\[\#14110F\] h3, .bg-\[\#14110F\] h4, .bg-\[\#14110F\] p, .bg-\[\#14110F\] span, .bg-\[\#14110F\] div, .bg-\[\#14110F\] label,
+  .bg-\[\#161210\] h1, .bg-\[\#161210\] h2, .bg-\[\#161210\] h3, .bg-\[\#161210\] h4, .bg-\[\#161210\] p, .bg-\[\#161210\] span, .bg-\[\#161210\] div, .bg-\[\#161210\] label,
+  .bg-\[\#1C1815\] h1, .bg-\[\#1C1815\] h2, .bg-\[\#1C1815\] h3, .bg-\[\#1C1815\] h4, .bg-\[\#1C1815\] p, .bg-\[\#1C1815\] span, .bg-\[\#1C1815\] div, .bg-\[\#1C1815\] label,
+  .bg-\[\#1E1815\] h1, .bg-\[\#1E1815\] h2, .bg-\[\#1E1815\] h3, .bg-\[\#1E1815\] h4, .bg-\[\#1E1815\] p, .bg-\[\#1E1815\] span, .bg-\[\#1E1815\] div, .bg-\[\#1E1815\] label,
+  .bg-bgDarkPaper h1, .bg-bgDarkPaper h2, .bg-bgDarkPaper h3, .bg-bgDarkPaper h4, .bg-bgDarkPaper p, .bg-bgDarkPaper span, .bg-bgDarkPaper div, .bg-bgDarkPaper label,
+  .bg-bgDarkSurface h1, .bg-bgDarkSurface h2, .bg-bgDarkSurface h3, .bg-bgDarkSurface h4, .bg-bgDarkSurface p, .bg-bgDarkSurface span, .bg-bgDarkSurface div, .bg-bgDarkSurface label {
+    color: #1E1B18 !important;
+  }
+
+  /* Specific Headings & Accents Inside White Cards -> Deep Crimson Red (#9E1F1F) */
   .bg-\[\#161210\] .text-\[\#C29B7F\],
+  .bg-\[\#161210\] .text-accentCopper,
   .bg-\[\#1C1815\] .text-\[\#C29B7F\],
-  .bg-bgDarkSurface .text-\[\#C29B7F\] {
+  .bg-\[\#1E1815\] .text-\[\#C29B7F\],
+  .bg-bgDarkSurface .text-accentCopper {
     color: #9E1F1F !important;
     font-weight: 700 !important;
   }
 
-  /* Paragraphs inside White Surface Cards -> Deep Charcoal (#4A423A) */
+  /* Muted Paragraphs & Subtitles Inside White Cards -> Dark Slate (#4A423A) */
   .bg-\[\#161210\] p,
   .bg-\[\#161210\] .text-\[\#A89F91\],
   .bg-\[\#161210\] .text-\[\#9E9287\],
+  .bg-\[\#14110F\] p,
   .bg-\[\#14110F\] .text-\[\#A89F91\],
   .bg-\[\#1C1815\] p,
   .bg-\[\#1C1815\] .text-\[\#A89F91\] {
@@ -122,8 +134,8 @@
   }
 
   /* ----------------------------------------------------
-     STEP CARDS (#experience section: 01 DUDUK, 02 SCAN QR, 03 PILIH MENU, 04 NIKMATI)
-     Deep Red Card (#7A1414) + Pure White Text (#FFFFFF) + Gold Step Numbers (#FFE600)
+     C. STEP CARDS (#experience section: 01 DUDUK, 02 SCAN QR)
+     Deep Crimson Card (#7A1414) + Pure White Text (#FFFFFF) + Gold Step Numbers (#FFE600)
      ---------------------------------------------------- */
   .bg-\[\#0E0B0A\].reveal-step-card,
   .bg-\[\#0E0B0A\].rounded-xl {
@@ -132,27 +144,23 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
   }
 
-  /* Step Number (01, 02, 03, 04) -> Bright Gold (#FFE600) */
+  .bg-\[\#0E0B0A\].reveal-step-card * {
+    color: #FFFFFF !important;
+  }
+
   .bg-\[\#0E0B0A\].reveal-step-card .text-\[\#B82E2E\],
   .bg-\[\#0E0B0A\].reveal-step-card span.font-serif {
     color: #FFE600 !important;
     font-weight: 700 !important;
   }
 
-  /* Step Card Headings (DUDUK, SCAN QR, PILIH MENU, NIKMATI) -> Pure White (#FFFFFF) */
-  .bg-\[\#0E0B0A\].reveal-step-card h3,
-  .bg-\[\#0E0B0A\].reveal-step-card .text-\[\#FFFFFF\] {
-    color: #FFFFFF !important;
-    font-weight: 700 !important;
-  }
-
-  /* Step Card Descriptions -> Light Warm Peach (#F7EFE8) */
-  .bg-\[\#0E0B0A\].reveal-step-card p,
-  .bg-\[\#0E0B0A\].reveal-step-card .text-\[\#A89F91\] {
+  .bg-\[\#0E0B0A\].reveal-step-card p {
     color: #F7EFE8 !important;
   }
 
-  /* Typography Colors on Main Red Canvas */
+  /* ----------------------------------------------------
+     D. TYPOGRAPHY ON MAIN RED CANVAS
+     ---------------------------------------------------- */
   .text-\[\#FFFFFF\],
   .text-\[\#F3EFEA\],
   .text-\[\#F7F4EF\],
