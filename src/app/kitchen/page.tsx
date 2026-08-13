@@ -58,39 +58,65 @@ export default function KitchenDisplayPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Real-time Order Fetcher from Live API
+  // Real-time Order Fetcher from Live API (With zero-data-loss LocalStorage cache fallback)
   const fetchKitchenOrders = async (showLoader = false) => {
     if (showLoader) setLoading(true);
     setIsRefreshing(true);
     try {
       const res = await fetch('/api/admin/orders?status=ALL');
       const data = await res.json();
-      if (data.success && Array.isArray(data.orders)) {
-        // Merge recent local optimistic status overrides to prevent poll reverting
-        const fetchedOrders = data.orders.map((o: any) => {
-          const localOverride = recentLocalUpdatesRef.current[o.id];
-          if (localOverride && Date.now() - localOverride.timestamp < 15000) {
-            return { ...o, order_status: localOverride.status };
-          }
-          return o;
-        });
+      let apiOrders = (data.success && Array.isArray(data.orders)) ? data.orders : [];
 
-        // Clean expired overrides (> 15 seconds)
-        Object.keys(recentLocalUpdatesRef.current).forEach((id) => {
-          if (Date.now() - recentLocalUpdatesRef.current[id].timestamp >= 15000) {
-            delete recentLocalUpdatesRef.current[id];
-          }
-        });
-        
-        // Play sound chime if new uncompleted order count increased
-        const activeCount = fetchedOrders.filter((o: any) => o.order_status !== 'COMPLETED').length;
-        if (activeCount > previousOrderCountRef.current && previousOrderCountRef.current !== 0 && soundEnabled) {
-          playNewOrderChime();
-        }
-        previousOrderCountRef.current = activeCount;
+      // Merge with LocalStorage Admin & Active Order Caches to guarantee ZERO data loss across lambda instances
+      if (typeof window !== 'undefined') {
+        try {
+          const adminCache = localStorage.getItem('kopimage_admin_orders_cache_v4');
+          const activeOrderCache = localStorage.getItem('kopimage_active_table_order');
+          const localList: any[] = [];
+          if (adminCache) localList.push(...JSON.parse(adminCache));
+          if (activeOrderCache) localList.push(JSON.parse(activeOrderCache));
 
-        setOrders(fetchedOrders);
+          const apiMap = new Map(apiOrders.map((o: any) => [o.id, o]));
+          localList.forEach((loc) => {
+            if (!loc || !loc.id) return;
+            const existing = apiMap.get(loc.id);
+            if (!existing) {
+              apiOrders.push(loc);
+            } else {
+              // Prefer record with updated payment_status / order_status
+              if (loc.payment_status === 'PAID' && existing.payment_status !== 'PAID') {
+                apiMap.set(loc.id, { ...existing, ...loc });
+              }
+            }
+          });
+          apiOrders = Array.from(apiMap.values());
+        } catch (e) {}
       }
+
+      // Merge recent local optimistic status overrides to prevent poll reverting
+      const fetchedOrders = apiOrders.map((o: any) => {
+        const localOverride = recentLocalUpdatesRef.current[o.id];
+        if (localOverride && Date.now() - localOverride.timestamp < 15000) {
+          return { ...o, order_status: localOverride.status };
+        }
+        return o;
+      });
+
+      // Clean expired overrides (> 15 seconds)
+      Object.keys(recentLocalUpdatesRef.current).forEach((id) => {
+        if (Date.now() - recentLocalUpdatesRef.current[id].timestamp >= 15000) {
+          delete recentLocalUpdatesRef.current[id];
+        }
+      });
+      
+      // Play sound chime if new uncompleted order count increased
+      const activeCount = fetchedOrders.filter((o: any) => o.order_status !== 'COMPLETED').length;
+      if (activeCount > previousOrderCountRef.current && previousOrderCountRef.current !== 0 && soundEnabled) {
+        playNewOrderChime();
+      }
+      previousOrderCountRef.current = activeCount;
+
+      setOrders(fetchedOrders);
     } catch (err) {
       console.error('Failed to fetch kitchen orders:', err);
     } finally {
@@ -101,7 +127,7 @@ export default function KitchenDisplayPage() {
 
   useEffect(() => {
     fetchKitchenOrders(true);
-    const interval = setInterval(() => fetchKitchenOrders(false), 5000);
+    const interval = setInterval(() => fetchKitchenOrders(false), 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -173,7 +199,7 @@ export default function KitchenDisplayPage() {
     // Search Filter
     const matchesSearch =
       (o.order_number || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (o.tables?.code || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (o.table_id || o.tables?.code || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (o.customer_name || '').toLowerCase().includes(searchQuery.toLowerCase());
 
     if (!matchesSearch) return false;
@@ -181,10 +207,12 @@ export default function KitchenDisplayPage() {
     // Station Filter
     if (stationFilter !== 'ALL') {
       const itemsList = o.order_items || o.items || [];
-      const hasStationItem = itemsList.some(
-        (item: any) => getItemStation(item.item_name) === stationFilter
-      );
-      if (!hasStationItem) return false;
+      if (itemsList.length > 0) {
+        const hasStationItem = itemsList.some(
+          (item: any) => getItemStation(item.item_name) === stationFilter
+        );
+        if (!hasStationItem) return false;
+      }
     }
 
     return true;

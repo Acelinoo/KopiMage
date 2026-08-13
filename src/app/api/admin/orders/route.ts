@@ -49,7 +49,21 @@ export async function GET(request: Request) {
 
     // Normalize item fields (ensure both items and order_items are set)
     let finalOrders = combinedOrders.map((order: any) => {
-      const itemsList = order.order_items || order.items || [];
+      let itemsList: any[] = [];
+      if (Array.isArray(order.order_items) && order.order_items.length > 0) {
+        itemsList = order.order_items;
+      } else if (Array.isArray(order.items) && order.items.length > 0) {
+        itemsList = order.items;
+      } else if (typeof order.items === 'string') {
+        try {
+          itemsList = JSON.parse(order.items);
+        } catch (e) {}
+      } else if (typeof order.order_items === 'string') {
+        try {
+          itemsList = JSON.parse(order.order_items);
+        } catch (e) {}
+      }
+
       return {
         ...order,
         items: itemsList,

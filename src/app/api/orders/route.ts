@@ -143,6 +143,7 @@ export async function POST(request: Request) {
       total_amount: calculatedSubtotal,
       order_status: initialOrderStatus,
       payment_status: initialPaymentStatus,
+      items: processedItems,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
