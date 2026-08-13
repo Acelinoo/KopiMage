@@ -252,7 +252,7 @@ export default function KitchenDisplayPage() {
   const readyCount = orders.filter((o) => o.order_status === 'READY').length;
 
   return (
-    <div className="min-h-screen bg-[#070605] text-[#F7F4EF] font-sans p-4 md:p-8 selection:bg-[#B82E2E] selection:text-white">
+    <div style={{ background: 'var(--bg-main)', color: 'var(--text-primary)', transition: 'background-color 0.25s ease, color 0.25s ease' }} className="min-h-screen font-sans p-4 md:p-8 selection:bg-[#B82E2E] selection:text-white">
       {/* Top Bar Navigation */}
       <header className="max-w-7xl mx-auto mb-8 bg-[#0E0C0A] border border-[#FFFFFF]/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">

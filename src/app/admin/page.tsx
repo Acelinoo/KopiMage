@@ -570,7 +570,7 @@ export default function AdminDashboardPage() {
   const totalOrdersCount = ordersList.length;
 
   return (
-    <main className="min-h-screen bg-[#0B0908] text-[#F7F4EF] font-sans pb-20 selection:bg-[#B82E2E] selection:text-[#FFFFFF]">
+    <main style={{ background: 'var(--bg-main)', color: 'var(--text-primary)', transition: 'background-color 0.25s ease, color 0.25s ease' }} className="min-h-screen font-sans pb-20 selection:bg-[#B82E2E] selection:text-[#FFFFFF]">
       {/* Industrial Craftsman Header */}
       <header className="sticky top-0 z-40 bg-[#120F0D]/95 backdrop-blur-md border-b border-[#FFFFFF]/10 px-4 sm:px-8 py-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -23,7 +23,7 @@ export default function HomePage({
 
   // Otherwise, render Public Digital Brand Experience Visual Essay
   return (
-    <div className="bg-[#0C0A09] text-[#F3EFEA] min-h-screen flex flex-col justify-between">
+    <div style={{ background: 'var(--bg-main)', color: 'var(--text-primary)', transition: 'background-color 0.25s ease, color 0.25s ease' }} className="min-h-screen flex flex-col justify-between">
       <EditorialHeader />
       <main className="flex-1">
         <EditorialHome />

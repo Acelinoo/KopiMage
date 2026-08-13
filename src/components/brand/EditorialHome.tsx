@@ -181,11 +181,11 @@ export function EditorialHome() {
     });
 
     return (
-        <div className="bg-[#0E0B0A] text-[#FFFFFF] min-h-screen selection:bg-[#B82E2E] selection:text-[#FFFFFF]">
+        <div style={{ background: 'var(--bg-main)', color: 'var(--text-primary)', transition: 'background-color 0.25s ease, color 0.25s ease' }} className="min-h-screen selection:bg-[#B82E2E] selection:text-[#FFFFFF]">
             {/* ----------------------------------------------------
           1. HERO SECTION (#home) — INDUSTRIAL COKLAT & DARK MATTE
          ---------------------------------------------------- */}
-            <section id="home" className="relative pt-6 pb-12 lg:pb-16 editorial-border-b bg-[#0E0B0A]">
+            <section id="home" style={{ background: 'var(--bg-main)' }} className="relative pt-6 pb-12 lg:pb-16 editorial-border-b">
                 <div className="editorial-container">
                     {/* Sub-header Bar (Operating Hours & Live Music Info) */}
                     <div className="flex flex-wrap items-center justify-between border-b border-[#FFFFFF]/10 pb-4 mb-8 gap-3 reveal-fade-up is-visible">
