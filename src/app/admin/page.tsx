@@ -237,7 +237,7 @@ export default function AdminDashboardPage() {
         `Halo Kak *${rejectingOrder.customer_name || 'Pelanggan'}*,\n\n` +
         `Mohon maaf, bukti pembayaran untuk Pesanan *#${rejectingOrder.order_number}* di KOPIMAGE belum dapat kami verifikasi.\n\n` +
         `📌 *Alasan Penolakan:* ${finalReason}\n\n` +
-        `Silakan unggah ulang foto bukti transfer yang jelas melalui link pesanan Anda atau hubungi kasir kami di kedai. Terima kasih!`
+        `Silakan unggah ulang foto bukti transfer yang jelas melalui link pesananmu atau hubungi kasir kami di kedai. Terima kasih!`
       );
 
       const waUrl = `https://wa.me/${phone}?text=${waText}`;

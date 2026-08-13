@@ -273,10 +273,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         </div>
 
         <h3 style={{ fontFamily: 'serif', fontSize: '1.8rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.5rem' }}>
-          Memproses Pesanan Anda...
+          Memproses Pesananmu...
         </h3>
         <p style={{ fontSize: '0.88rem', color: '#D4A373', maxWidth: '420px', marginBottom: '2.5rem', lineHeight: 1.5 }}>
-          Mohon tunggu sebentar, sistem KopiMage sedang memverifikasi dan menyambungkan pesanan Anda ke Stasiun Dapur.
+          Tunggu sebentar ya, pesananmu lagi diverifikasi dan disambungin ke Stasiun Dapur KopiMage.
         </p>
 
         {/* Steps Progress Checklist */}
@@ -511,11 +511,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 ⏳ MENUNGGU PERSETUJUAN PEMBATALAN
               </h4>
               <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
-                Permintaan pembatalan Anda sedang ditinjau oleh Admin KOPIMAGE. Mohon tunggu konfirmasi.
+                Permintaan pembatalanmu lagi ditinjau oleh Admin KOPIMAGE. Tunggu sebentar ya.
               </p>
               {createdOrder.cancellation_reason && (
                 <p style={{ fontSize: '0.78rem', color: '#A89F91', marginTop: '0.5rem', fontStyle: 'italic' }}>
-                  Alasan Anda: "{createdOrder.cancellation_reason}"
+                  Alasanmu: "{createdOrder.cancellation_reason}"
                 </p>
               )}
             </div>
@@ -552,10 +552,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     <Sparkles className="w-6 h-6 text-[#D4A373] animate-pulse" />
                   </div>
                   <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.35rem', fontFamily: 'serif' }}>
-                    🙏 TERIMA KASIH TELAH MEMESAN!
+                    🙏 TERIMA KASIH UDAH PESEN!
                   </h4>
                   <p style={{ fontSize: '0.85rem', color: '#F7F4EF', lineHeight: 1.5 }}>
-                    Pesanan Anda telah 100% selesai disajikan oleh Dapur & Barista KOPIMAGE. Selamat menikmati sajian kopi & hidangan terbaik kami! ☕✨
+                    Pesananmu udah 100% selesai disajiin oleh Dapur & Barista KOPIMAGE. Selamat menikmati kopi & makanan terbaik kami! ☕✨
                   </p>
                 </div>
               ) : isReady ? (
@@ -565,27 +565,27 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     ☕ PESANAN SIAP DIHIDANGKAN!
                   </h4>
                   <p style={{ fontSize: '0.85rem', color: '#F7F4EF' }}>
-                    Pesanan Anda sudah selesai diracik oleh Barista & Dapur KopiMage dan siap diantarkan ke meja.
+                    Pesananmu udah selesai diracik oleh Barista & Dapur KopiMage dan siap meluncur ke mejamu.
                   </p>
                 </div>
               ) : isApproved ? (
                 <div>
                   <CheckCircle className="w-9 h-9 text-[#2ECC71] mx-auto mb-2 animate-pulse" />
                   <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                    ✓ PEMBAYARAN DIVERIFIKASI LUNAS!
+                    ✓ PEMBAYARAN TERVERIFIKASI LUNAS!
                   </h4>
                   <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
-                    Pesanan Anda telah disetujui Admin dan sedang diracik oleh Dapur & Barista KopiMage.
+                    Pesananmu telah disetujui Admin dan lagi diracik oleh Dapur & Barista KopiMage.
                   </p>
                 </div>
               ) : (
                 <div>
                   <Coffee className="w-9 h-9 text-[#D4A373] mx-auto mb-2 animate-pulse" />
                   <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#D4A373', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                    👨‍🍳 PESANAN SEDANG DIPROSES DAPUR & BARISTA
+                    👨‍🍳 PESANAN LAGI DIRACIK DAPUR & BARISTA
                   </h4>
                   <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
-                    Pesanan Anda telah diteruskan ke Stasiun Dapur & Barista KopiMage dan sedang diracik. Kasir Admin akan mengonfirmasi pembayaran Anda secara paralel.
+                    Pesananmu udah diteruskan ke Dapur & Barista KopiMage dan lagi diracik ya. Kasir Admin bakal cek verifikasi pembayaranmu secara paralel.
                   </p>
                 </div>
               )}

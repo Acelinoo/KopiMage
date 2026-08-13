@@ -107,13 +107,13 @@ export default function AboutPage() {
                   <div className="p-6 border border-[#F3EFEA]/10 bg-[#0C0A09]">
                     <span className="font-serif text-2xl text-[#C29B7F] block mb-2">Penghargaan Waktu</span>
                     <p className="font-sans text-xs text-[#9E9287] leading-relaxed">
-                      Waktu Anda di meja adalah milik Anda sepenuhnya. Duduklah selama yang Anda butuhkan.
+                      Waktumu di meja adalah milikmu sepenuhnya. Duduklah senyaman dan selama yang kamu butuhkan.
                     </p>
                   </div>
                   <div className="p-6 border border-[#F3EFEA]/10 bg-[#0C0A09]">
                     <span className="font-serif text-2xl text-[#C29B7F] block mb-2">Keramahan Hening</span>
                     <p className="font-sans text-xs text-[#9E9287] leading-relaxed">
-                      Pelayanan yang sigap tanpa perlu bersuara keras atau mengganggu privasi Anda.
+                      Pelayanan yang sigap dan ramah tanpa mengganggu kenyamanan dan privasimu.
                     </p>
                   </div>
                   <div className="p-6 border border-[#F3EFEA]/10 bg-[#0C0A09]">

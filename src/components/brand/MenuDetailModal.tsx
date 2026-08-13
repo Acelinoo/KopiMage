@@ -104,7 +104,7 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose 
 
                   {/* Description */}
                   <p className="font-sans text-xs sm:text-sm text-[#A89F91] font-light leading-relaxed mb-6 border-t border-[#FFFFFF]/08 pt-4">
-                    {item.description || 'Racikan istimewa khas Kopi Mage dengan bahan-bahan pilihan segar. Disajikan langsung oleh barista berpengalaman untuk memberikan rasa kopi dan sajian kuliner konsisten.'}
+                    {item.description || 'Racikan khas Kopi Mage dengan bahan pilihan. Diracik langsung oleh barista kami biar rasanya selalu pas di lidahmu.'}
                   </p>
 
                   {/* Item Features / Specs */}

@@ -51,7 +51,7 @@ export default function VisitPage() {
                     Jl. Gading Tutuka No. 88, Kecamatan Soreang, Kabupaten Bandung, Jawa Barat 40911
                   </p>
                   <a
-                    href="https://maps.google.com/?q=Kopimage+Soreang"
+                    href="https://maps.app.goo.gl/SS6748EDgyeR2Jgh9"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="editorial-btn text-xs"
@@ -153,7 +153,7 @@ export default function VisitPage() {
                       <div>
                         <span className="font-sans text-xs text-[#F3EFEA] font-medium block">Pet Friendly Terrace</span>
                         <span className="font-sans text-[0.75rem] text-[#9E9287] font-light">
-                          Area teras outdoor ramah untuk hewan peliharaan Anda.
+                          Area teras outdoor ramah buat hewan peliharaanmu.
                         </span>
                       </div>
                     </div>

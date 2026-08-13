@@ -147,10 +147,10 @@ function EditorialHeaderContent() {
               <QrCode className="w-6 h-6 text-[#C29B7F]" />
             </div>
             <h3 className="font-serif text-2xl text-[#F3EFEA] mb-3">
-              Hospitality via Table QR
+              Pesan Praktis Lewat QR Meja
             </h3>
             <p className="font-sans text-sm text-[#9E9287] leading-relaxed mb-6">
-              Menu digital & sistem pemesanan KOPIMAGE hanya dapat diakses saat Anda berada di lokasi. Pindai kode QR yang tertera di atas meja Anda untuk mulai memilih sajian.
+              Menu lengkap & pemesanan KOPIMAGE bisa kamu akses langsung pas mampir ke kedai. Cukup scan kode QR yang ada di mejamu buat langsung pilih dan pesen sajian favorit!
             </p>
             <div className="flex flex-col gap-3">
               <a
@@ -158,7 +158,7 @@ function EditorialHeaderContent() {
                 onClick={() => setShowQRModal(false)}
                 className="w-full py-3 bg-[#F3EFEA] text-[#0C0A09] font-sans text-xs tracking-[0.15em] uppercase font-medium hover:bg-[#C29B7F] transition-colors block text-center"
               >
-                PELAJARI EXPERIENCE KOPIMAGE
+                LIHAT CARA PESAN
               </a>
               <button
                 onClick={() => setShowQRModal(false)}

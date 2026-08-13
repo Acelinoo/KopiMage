@@ -165,7 +165,7 @@ export default function OrderTrackerPage() {
                 PESANAN SIAP DISAJIKAN
               </h3>
               <p style={{ fontSize: '0.85rem', color: '#C4BBB4', margin: 0 }}>
-                Hidangan racikan Anda sudah siap di-barista/dapur dan sedang diantar ke meja Anda.
+                Pesananmu sudah selesai diracik dan lagi meluncur ke mejamu.
               </p>
             </div>
           </div>
@@ -371,7 +371,7 @@ export default function OrderTrackerPage() {
               </div>
               <div>
                 <div style={{ fontSize: '0.92rem', color: isPreparing ? '#25D366' : '#F7F4EF', fontWeight: 800 }}>2. Diproses Barista & Dapur (PREPARING)</div>
-                <div style={{ fontSize: '0.78rem', color: '#A89F91' }}>Barista & dapur sedang meracik hidangan Anda</div>
+                <div style={{ fontSize: '0.78rem', color: '#A89F91' }}>Barista & dapur lagi meracik hidangan favoritmu</div>
               </div>
             </div>
 

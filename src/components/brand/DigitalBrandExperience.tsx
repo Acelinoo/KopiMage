@@ -99,7 +99,7 @@ export const DigitalBrandExperience: React.FC = () => {
               </h1>
 
               <p style={{ fontSize: 'clamp(1rem, 2vw, 1.35rem)', color: '#C4BBB4', lineHeight: 1.6, maxWidth: '640px', marginBottom: '2.5rem', fontWeight: 400 }}>
-                Dari racikan espresso murni, Es Kopi Susu signature, hingga santapan khas yang menemani jam nongkrong dan bersantai Anda di Soreang.
+                Dari racikan espresso murni, Es Kopi Susu signature, hingga santapan khas yang menemani jam nongkrong dan santaimu di Soreang.
               </p>
 
               <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -206,7 +206,7 @@ export const DigitalBrandExperience: React.FC = () => {
                   KOPIMAGE dibangun atas kecintaan terhadap racikan kopi yang konsisten dan kenyamanan ruang singgah. Di setiap tetes espresso dan setiap porsi hidangan yang kami sajikan, ada ketelitian barista dan kehangatan khas Soreang.
                 </p>
                 <p style={{ fontSize: '1rem', color: '#8E847C', lineHeight: 1.7, marginBottom: '2rem' }}>
-                  Apakah Anda datang untuk menyelesaikan pekerjaan, bertukar cerita dengan teman dekat, atau sekadar menikmati waktu sendiri — meja kami selalu terbuka.
+                  Mau ngerjain tugas, bertukar cerita bareng sahabat, atau sekadar me-time santai — meja kami selalu terbuka buatmu.
                 </p>
 
                 <div style={{ display: 'flex', gap: '2rem', borderTop: '1px solid rgba(212,163,115,0.15)', paddingTop: '1.5rem' }}>
@@ -283,7 +283,7 @@ export const DigitalBrandExperience: React.FC = () => {
                     Dari Es Kopi Susu signature berbahan gula aren pilihan, varian kemasan Botolin 1 Liter, hingga kudapan gurih Mie Julid dan Buncis Pedas Ketus yang selalu dicari.
                   </p>
                   <p style={{ fontSize: '0.88rem', color: '#8E847C', lineHeight: 1.6 }}>
-                    Seluruh menu kami dapat Anda jelajahi dan pesan secara langsung saat berada di meja kedai melalui pemindaian kode QR.
+                    Seluruh menu kami bisa kamu jelajahi dan pesan secara langsung saat berada di meja kedai lewat scan kode QR.
                   </p>
                 </div>
               </ScrollReveal>
@@ -341,7 +341,7 @@ export const DigitalBrandExperience: React.FC = () => {
                 Pemesanan di Tempat Sangat Praktis
               </h2>
               <p style={{ fontSize: '1rem', color: '#C4BBB4', margin: 0, lineHeight: 1.6 }}>
-                Menu lengkap dan transaksi langsung tersedia di setiap meja kedai kami. Tanpa perlu mengantri panjang di kasir.
+                Menu lengkap dan transaksi langsung tersedia di setiap meja kedai kami. Tanpa perlu antre panjang di kasir.
               </p>
             </div>
           </ScrollReveal>
@@ -353,7 +353,7 @@ export const DigitalBrandExperience: React.FC = () => {
               <div style={{ background: '#1E1A17', padding: '2rem 1.5rem', borderRadius: '14px', border: '1px solid rgba(212,163,115,0.12)', textAlign: 'center', height: '100%' }}>
                 <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#D4A373', marginBottom: '0.5rem' }}>01</div>
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.4rem' }}>DUDUK</h4>
-                <p style={{ fontSize: '0.85rem', color: '#8E847C', margin: 0 }}>Pilih tempat duduk favorit Anda di area indoor atau terrace.</p>
+                <p style={{ fontSize: '0.85rem', color: '#8E847C', margin: 0 }}>Pilih spot duduk favoritmu di area indoor atau terrace sejuk.</p>
               </div>
             </ScrollReveal>
 
@@ -361,7 +361,7 @@ export const DigitalBrandExperience: React.FC = () => {
               <div style={{ background: '#1E1A17', padding: '2rem 1.5rem', borderRadius: '14px', border: '1px solid rgba(212,163,115,0.12)', textAlign: 'center', height: '100%' }}>
                 <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#D4A373', marginBottom: '0.5rem' }}>02</div>
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.4rem' }}>SCAN</h4>
-                <p style={{ fontSize: '0.85rem', color: '#8E847C', margin: 0 }}>Pindai kode QR yang tertera di sudut meja menggunakan kamera HP.</p>
+                <p style={{ fontSize: '0.85rem', color: '#8E847C', margin: 0 }}>Scan stiker QR yang terpasang di mejamu pakai kamera HP.</p>
               </div>
             </ScrollReveal>
 
@@ -377,7 +377,7 @@ export const DigitalBrandExperience: React.FC = () => {
               <div style={{ background: '#1E1A17', padding: '2rem 1.5rem', borderRadius: '14px', border: '1px solid rgba(212,163,115,0.12)', textAlign: 'center', height: '100%' }}>
                 <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#D4A373', marginBottom: '0.5rem' }}>04</div>
                 <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.4rem' }}>NIKMATI</h4>
-                <p style={{ fontSize: '0.85rem', color: '#8E847C', margin: 0 }}>Pesanan Anda akan diantar langsung oleh barista ke meja Anda.</p>
+                <p style={{ fontSize: '0.85rem', color: '#8E847C', margin: 0 }}>Pesananmu bakal diantar langsung hangat ke meja.</p>
               </div>
             </ScrollReveal>
 

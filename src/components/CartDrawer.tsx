@@ -68,8 +68,8 @@ export const CartDrawer: React.FC = () => {
           {cartItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#8E847C' }}>
               <ShoppingBag size={48} color="rgba(212, 163, 115, 0.3)" style={{ marginBottom: '1rem' }} />
-              <p style={{ fontSize: '0.95rem', color: '#C4BBB4' }}>Keranjang belanja Anda masih kosong.</p>
-              <span style={{ fontSize: '0.8rem' }}>Pilih racikan kopi atau makanan favorit Anda dari menu.</span>
+              <p style={{ fontSize: '0.95rem', color: '#C4BBB4' }}>Keranjangmu masih kosong nih.</p>
+              <span style={{ fontSize: '0.8rem' }}>Yuk pilih racikan kopi atau cemilan favoritmu dari menu!</span>
             </div>
           ) : (
             cartItems.map((ci) => (

@@ -15,19 +15,21 @@ export async function GET() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!error && dbItems) {
+    if (!error && dbItems && dbItems.length > 0) {
       const dbIds = new Set(dbItems.map((i) => i.id));
       const customAdded = inMemoryMenuItemsStore.filter((i) => !dbIds.has(i.id));
       const mergedMenu = [...dbItems, ...customAdded];
       return NextResponse.json({ success: true, menu: mergedMenu });
     }
 
-    return NextResponse.json({ success: true, menu: inMemoryMenuItemsStore });
+    const fallbackMenu = inMemoryMenuItemsStore.length > 0 ? inMemoryMenuItemsStore : defaultMenuItems;
+    return NextResponse.json({ success: true, menu: fallbackMenu });
   } catch (err: any) {
     console.error('Error fetching menu items:', err);
+    const fallbackMenu = inMemoryMenuItemsStore.length > 0 ? inMemoryMenuItemsStore : defaultMenuItems;
     return NextResponse.json(
-      { success: false, error: err.message, menu: inMemoryMenuItemsStore },
-      { status: 500 }
+      { success: false, error: err.message, menu: fallbackMenu },
+      { status: 200 }
     );
   }
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { MapPin, Clock, Phone, Instagram, Coffee, ExternalLink, MessageCircle } from 'lucide-react';
 
 export const InfoLocation: React.FC = () => {
-  const mapsUrl = "https://maps.google.com/?q=Gading+Tutuka+Soreang+KopiMage";
+  const mapsUrl = "https://maps.app.goo.gl/SS6748EDgyeR2Jgh9";
   const whatsappUrl = "https://wa.me/6281313432001?text=Halo%20KOPIMAGE,%20saya%20mau%20tanya%20informasi/pesan";
   const instagramUrl = "https://instagram.com/kopimage";
 
@@ -19,7 +19,7 @@ export const InfoLocation: React.FC = () => {
             Lokasi &amp; Jam Operasional
           </h2>
           <p style={{ color: '#C4BBB4', maxWidth: '580px', margin: '0 auto' }}>
-            Kami siap menyambut Anda setiap hari untuk momen ngopi, kerja santai, dan kumpul hangat di Soreang.
+            Kami siap menyambut kamu setiap hari buat momen ngopi, nugas santai, dan kumpul hangat di Soreang.
           </p>
         </div>
 
