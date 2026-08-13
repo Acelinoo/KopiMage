@@ -543,9 +543,9 @@ export default function AdminDashboardPage() {
                 }`}
               >
                 <span>VERIFIKASI BAYAR</span>
-                {pendingCount > 0 && (
+                {verifyingCount > 0 && (
                   <span className="px-1.5 py-0.5 rounded-md bg-white text-[#B82E2E] text-[0.65rem] font-bold font-mono">
-                    {pendingCount}
+                    {verifyingCount}
                   </span>
                 )}
               </button>
