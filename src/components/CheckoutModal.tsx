@@ -309,33 +309,34 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
             width: '100%',
             maxWidth: '520px',
             borderRadius: '24px',
-            padding: '2rem',
+            padding: '1.25rem 1.5rem',
             position: 'relative',
             background: '#161311',
             border: isApproved ? '1px solid rgba(46, 204, 113, 0.5)' : '1px solid rgba(212, 163, 115, 0.4)',
-            maxHeight: '92vh',
-            overflowY: 'auto',
+            maxHeight: '88vh',
+            display: 'flex',
+            flexDirection: 'column',
             boxShadow: '0 25px 60px rgba(0,0,0,0.9)',
           }}
         >
-          {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
+          {/* Header (Fixed at top - Never cut off) */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.85rem', flexShrink: 0 }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
                 <span style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#D4A373', fontWeight: 800 }}>STATUS PESANAN LIVE</span>
                 <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: isApproved ? '#2ECC71' : '#E67E22', display: 'inline-block' }} className="animate-ping" />
               </div>
-              <h3 style={{ fontSize: '1.5rem', color: '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif' }}>
+              <h3 style={{ fontSize: '1.35rem', color: '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif' }}>
                 {createdOrder.order_number}
               </h3>
-              <p style={{ fontSize: '0.8rem', color: '#A89F91', marginTop: '0.2rem' }}>
+              <p style={{ fontSize: '0.78rem', color: '#A89F91', marginTop: '0.15rem', margin: 0 }}>
                 {createdOrder.mode === 'dine-in' ? `Dine-In • MEJA ${createdOrder.table_id || '01'}` : 'Takeaway'} ({createdOrder.customer_name})
               </p>
             </div>
             <button
               onClick={onClose}
               style={{
-                background: 'rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.1)',
                 border: 'none',
                 color: '#FFF',
                 cursor: 'pointer',
@@ -344,11 +345,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                marginTop: '-0.2rem',
               }}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
+
+          {/* Scrollable Modal Content Body */}
+          <div style={{ overflowY: 'auto', flex: 1, paddingRight: '0.25rem' }}>
 
           {/* REALTIME APPROVAL ANIMATION BANNER */}
           <div
@@ -522,35 +527,49 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         style={{
           width: '100%',
           maxWidth: '540px',
-          borderRadius: '20px',
-          padding: '2rem',
+          borderRadius: '24px',
+          padding: '1.25rem 1.5rem',
           position: 'relative',
           background: '#161311',
           border: '1px solid rgba(212, 163, 115, 0.3)',
-          maxHeight: '92vh',
-          overflowY: 'auto',
+          maxHeight: '88vh',
+          display: 'flex',
+          flexDirection: 'column',
           boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
-        }}
-      >
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        {/* Header (Fixed at Top - Never cut off) */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.85rem', flexShrink: 0 }}>
           <div>
-            <h3 style={{ fontSize: '1.4rem', color: '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif' }}>Checkout Pesanan</h3>
-            <span style={{ fontSize: '0.8rem', color: '#D4A373', fontWeight: 600 }}>Kedai KOPIMAGE Soreang</span>
+            <h3 style={{ fontSize: '1.35rem', color: '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif' }}>Checkout Pesanan</h3>
+            <span style={{ fontSize: '0.78rem', color: '#D4A373', fontWeight: 600 }}>Kedai KOPIMAGE Soreang</span>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#C4BBB4', cursor: 'pointer', padding: '0.4rem' }}>
-            <X size={22} />
+          <button
+            onClick={onClose}
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: 'none',
+              color: '#F7F4EF',
+              padding: '0.4rem',
+              borderRadius: '50%',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: '-0.2rem',
+            }}
+          >
+            <X size={20} />
           </button>
         </div>
 
         {errorMessage && (
-          <div style={{ background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.4)', padding: '0.75rem 1rem', borderRadius: '12px', color: '#E74C3C', fontSize: '0.88rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.4)', padding: '0.75rem 1rem', borderRadius: '12px', color: '#E74C3C', fontSize: '0.88rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
             <AlertCircle size={18} />
             <span>{errorMessage}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmitOrder} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* Form Body (Scrollable) */}
+        <form onSubmit={handleSubmitOrder} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', overflowY: 'auto', flex: 1, paddingRight: '0.25rem' }}>
           
           {/* Mode Pemesanan */}
           <div>
