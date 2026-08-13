@@ -9,31 +9,60 @@
    Palette: Merah Logo (#B82E2E), Putih (#FFFFFF), Coklat Mewah (#C29B7F), Dark Matte (#0E0B0A)
    ---------------------------------------------------- */
 
-:root {
-  --bg-dark: #0E0B0A;
-  --bg-dark-paper: #161210;
-  --bg-dark-surface: #1E1815;
-  
-  --text-light: #FFFFFF;
-  --text-[#F3EFEA]: #F8F6F0;
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+  --bg-main: #0E0B0A;
+  --bg-surface: #161210;
+  --bg-surface-elevated: #1E1815;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #F8F6F0;
   --text-muted: #A89F91;
   --text-subtle: #6E6358;
-  
-  --accent-red: #B82E2E;          /* Merah Logo Kopi Mage */
-  --accent-red-bright: #D63434;   /* Highlight Red */
-  --accent-copper: #C29B7F;       /* Industrial Coklat Mewah */
-  --accent-brown: #A3734C;        /* Warm Industrial Bronze */
-  
-  --border-line: rgba(255, 255, 255, 0.1);
-  --border-line-hover: rgba(255, 255, 255, 0.25);
-  --border-accent-red: rgba(184, 46, 46, 0.4);
-  --border-accent-copper: rgba(194, 155, 127, 0.4);
-  
+
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(255, 255, 255, 0.25);
+  --border-brand: rgba(184, 46, 46, 0.4);
+
+  --brand-red: #B82E2E;
+  --brand-red-hover: #D63434;
+  --brand-red-dark: #8C2020;
+  --brand-copper: #C29B7F;
+
+  --status-success: #2ECC71;
+  --status-warning: #E67E22;
+  --status-error: #E74C3C;
+
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, sans-serif;
-  
+
   --transition-smooth: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   --transition-fast: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-main: #FAF8F5;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F3EFEA;
+
+  --text-primary: #1E1B18;
+  --text-secondary: #4A423A;
+  --text-muted: #7A7067;
+  --text-subtle: #9E9388;
+
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(0, 0, 0, 0.2);
+  --border-brand: rgba(184, 46, 46, 0.3);
+
+  --brand-red: #B82E2E;
+  --brand-red-hover: #A12424;
+  --brand-red-dark: #7A1A1A;
+  --brand-copper: #A3734C;
+
+  --status-success: #27AE60;
+  --status-warning: #D35400;
+  --status-error: #C0392B;
 }
 
 * {
@@ -44,20 +73,20 @@
 
 html {
   scroll-behavior: smooth;
-  color-scheme: dark !important;
-  background-color: var(--bg-dark) !important;
-  color: var(--text-light) !important;
+  background-color: var(--bg-main) !important;
+  color: var(--text-primary) !important;
 }
 
 body {
-  background-color: var(--bg-dark) !important;
-  color: var(--text-light) !important;
+  background-color: var(--bg-main) !important;
+  color: var(--text-primary) !important;
   font-family: var(--font-sans);
   line-height: 1.7;
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 a {

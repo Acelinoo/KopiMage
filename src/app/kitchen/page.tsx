@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   Coffee,
   Clock,
@@ -271,6 +272,9 @@ export default function KitchenDisplayPage() {
 
         {/* Stats Pills & Controls */}
         <div className="flex items-center gap-3 flex-wrap">
+          {/* Theme Toggle Button */}
+          <ThemeToggle />
+
           {/* Connection Status Indicator */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
             <span className={`w-2 h-2 rounded-full ${connectionStatus === 'LIVE' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />

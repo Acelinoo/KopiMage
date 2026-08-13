@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Menu, X, ArrowUpRight, QrCode, Sun, Moon } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 function EditorialHeaderContent() {
   const pathname = usePathname();
@@ -52,6 +53,7 @@ function EditorialHeaderContent() {
 
           {/* Action CTA Button */}
           <div className="hidden md:flex items-center space-x-3">
+            <ThemeToggle />
             {tableId ? (
               <Link
                 href={`/?table=${tableId}`}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import Image from 'next/image';
 import {
   ShieldCheck,
@@ -587,6 +588,7 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
+            <ThemeToggle />
             <button
               onClick={() => fetchAdminOrders(true)}
               disabled={isRefreshing}

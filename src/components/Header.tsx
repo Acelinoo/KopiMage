@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, Menu as MenuIcon, X } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -90,6 +91,7 @@ export const Header: React.FC = () => {
 
         {/* Header Action Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+          <ThemeToggle />
           {/* Cart Button */}
           <button
             onClick={() => setIsCartOpen(true)}

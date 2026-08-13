@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import '../styles/globals.css';
 import { CartProvider } from '@/context/CartContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { CartDrawer } from '@/components/CartDrawer';
 
 export const metadata: Metadata = {
@@ -21,12 +22,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" style={{ background: '#0C0A09', color: '#F3EFEA', colorScheme: 'dark' }}>
-      <body style={{ background: '#0C0A09', color: '#F3EFEA', margin: 0, padding: 0 }}>
-        <CartProvider>
-          {children}
-          <CartDrawer />
-        </CartProvider>
+    <html lang="id">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var stored = localStorage.getItem('kopimage_theme');
+                  var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                  document.documentElement.setAttribute('data-theme', theme);
+                } catch (e) {
+                  document.documentElement.setAttribute('data-theme', 'dark');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
+      <body>
+        <ThemeProvider>
+          <CartProvider>
+            {children}
+            <CartDrawer />
+          </CartProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

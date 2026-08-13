@@ -84,11 +84,11 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
   }, [activeCategory, searchQuery, liveMenuItems]);
 
   return (
-    <div style={{ background: '#090807', color: '#F7F4EF', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: 'var(--bg-main)', color: 'var(--text-primary)', minHeight: '100vh', display: 'flex', flexDirection: 'column', transition: 'background-color 0.25s ease, color 0.25s ease' }}>
       <Header />
 
       {/* Hero Table Section */}
-      <section style={{ paddingTop: '7.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+      <section style={{ paddingTop: '7.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid var(--border-color)' }}>
         <div className="container" style={{ maxWidth: '840px', margin: '0 auto' }}>
           <div style={{ textAlign: 'left', padding: '0 1rem' }}>
             
