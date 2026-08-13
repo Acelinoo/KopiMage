@@ -84,8 +84,8 @@ export default function KitchenDisplayPage() {
               apiOrders.push(loc);
             } else {
               // Prefer record with updated payment_status / order_status
-              if (loc.payment_status === 'PAID' && existing.payment_status !== 'PAID') {
-                apiMap.set(loc.id, { ...existing, ...loc });
+              if (loc.payment_status === 'PAID' && (existing as any)?.payment_status !== 'PAID') {
+                apiMap.set(loc.id, { ...(existing as any), ...loc });
               }
             }
           });
