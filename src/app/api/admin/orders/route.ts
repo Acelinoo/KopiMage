@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
-import { getOrdersFromStore, updateOrderInStore, OrderRecord } from '@/lib/ordersStore';
+import { getOrdersFromStore, updateOrderInStore, clearOrdersStore, OrderRecord } from '@/lib/ordersStore';
 
 export async function GET(request: Request) {
   try {
@@ -191,6 +191,43 @@ export async function PATCH(request: Request) {
     console.error('Error updating order status:', err);
     return NextResponse.json(
       { error: 'Gagal memperbarui status pesanan: ' + err.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const supabase = createAdminSupabaseClient();
+    const { searchParams } = new URL(request.url);
+    const orderId = searchParams.get('id');
+    const isAll = searchParams.get('all') === 'true';
+
+    if (isAll) {
+      await supabase.from('order_items').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      await supabase.from('orders').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      clearOrdersStore();
+
+      return NextResponse.json({
+        success: true,
+        message: 'Semua pesanan telah berhasil dihapus.',
+      });
+    }
+
+    if (orderId) {
+      await supabase.from('order_items').delete().eq('order_id', orderId);
+      await supabase.from('orders').delete().eq('id', orderId);
+      return NextResponse.json({
+        success: true,
+        message: 'Pesanan telah berhasil dihapus.',
+      });
+    }
+
+    return NextResponse.json({ error: 'Harap tentukan id atau parameter all=true.' }, { status: 400 });
+  } catch (err: any) {
+    console.error('Error deleting orders:', err);
+    return NextResponse.json(
+      { error: 'Gagal menghapus pesanan: ' + err.message },
       { status: 500 }
     );
   }

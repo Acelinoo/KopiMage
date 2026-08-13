@@ -90,3 +90,10 @@ export function updateOrderInStore(
   }
   return null;
 }
+
+/**
+ * Clear all stored orders from memory store
+ */
+export function clearOrdersStore() {
+  sharedOrdersStore.length = 0;
+}
