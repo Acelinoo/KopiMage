@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { OrderMode, PaymentMethod } from '@/types/order';
-import { VALID_TABLES_REGISTRY } from '@/types/table';
-import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee, Clock, ShieldCheck, RefreshCw } from 'lucide-react';
 
 interface CheckoutModalProps {
   onClose: () => void;
@@ -14,7 +12,6 @@ interface CheckoutModalProps {
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess }) => {
   const { cartItems, estimatedSubtotal, clearCart, activeTableId } = useCart();
-  const router = useRouter();
 
   const [mode, setMode] = useState<OrderMode>(activeTableId ? 'dine-in' : 'dine-in');
   const formattedInitialTable = activeTableId ? String(activeTableId).padStart(2, '0') : '01';
@@ -28,8 +25,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
   const [submissionStep, setSubmissionStep] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Single Popup Unified State: Track created order right inside this popup
+  const [createdOrder, setCreatedOrder] = useState<any>(null);
+  const [isPolling, setIsPolling] = useState<boolean>(false);
+
   // Fetch Live Tables from /api/tables & LocalStorage fallback
-  React.useEffect(() => {
+  useEffect(() => {
     const isCleared = typeof window !== 'undefined' && localStorage.getItem('kopimage_tables_cleared') === 'true';
     const localTables = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_tables_v3') : null;
     const parsedLocal = localTables ? JSON.parse(localTables) : [];
@@ -54,6 +55,31 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
     }
   }, []);
 
+  // Real-time Polling for Order Status Updates inside 1 Single Popup
+  useEffect(() => {
+    if (!createdOrder?.id) return;
+
+    const interval = setInterval(async () => {
+      try {
+        setIsPolling(true);
+        const res = await fetch('/api/admin/orders?status=ALL');
+        const data = await res.json();
+        if (data.success && Array.isArray(data.orders)) {
+          const matched = data.orders.find((o: any) => o.id === createdOrder.id);
+          if (matched) {
+            setCreatedOrder(matched);
+          }
+        }
+      } catch (err) {
+        console.warn('Realtime order polling warning:', err);
+      } finally {
+        setIsPolling(false);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [createdOrder?.id]);
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -74,11 +100,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
     setIsSubmitting(true);
     setErrorMessage('');
-    setSubmissionStep(1); // Step 1: Validating payload
+    setSubmissionStep(1); // Step 1: Mengecek pemesanan & meja
 
     try {
-      await new Promise((r) => setTimeout(r, 400)); // Smooth animation delay
-      setSubmissionStep(2); // Step 2: Uploading data & payment proof
+      await new Promise((r) => setTimeout(r, 450)); // Smooth step delay
+      setSubmissionStep(2); // Step 2: Membuat pesanan di sistem
 
       let uploadedProofUrl: string | null = null;
 
@@ -114,7 +140,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         }
       }
 
-      setSubmissionStep(3); // Step 3: Dispatching to Order API
+      setSubmissionStep(3); // Step 3: Mengirimkan pesanan ke Admin & Dapur
+      await new Promise((r) => setTimeout(r, 450));
 
       // Build order items payload
       const itemsPayload = cartItems.map((ci) => ({
@@ -151,21 +178,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         throw new Error(data.error || 'Gagal memproses pesanan di server.');
       }
 
-      // Save tracking secret for security check
-      if (data.order?.tracking_secret) {
-        localStorage.setItem(`kopimage_tracking_${data.order.id}`, data.order.tracking_secret);
-      }
-
-      const targetUrl = `/order/${data.order.id}?secret=${data.order.tracking_secret}`;
-
-      // Prefetch route immediately for instant transition
-      router.prefetch(targetUrl);
-
-      setSubmissionStep(4); // Step 4: Redirection ready
-      await new Promise((r) => setTimeout(r, 600));
-
+      setCreatedOrder(data.order);
+      setSubmissionStep(4); // Step 4: Selesai -> Tampilkan Live Popup Status
       clearCart();
-      router.push(targetUrl);
+      onSuccess();
     } catch (err: any) {
       console.error('Checkout error:', err);
       setErrorMessage(err.message || 'Terjadi kesalahan sistem saat checkout.');
@@ -174,8 +190,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
     }
   };
 
-  // Full-Screen Luxury Step Progress Overlay to prevent any transition gap
-  if (submissionStep > 0) {
+  // ----------------------------------------------------
+  // VIEW 1: ANIMASI LOADING PROSES (Mengecek, Membuat, Mengirim)
+  // ----------------------------------------------------
+  if (submissionStep > 0 && submissionStep < 4) {
     return (
       <div
         style={{
@@ -210,19 +228,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               boxShadow: '0 0 50px rgba(184, 46, 46, 0.4)',
             }}
           >
-            {submissionStep < 4 ? (
-              <Loader2 className="w-10 h-10 text-[#D4A373] animate-spin" />
-            ) : (
-              <CheckCircle className="w-12 h-12 text-[#2ECC71] animate-bounce" />
-            )}
+            <Loader2 className="w-10 h-10 text-[#D4A373] animate-spin" />
           </div>
         </div>
 
         <h3 style={{ fontFamily: 'serif', fontSize: '1.8rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.5rem' }}>
-          {submissionStep === 4 ? 'Pesanan Berhasil Dibuat!' : 'Memproses Pesanan Anda...'}
+          Memproses Pesanan Anda...
         </h3>
         <p style={{ fontSize: '0.88rem', color: '#D4A373', maxWidth: '420px', marginBottom: '2.5rem', lineHeight: 1.5 }}>
-          Mohon tunggu sebentar, sistem KopiMage sedang memproses dan menyambungkan pesanan Anda ke Stasiun Dapur.
+          Mohon tunggu sebentar, sistem KopiMage sedang memverifikasi dan menyambungkan pesanan Anda ke Stasiun Dapur.
         </p>
 
         {/* Steps Progress Checklist */}
@@ -232,7 +246,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               {submissionStep > 1 ? '✓' : '1'}
             </div>
             <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 1 ? 600 : 400, color: submissionStep >= 1 ? '#F7F4EF' : '#777' }}>
-              Memverifikasi rincian menu & nomor meja
+              Mengecek pemesanan & nomor meja
             </span>
           </div>
 
@@ -241,7 +255,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               {submissionStep > 2 ? '✓' : '2'}
             </div>
             <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 2 ? 600 : 400, color: submissionStep >= 2 ? '#F7F4EF' : '#777' }}>
-              Mengirimkan data & bukti pembayaran
+              Membuat pesanan di sistem KopiMage
             </span>
           </div>
 
@@ -250,17 +264,210 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               {submissionStep > 3 ? '✓' : '3'}
             </div>
             <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 3 ? 600 : 400, color: submissionStep >= 3 ? '#F7F4EF' : '#777' }}>
-              Menyambungkan ke Stasiun Dapur KopiMage
+              Mengirimkan pesanan ke Admin Kasir & Dapur
             </span>
           </div>
+        </div>
+      </div>
+    );
+  }
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 4 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep === 4 ? '#2ECC71' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep === 4 ? '#000' : '#777', flexShrink: 0 }}>
-              {submissionStep === 4 ? '✓' : '4'}
+  // ----------------------------------------------------
+  // VIEW 2: UNIFIED SINGLE POPUP REAL-TIME ORDER STATUS TRACKER
+  // (Muncul Langsung di 1 Popup Tanpa Redirect Halaman!)
+  // ----------------------------------------------------
+  if (createdOrder) {
+    const isApproved = createdOrder.payment_status === 'PAID' || createdOrder.payment_method === 'cashier';
+    const isReady = createdOrder.order_status === 'READY';
+    const isCompleted = createdOrder.order_status === 'COMPLETED';
+
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 1050,
+          background: 'rgba(0, 0, 0, 0.88)',
+          backdropFilter: 'blur(20px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '1rem',
+        }}
+      >
+        <div
+          className="glass-panel"
+          style={{
+            width: '100%',
+            maxWidth: '520px',
+            borderRadius: '24px',
+            padding: '2rem',
+            position: 'relative',
+            background: '#161311',
+            border: isApproved ? '1px solid rgba(46, 204, 113, 0.5)' : '1px solid rgba(212, 163, 115, 0.4)',
+            maxHeight: '92vh',
+            overflowY: 'auto',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.9)',
+          }}
+        >
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', pb: '1rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                <span style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#D4A373', fontWeight: 800 }}>STATUS PESANAN LIVE</span>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: isApproved ? '#2ECC71' : '#E67E22', display: 'inline-block' }} className="animate-ping" />
+              </div>
+              <h3 style={{ fontSize: '1.5rem', color: '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif' }}>
+                {createdOrder.order_number}
+              </h3>
+              <p style={{ fontSize: '0.8rem', color: '#A89F91', marginTop: '0.2rem' }}>
+                {createdOrder.mode === 'dine-in' ? `Dine-In • MEJA ${createdOrder.table_id || '01'}` : 'Takeaway'} ({createdOrder.customer_name})
+              </p>
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 4 ? 600 : 400, color: submissionStep === 4 ? '#2ECC71' : '#777' }}>
-              Membuka Halaman Pelacakan Pesanan...
+            <button
+              onClick={onClose}
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                border: 'none',
+                color: '#FFF',
+                cursor: 'pointer',
+                padding: '0.5rem',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* REALTIME APPROVAL ANIMATION BANNER */}
+          <div
+            style={{
+              padding: '1.2rem',
+              borderRadius: '16px',
+              marginBottom: '1.5rem',
+              background: isReady
+                ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(39, 174, 96, 0.1) 100%)'
+                : isApproved
+                ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.18) 0%, rgba(212, 163, 115, 0.1) 100%)'
+                : 'linear-gradient(135deg, rgba(230, 126, 34, 0.2) 0%, rgba(184, 46, 46, 0.1) 100%)',
+              border: isReady
+                ? '1px solid #2ECC71'
+                : isApproved
+                ? '1px solid rgba(46, 204, 113, 0.4)'
+                : '1px solid rgba(230, 126, 34, 0.4)',
+              textAlign: 'center',
+            }}
+          >
+            {isReady ? (
+              <div>
+                <Coffee className="w-10 h-10 text-[#2ECC71] mx-auto mb-2 animate-bounce" />
+                <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.3rem', fontFamily: 'serif' }}>
+                  ☕ PESANAN SIAP DIHIDANGKAN!
+                </h4>
+                <p style={{ fontSize: '0.85rem', color: '#F7F4EF' }}>
+                  Pesanan Anda sudah selesai diracik oleh Barista & Dapur KopiMage dan siap diantarkan ke meja.
+                </p>
+              </div>
+            ) : isApproved ? (
+              <div>
+                <CheckCircle className="w-9 h-9 text-[#2ECC71] mx-auto mb-2 animate-pulse" />
+                <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.3rem', fontFamily: 'serif' }}>
+                  ✓ PEMBAYARAN DIVERIFIKASI LUNAS!
+                </h4>
+                <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
+                  Pesanan Anda telah disetujui Admin dan sedang diracik oleh Dapur & Barista.
+                </p>
+              </div>
+            ) : (
+              <div>
+                <Clock className="w-8 h-8 text-[#E67E22] mx-auto mb-2 animate-spin" style={{ animationDuration: '4s' }} />
+                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#E67E22', marginBottom: '0.3rem', fontFamily: 'serif' }}>
+                  ⏳ MENUNGGU VERIFIKASI ADMIN KASIR
+                </h4>
+                <p style={{ fontSize: '0.82rem', color: '#D4A373' }}>
+                  Pesanan Anda sudah dikirim ke Admin. Begitu pembayaran diverifikasi lunas, status di popup ini akan otomatis berubah menjadi <strong className="text-white">DIPROSES DAPUR</strong> secara real-time!
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* REALTIME STATUS TRACKER STEPS */}
+          <div style={{ marginBottom: '1.5rem', background: '#0E0C0A', padding: '1rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <span style={{ fontSize: '0.7rem', color: '#A89F91', letterSpacing: '0.1em', uppercase: 'true', fontWeight: 700, display: 'block', marginBottom: '0.8rem' }}>
+              PROGRES REALTIME DAPUR & KASIR:
             </span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', textAlign: 'center' }}>
+              {/* Step 1: Verifikasi / Terkirim */}
+              <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: isApproved ? '1px solid #2ECC71' : '1px solid #E67E22' }}>
+                <span style={{ fontSize: '0.65rem', display: 'block', color: isApproved ? '#2ECC71' : '#E67E22', fontWeight: 700 }}>
+                  {isApproved ? '✓ TERVERIFIKASI' : '⏳ VERIFIKASI'}
+                </span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FFF' }}>Kasir Admin</span>
+              </div>
+
+              {/* Step 2: Diproses Dapur */}
+              <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: createdOrder.order_status === 'PREPARING' || isReady || isCompleted ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.1)' }}>
+                <span style={{ fontSize: '0.65rem', display: 'block', color: createdOrder.order_status === 'PREPARING' || isReady || isCompleted ? '#D4A373' : '#666', fontWeight: 700 }}>
+                  {createdOrder.order_status === 'PREPARING' ? '👨‍🍳 DIPROSES' : isReady || isCompleted ? '✓ DIPROSES' : 'PENDING'}
+                </span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: createdOrder.order_status === 'PREPARING' || isReady || isCompleted ? '#FFF' : '#666' }}>Dapur & Barista</span>
+              </div>
+
+              {/* Step 3: Siap Hidangkan */}
+              <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: isReady || isCompleted ? '1px solid #2ECC71' : '1px solid rgba(255,255,255,0.1)' }}>
+                <span style={{ fontSize: '0.65rem', display: 'block', color: isReady || isCompleted ? '#2ECC71' : '#666', fontWeight: 700 }}>
+                  {isReady ? '☕ SIAP' : isCompleted ? '✓ SELESAI' : 'TUNGGU'}
+                </span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: isReady || isCompleted ? '#FFF' : '#666' }}>Siap Meja</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ITEM RINGKASAN */}
+          {createdOrder.items && createdOrder.items.length > 0 && (
+            <div style={{ marginBottom: '1.5rem', background: '#0E0C0A', padding: '1rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <span style={{ fontSize: '0.7rem', color: '#A89F91', letterSpacing: '0.1em', uppercase: 'true', fontWeight: 700, display: 'block', marginBottom: '0.6rem' }}>
+                RINCIAN ITEM PESANAN:
+              </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {createdOrder.items.map((item: any, idx: number) => (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#F7F4EF' }}>
+                    <span>{item.quantity}x {item.item_name}</span>
+                    <span style={{ color: '#D4A373', fontWeight: 600 }}>Rp {(item.subtotal || item.unit_price * item.quantity).toLocaleString('id-ID')}</span>
+                  </div>
+                ))}
+              </div>
+              <div style={{ borderTop: '1px border rgba(255,255,255,0.1)', marginTop: '0.8rem', pt: '0.6rem', display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '0.95rem', color: '#FFF' }}>
+                <span>Total Pembayaran</span>
+                <span style={{ color: '#D4A373' }}>Rp {createdOrder.total_amount?.toLocaleString('id-ID')}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <button
+              onClick={onClose}
+              style={{
+                flex: 1,
+                padding: '0.85rem',
+                borderRadius: '14px',
+                background: '#D4A373',
+                color: '#0E0C0A',
+                fontWeight: 800,
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.9rem',
+              }}
+            >
+              Tutup Popup
+            </button>
           </div>
         </div>
       </div>
