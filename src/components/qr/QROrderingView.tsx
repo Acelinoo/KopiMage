@@ -220,8 +220,8 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                gap: '1.25rem'
+                gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                gap: '1rem'
               }}
             >
               {filteredItems.map((item) => (

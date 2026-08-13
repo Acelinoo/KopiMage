@@ -600,7 +600,7 @@ export default function AdminDashboardPage() {
             </button>
 
             {/* Industrial Navigation Tabs */}
-            <div className="flex bg-[#0E0B0A] p-1 rounded-xl border border-[#FFFFFF]/10 gap-1">
+            <div className="flex bg-[#0E0B0A] p-1 rounded-xl border border-[#FFFFFF]/10 gap-1 overflow-x-auto max-w-full shrink-0">
               <button
                 onClick={() => setActiveTab('verification')}
                 className={`px-4 py-2 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer flex items-center gap-2 ${

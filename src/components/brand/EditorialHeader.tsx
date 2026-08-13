@@ -73,11 +73,12 @@ function EditorialHeaderContent() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Actions & Menu Button */}
           <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-[#F3EFEA] p-2 hover:text-[#B82E2E] transition-colors"
+              className="text-[#F3EFEA] p-2 hover:text-[#B82E2E] transition-colors cursor-pointer"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -88,7 +89,7 @@ function EditorialHeaderContent() {
 
       {/* Mobile Fullscreen Editorial Drawer */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 top-20 z-30 bg-[#0C0A09] flex flex-col justify-between p-8 md:hidden border-t border-[#F3EFEA]/10 animate-fade-in">
+        <div style={{ background: 'var(--bg-main)' }} className="fixed inset-0 top-20 z-30 flex flex-col justify-between p-6 sm:p-8 md:hidden border-t border-[#FFFFFF]/10 overflow-y-auto animate-fade-in">
           <div className="flex flex-col space-y-6 pt-4">
             {navItems.map((item) => {
               const targetHref = tableId ? `/?table=${tableId}${item.href}` : `/${item.href}`;

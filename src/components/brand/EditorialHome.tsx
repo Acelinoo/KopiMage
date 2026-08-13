@@ -201,18 +201,32 @@ export function EditorialHome() {
                     </div>
 
                     {/* Clean 2-Column Content Area */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-center">
 
-                        {/* LEFT COLUMN: Title + Description + Side-by-Side Action Buttons */}
-                        <div className="md:col-span-7 lg:col-span-6 reveal-fade-up is-visible" style={{ transitionDelay: '0.1s' }}>
+                        {/* HERO IMAGE: Order 1 on mobile (Appears ON TOP of title), Order 2 on desktop */}
+                        <div className="order-1 md:order-2 md:col-span-5 lg:col-span-6 reveal-scale-pop is-visible flex justify-center lg:justify-end" style={{ transitionDelay: '0.1s' }}>
+                            <div className="relative w-full max-w-[280px] xs:max-w-[340px] sm:max-w-[420px] lg:max-w-[480px] aspect-square rounded-2xl overflow-hidden border border-[#B82E2E]/30 shadow-xl bg-[#161210] mx-auto lg:ml-auto">
+                                <Image
+                                    src="/images/Welcome.webp"
+                                    alt="Kopi Mage Espresso Crema & Roasted Coffee Beans"
+                                    fill
+                                    priority
+                                    className="object-cover object-center"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                />
+                            </div>
+                        </div>
+
+                        {/* HERO TEXT CONTENT: Order 2 on mobile (Appears BELOW image), Order 1 on desktop */}
+                        <div className="order-2 md:order-1 md:col-span-7 lg:col-span-6 reveal-fade-up is-visible" style={{ transitionDelay: '0.2s' }}>
 
                             {/* Main Headline Text */}
-                            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[#FFFFFF] leading-[1.12] mb-5">
+                            <h1 className="font-serif text-2xl xs:text-3xl sm:text-5xl lg:text-6xl font-light text-[#FFFFFF] leading-[1.15] mb-4 sm:mb-5">
                                 Kedai Kopi Berkonsep Industrial di Soreang & Margahayu
                             </h1>
 
                             {/* Description Paragraph */}
-                            <p className="font-sans text-sm sm:text-base text-[#A89F91] leading-relaxed font-light mb-8 max-w-xl">
+                            <p className="font-sans text-xs sm:text-base text-[#A89F91] leading-relaxed font-light mb-6 sm:mb-8 max-w-xl">
                                 Tempat santai untuk ngopi, nugas, dan kumpul bersama teman atau pasangan. Menyediakan pilihan kopi racikan barista, makanan hangat, dan suasana teras sejuk di 2 cabang resmi (Gading Tutuka & Lanud Sulaiman).
                             </p>
 
@@ -235,20 +249,6 @@ export function EditorialHome() {
                             </div>
                         </div>
 
-                        {/* RIGHT COLUMN: Prominent Welcome.png Coffee Image */}
-                        <div className="md:col-span-5 lg:col-span-6 reveal-scale-pop is-visible flex justify-center lg:justify-end" style={{ transitionDelay: '0.2s' }}>
-                            <div className="relative w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[480px] aspect-square rounded-2xl overflow-hidden border border-[#B82E2E]/30 shadow-xl bg-[#161210] mx-auto lg:ml-auto">
-                                <Image
-                                    src="/images/Welcome.webp"
-                                    alt="Kopi Mage Espresso Crema & Roasted Coffee Beans"
-                                    fill
-                                    priority
-                                    className="object-cover object-center"
-                                    sizes="(max-width: 768px) 100vw, 50vw"
-                                />
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </section>
@@ -258,7 +258,7 @@ export function EditorialHome() {
          ---------------------------------------------------- */}
             <section id="about" className="py-16 lg:py-24 editorial-border-b bg-[#161210]">
                 <div className="editorial-container">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-12 sm:mb-16">
                         <div className="lg:col-span-5 reveal-slide-left">
                             <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold block mb-4">
                                 02 / TENTANG KOPI MAGE
@@ -812,7 +812,7 @@ export function EditorialHome() {
                     <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-[#FFFFFF]/10 reveal-fade-up">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <span className="w-2.5 h-2.5 rounded-full bg-[#B82E2E] animate-pulse" />
+
                                 <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold">
                                     08 / LOKASI 2 CABANG KOPI MAGE
                                 </span>
@@ -857,12 +857,7 @@ export function EditorialHome() {
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                         {/* Live Map Tracker Embed Frame */}
                         <div className="lg:col-span-8 relative border border-[#FFFFFF]/15 overflow-hidden min-h-[300px] sm:min-h-[380px] lg:min-h-[440px] bg-[#161210] rounded-2xl reveal-scale-pop shadow-sm">
-                            <div className="absolute top-4 left-4 z-20 bg-[#0E0B0A]/90 backdrop-blur-md px-3 sm:px-4 py-2 border border-[#B82E2E]/40 rounded-lg flex items-center gap-2 sm:gap-3 shadow-sm">
-                                <Navigation className="w-4 h-4 text-[#B82E2E] animate-bounce" />
-                                <span className="font-sans text-[0.6rem] sm:text-[0.65rem] tracking-[0.18em] sm:tracking-[0.2em] uppercase text-[#FFFFFF] font-semibold">
-                                    {activeOutlet === 'gading' ? 'RADAR MAP • GADING TUTUKA SOREANG' : 'RADAR MAP • LANUD SULAIMAN MARGAHAYU'}
-                                </span>
-                            </div>
+
 
                             <iframe
                                 title={activeOutlet === 'gading' ? 'Kopi Mage Gading Tutuka Google Maps' : 'Kopi Mage Lanud Sulaiman Google Maps'}
