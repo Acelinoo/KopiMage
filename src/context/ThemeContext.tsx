@@ -13,7 +13,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>('dark');
+  const [theme, setThemeState] = useState<Theme>('light');
 
   useEffect(() => {
     try {
@@ -22,13 +22,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         setThemeState(stored);
         document.documentElement.setAttribute('data-theme', stored);
       } else {
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const systemTheme: Theme = prefersDark ? 'dark' : 'light';
-        setThemeState(systemTheme);
-        document.documentElement.setAttribute('data-theme', systemTheme);
+        setThemeState('light');
+        document.documentElement.setAttribute('data-theme', 'light');
       }
     } catch (e) {
-      document.documentElement.setAttribute('data-theme', 'dark');
+      document.documentElement.setAttribute('data-theme', 'light');
     }
   }, []);
 
