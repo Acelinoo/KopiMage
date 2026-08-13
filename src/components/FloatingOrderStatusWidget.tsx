@@ -117,10 +117,8 @@ export const FloatingOrderStatusWidget: React.FC = () => {
             >
               {isReady ? (
                 <Coffee className="w-5 h-5 text-[#2ECC71] animate-bounce" />
-              ) : isApproved ? (
-                <CheckCircle className="w-5 h-5 text-[#D4A373] animate-pulse" />
               ) : (
-                <Clock className="w-5 h-5 text-[#E67E22] animate-spin" style={{ animationDuration: '4s' }} />
+                <Coffee className="w-5 h-5 text-[#D4A373] animate-pulse" />
               )}
             </div>
 
@@ -134,18 +132,16 @@ export const FloatingOrderStatusWidget: React.FC = () => {
                 style={{
                   fontSize: '0.85rem',
                   fontWeight: 800,
-                  color: isReady ? '#2ECC71' : isApproved ? '#F7F4EF' : '#E67E22',
+                  color: isReady ? '#2ECC71' : '#D4A373',
                   display: 'block',
                   lineHeight: '1.2',
                 }}
               >
                 {isReady
                   ? '☕ SIAP DIHIDANGKAN!'
-                  : isPreparing
-                  ? '👨‍🍳 DIPROSES DAPUR & BARISTA'
                   : isApproved
-                  ? '✓ PEMBAYARAN DIVERIFIKASI'
-                  : '⏳ MENUNGGU VERIFIKASI ADMIN'}
+                  ? '✓ PEMBAYARAN LUNAS'
+                  : '👨‍🍳 DIPROSES DAPUR & BARISTA'}
               </span>
             </div>
           </div>

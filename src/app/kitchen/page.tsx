@@ -186,10 +186,8 @@ export default function KitchenDisplayPage() {
 
   // Filter orders by search, approval status, & tabs
   const filteredOrders = orders.filter((o) => {
-    // KITCHEN APPROVAL POLICY:
-    // QRIS/Transfer orders only appear in kitchen after Admin approves payment (PAID).
-    // Cashier orders appear in kitchen immediately (cashier).
-    const isApprovedForKitchen = o.payment_method === 'cashier' || o.payment_status === 'PAID';
+    // ALL orders show up in kitchen instantly so Barista & Dapur can prepare coffee & food without delay
+    const isApprovedForKitchen = true;
     if (!isApprovedForKitchen) return false;
 
     const isCompleted = o.order_status === 'COMPLETED';
@@ -218,9 +216,9 @@ export default function KitchenDisplayPage() {
     return true;
   });
 
-  const activeOrdersCount = orders.filter((o) => (o.payment_method === 'cashier' || o.payment_status === 'PAID') && o.order_status !== 'COMPLETED').length;
-  const preparingCount = orders.filter((o) => (o.payment_method === 'cashier' || o.payment_status === 'PAID') && o.order_status === 'PREPARING').length;
-  const readyCount = orders.filter((o) => (o.payment_method === 'cashier' || o.payment_status === 'PAID') && o.order_status === 'READY').length;
+  const activeOrdersCount = orders.filter((o) => o.order_status !== 'COMPLETED').length;
+  const preparingCount = orders.filter((o) => o.order_status === 'PREPARING').length;
+  const readyCount = orders.filter((o) => o.order_status === 'READY').length;
 
   return (
     <div className="min-h-screen bg-[#070605] text-[#F7F4EF] font-sans p-4 md:p-8 selection:bg-[#B82E2E] selection:text-white">

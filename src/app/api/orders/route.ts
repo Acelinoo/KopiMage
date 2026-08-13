@@ -124,8 +124,8 @@ export async function POST(request: Request) {
     const trackingSecret = crypto.randomUUID();
     const orderId = crypto.randomUUID();
 
-    // Initial Status Determination according to Dual Status Machine
-    const initialOrderStatus: 'NEW_ORDER' = 'NEW_ORDER';
+    // Initial Status: Instantly dispatch to Kitchen & Barista as PREPARING
+    const initialOrderStatus: 'PREPARING' = 'PREPARING';
     const initialPaymentStatus: 'UNPAID' | 'VERIFYING' = payment_method === 'cashier' ? 'UNPAID' : 'VERIFYING';
 
     // 5. Insert into database

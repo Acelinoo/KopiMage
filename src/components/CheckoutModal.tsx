@@ -360,12 +360,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(39, 174, 96, 0.1) 100%)'
                 : isApproved
                 ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.18) 0%, rgba(212, 163, 115, 0.1) 100%)'
-                : 'linear-gradient(135deg, rgba(230, 126, 34, 0.2) 0%, rgba(184, 46, 46, 0.1) 100%)',
+                : 'linear-gradient(135deg, rgba(212, 163, 115, 0.2) 0%, rgba(184, 46, 46, 0.1) 100%)',
               border: isReady
                 ? '1px solid #2ECC71'
                 : isApproved
                 ? '1px solid rgba(46, 204, 113, 0.4)'
-                : '1px solid rgba(230, 126, 34, 0.4)',
+                : '1px solid rgba(212, 163, 115, 0.5)',
               textAlign: 'center',
             }}
           >
@@ -386,17 +386,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   ✓ PEMBAYARAN DIVERIFIKASI LUNAS!
                 </h4>
                 <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
-                  Pesanan Anda telah disetujui Admin dan sedang diracik oleh Dapur & Barista.
+                  Pesanan Anda telah disetujui Admin dan sedang diracik oleh Dapur & Barista KopiMage.
                 </p>
               </div>
             ) : (
               <div>
-                <Clock className="w-8 h-8 text-[#E67E22] mx-auto mb-2 animate-spin" style={{ animationDuration: '4s' }} />
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#E67E22', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                  ⏳ MENUNGGU VERIFIKASI ADMIN KASIR
+                <Coffee className="w-9 h-9 text-[#D4A373] mx-auto mb-2 animate-pulse" />
+                <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#D4A373', marginBottom: '0.3rem', fontFamily: 'serif' }}>
+                  👨‍🍳 PESANAN SEDANG DIPROSES DAPUR & BARISTA
                 </h4>
-                <p style={{ fontSize: '0.82rem', color: '#D4A373' }}>
-                  Pesanan Anda sudah dikirim ke Admin. Begitu pembayaran diverifikasi lunas, status di popup ini akan otomatis berubah menjadi <strong className="text-white">DIPROSES DAPUR</strong> secara real-time!
+                <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
+                  Pesanan Anda telah diteruskan ke Stasiun Dapur & Barista KopiMage dan sedang diracik. Kasir Admin akan mengonfirmasi pembayaran Anda secara paralel.
                 </p>
               </div>
             )}
@@ -408,20 +408,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               PROGRES REALTIME DAPUR & KASIR:
             </span>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', textAlign: 'center' }}>
-              {/* Step 1: Verifikasi / Terkirim */}
-              <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: isApproved ? '1px solid #2ECC71' : '1px solid #E67E22' }}>
-                <span style={{ fontSize: '0.65rem', display: 'block', color: isApproved ? '#2ECC71' : '#E67E22', fontWeight: 700 }}>
-                  {isApproved ? '✓ TERVERIFIKASI' : '⏳ VERIFIKASI'}
+              {/* Step 1: Terkirim */}
+              <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid #2ECC71' }}>
+                <span style={{ fontSize: '0.65rem', display: 'block', color: '#2ECC71', fontWeight: 700 }}>
+                  ✓ TERKIRIM
                 </span>
                 <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FFF' }}>Kasir Admin</span>
               </div>
 
               {/* Step 2: Diproses Dapur */}
-              <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: createdOrder.order_status === 'PREPARING' || isReady || isCompleted ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.1)' }}>
-                <span style={{ fontSize: '0.65rem', display: 'block', color: createdOrder.order_status === 'PREPARING' || isReady || isCompleted ? '#D4A373' : '#666', fontWeight: 700 }}>
-                  {createdOrder.order_status === 'PREPARING' ? '👨‍🍳 DIPROSES' : isReady || isCompleted ? '✓ DIPROSES' : 'PENDING'}
+              <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid #D4A373' }}>
+                <span style={{ fontSize: '0.65rem', display: 'block', color: '#D4A373', fontWeight: 700 }}>
+                  👨‍🍳 DIPROSES
                 </span>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: createdOrder.order_status === 'PREPARING' || isReady || isCompleted ? '#FFF' : '#666' }}>Dapur & Barista</span>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FFF' }}>Dapur & Barista</span>
               </div>
 
               {/* Step 3: Siap Hidangkan */}
