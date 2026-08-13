@@ -487,7 +487,9 @@ export default function AdminDashboardPage() {
     (o.customer_phone || '').includes(searchQuery)
   );
 
-  const pendingCount = ordersList.filter((o) => o.payment_status === 'VERIFYING').length;
+  const pendingCount = ordersList.filter(
+    (o) => o.payment_status === 'VERIFYING' || o.payment_status === 'UNPAID'
+  ).length;
 
   return (
     <main className="min-h-screen bg-[#0B0908] text-[#F7F4EF] font-sans pb-20 selection:bg-[#B82E2E] selection:text-[#FFFFFF]">

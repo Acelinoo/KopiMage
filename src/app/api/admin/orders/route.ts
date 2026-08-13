@@ -1,26 +1,56 @@
 import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
-
-// Server-side in-memory cache fallback for demo stability when Supabase RLS/tables vary
-let inMemoryOrdersStore: any[] = [];
+import { getOrdersFromStore, updateOrderInStore, OrderRecord } from '@/lib/ordersStore';
 
 export async function GET(request: Request) {
   try {
     const supabase = createAdminSupabaseClient();
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') || 'VERIFYING';
+    const status = searchParams.get('status') || 'ALL';
 
-    // 1. Query Supabase using Service Role (Bypasses RLS)
+    // 1. Query Supabase with order_items joined
     const { data: dbOrders, error } = await supabase
       .from('orders')
-      .select('*')
+      .select('*, order_items(*)')
       .order('created_at', { ascending: false });
 
-    let finalOrders = dbOrders && dbOrders.length > 0 ? dbOrders : inMemoryOrdersStore;
+    if (error) {
+      console.warn('Supabase orders fetch warning:', error.message);
+    }
 
-    // Filter by status if specified (or return all for admin overview)
+    // 2. Merge database orders with in-memory shared store orders
+    const memoryOrders = getOrdersFromStore();
+    const dbOrderIds = new Set((dbOrders || []).map((o) => o.id));
+
+    // Combine DB orders with memory orders not yet in DB
+    const combinedOrders: OrderRecord[] = [
+      ...(dbOrders || []),
+      ...memoryOrders.filter((o) => !dbOrderIds.has(o.id)),
+    ];
+
+    // Normalize item fields (ensure both items and order_items are set)
+    let finalOrders = combinedOrders.map((order: any) => {
+      const itemsList = order.order_items || order.items || [];
+      return {
+        ...order,
+        items: itemsList,
+        order_items: itemsList,
+      };
+    });
+
+    // Sort descending by created_at
+    finalOrders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+    // Filter by status if requested
     if (status !== 'ALL') {
-      finalOrders = finalOrders.filter((o) => o.payment_status === status);
+      if (status === 'VERIFYING') {
+        // 'VERIFYING' tab includes both online proof verification (VERIFYING) and Cashier payment pending (UNPAID)
+        finalOrders = finalOrders.filter(
+          (o) => o.payment_status === 'VERIFYING' || o.payment_status === 'UNPAID'
+        );
+      } else {
+        finalOrders = finalOrders.filter((o) => o.payment_status === status);
+      }
     }
 
     // Process image URLs securely
@@ -31,7 +61,6 @@ export async function GET(request: Request) {
         if (proofUrl && !proofUrl.startsWith('http') && !proofUrl.startsWith('data:')) {
           const cleanPath = proofUrl.replace(/^payment-proofs\//, '');
           
-          // Try signed URL first
           const { data: signedData } = await supabase.storage
             .from('payment-proofs')
             .createSignedUrl(cleanPath, 3600);
@@ -39,7 +68,6 @@ export async function GET(request: Request) {
           if (signedData?.signedUrl) {
             proofUrl = signedData.signedUrl;
           } else {
-            // Fallback to public URL
             const { data: publicData } = supabase.storage
               .from('payment-proofs')
               .getPublicUrl(cleanPath);
@@ -58,7 +86,7 @@ export async function GET(request: Request) {
   } catch (err: any) {
     console.error('Error fetching admin orders:', err);
     return NextResponse.json(
-      { success: false, error: err.message, orders: inMemoryOrdersStore },
+      { success: false, error: err.message, orders: getOrdersFromStore() },
       { status: 500 }
     );
   }
@@ -78,7 +106,7 @@ export async function PATCH(request: Request) {
 
     const supabase = createAdminSupabaseClient();
 
-    // Update in Supabase using Service Role
+    // Update payload
     const updatePayload: any = {
       updated_at: new Date().toISOString(),
     };
@@ -104,20 +132,27 @@ export async function PATCH(request: Request) {
       .from('orders')
       .update(updatePayload)
       .eq('id', order_id)
-      .select();
+      .select('*, order_items(*)');
 
-    // Also update in-memory store for fallback guarantee
-    inMemoryOrdersStore = inMemoryOrdersStore.map((o) =>
-      o.id === order_id ? { ...o, ...updatePayload } : o
-    );
+    // Synchronize status update to memory store
+    const updatedInMemory = updateOrderInStore(order_id, updatePayload);
 
     if (error) {
       console.warn('Supabase DB update warning:', error.message);
     }
 
+    const returnOrder =
+      updatedDb && updatedDb.length > 0
+        ? {
+            ...updatedDb[0],
+            items: updatedDb[0].order_items || updatedDb[0].items || [],
+            order_items: updatedDb[0].order_items || updatedDb[0].items || [],
+          }
+        : updatedInMemory || { id: order_id, ...updatePayload };
+
     return NextResponse.json({
       success: true,
-      order: updatedDb && updatedDb.length > 0 ? updatedDb[0] : { id: order_id, ...updatePayload },
+      order: returnOrder,
     });
   } catch (err: any) {
     console.error('Error updating order status:', err);
@@ -127,3 +162,4 @@ export async function PATCH(request: Request) {
     );
   }
 }
+

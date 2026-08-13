@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { OrderMode, PaymentMethod } from '@/types/order';
 import { VALID_TABLES_REGISTRY } from '@/types/table';
-import { X, CheckCircle, Upload, QrCode, CreditCard, DollarSign, AlertCircle } from 'lucide-react';
+import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface CheckoutModalProps {
@@ -89,7 +89,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
       // Upload payment proof if QRIS/Transfer and file selected
       if (paymentMethod !== 'cashier' && proofFile) {
-        // Validation: Max 5MB & Image format only
         if (proofFile.size > 5 * 1024 * 1024) {
           throw new Error('Ukuran foto bukti transfer maksimal 5MB.');
         }
@@ -118,7 +117,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           console.warn('Supabase storage upload fallback:', sErr);
         }
 
-        // Fallback to Base64 data URL if storage bucket fails/errors
         if (!uploadedProofUrl) {
           uploadedProofUrl = await new Promise<string>((resolve) => {
             const reader = new FileReader();
@@ -190,8 +188,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         right: 0,
         bottom: 0,
         zIndex: 1050,
-        background: 'rgba(0, 0, 0, 0.8)',
-        backdropFilter: 'blur(12px)',
+        background: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(16px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -203,20 +201,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         style={{
           width: '100%',
           maxWidth: '540px',
-          borderRadius: 'var(--radius-lg)',
+          borderRadius: '20px',
           padding: '2rem',
           position: 'relative',
           background: '#161311',
-          border: '1px solid var(--border-active)',
+          border: '1px solid rgba(212, 163, 115, 0.3)',
           maxHeight: '92vh',
           overflowY: 'auto',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
         }}
       >
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div>
-            <h3 style={{ fontSize: '1.35rem', color: '#F7F4EF', fontWeight: 800, margin: 0 }}>Checkout Pesanan</h3>
-            <span style={{ fontSize: '0.8rem', color: '#D4A373' }}>Kedai KOPIMAGE Soreang</span>
+            <h3 style={{ fontSize: '1.4rem', color: '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif' }}>Checkout Pesanan</h3>
+            <span style={{ fontSize: '0.8rem', color: '#D4A373', fontWeight: 600 }}>Kedai KOPIMAGE Soreang</span>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#C4BBB4', cursor: 'pointer', padding: '0.4rem' }}>
             <X size={22} />
@@ -224,7 +223,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         </div>
 
         {errorMessage && (
-          <div style={{ background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.4)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md)', color: '#E74C3C', fontSize: '0.88rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.4)', padding: '0.75rem 1rem', borderRadius: '12px', color: '#E74C3C', fontSize: '0.88rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <AlertCircle size={18} />
             <span>{errorMessage}</span>
           </div>
@@ -242,33 +241,47 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 type="button"
                 onClick={() => setMode('dine-in')}
                 style={{
-                  padding: '0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
+                  padding: '0.8rem 0.5rem',
+                  borderRadius: '12px',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
                   cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.45rem',
+                  whiteSpace: 'nowrap',
                   border: mode === 'dine-in' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
                   background: mode === 'dine-in' ? 'rgba(212, 163, 115, 0.2)' : 'rgba(30, 26, 23, 0.6)',
                   color: mode === 'dine-in' ? '#D4A373' : '#C4BBB4',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                🍽️ Makan di Tempat (Dine-In)
+                <UtensilsCrossed size={16} />
+                <span>Makan di Tempat (Dine-In)</span>
               </button>
               <button
                 type="button"
                 onClick={() => setMode('takeaway')}
                 style={{
-                  padding: '0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
+                  padding: '0.8rem 0.5rem',
+                  borderRadius: '12px',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
                   cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.45rem',
+                  whiteSpace: 'nowrap',
                   border: mode === 'takeaway' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
                   background: mode === 'takeaway' ? 'rgba(212, 163, 115, 0.2)' : 'rgba(30, 26, 23, 0.6)',
                   color: mode === 'takeaway' ? '#D4A373' : '#C4BBB4',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                🛍️ Dibawa Pulang (Takeaway)
+                <ShoppingBag size={16} />
+                <span>Dibawa Pulang (Takeaway)</span>
               </button>
             </div>
           </div>
@@ -287,7 +300,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   padding: '0.75rem 1rem',
                   background: 'rgba(30, 26, 23, 0.9)',
                   border: '1px solid rgba(212, 163, 115, 0.3)',
-                  borderRadius: 'var(--radius-md)',
+                  borderRadius: '12px',
                   color: '#F7F4EF',
                   fontSize: '0.92rem',
                   outline: 'none',
@@ -319,7 +332,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   padding: '0.75rem',
                   background: 'rgba(30, 26, 23, 0.9)',
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 'var(--radius-md)',
+                  borderRadius: '12px',
                   color: '#F7F4EF',
                   fontSize: '0.9rem',
                   outline: 'none',
@@ -342,7 +355,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   padding: '0.75rem',
                   background: 'rgba(30, 26, 23, 0.9)',
                   border: '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 'var(--radius-md)',
+                  borderRadius: '12px',
                   color: '#F7F4EF',
                   fontSize: '0.9rem',
                   outline: 'none',
@@ -360,13 +373,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               <label
                 style={{
                   padding: '0.85rem 1rem',
-                  borderRadius: 'var(--radius-md)',
+                  borderRadius: '12px',
                   border: paymentMethod === 'cashier' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
                   background: paymentMethod === 'cashier' ? 'rgba(212, 163, 115, 0.15)' : 'rgba(30, 26, 23, 0.6)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.75rem',
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <input
@@ -376,7 +390,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   checked={paymentMethod === 'cashier'}
                   onChange={() => setPaymentMethod('cashier')}
                 />
-                <DollarSign size={20} color="#D4A373" />
+                <Store size={20} color="#D4A373" />
                 <div>
                   <div style={{ fontSize: '0.92rem', color: '#F7F4EF', fontWeight: 700 }}>Bayar di Kasir / Tempat</div>
                   <div style={{ fontSize: '0.78rem', color: '#8E847C' }}>Bayar tunai/EDC saat mengambil/di meja</div>
@@ -386,13 +400,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               <label
                 style={{
                   padding: '0.85rem 1rem',
-                  borderRadius: 'var(--radius-md)',
+                  borderRadius: '12px',
                   border: paymentMethod === 'qris_static' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
                   background: paymentMethod === 'qris_static' ? 'rgba(212, 163, 115, 0.15)' : 'rgba(30, 26, 23, 0.6)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.75rem',
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <input
@@ -412,13 +427,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               <label
                 style={{
                   padding: '0.85rem 1rem',
-                  borderRadius: 'var(--radius-md)',
+                  borderRadius: '12px',
                   border: paymentMethod === 'bank_transfer' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
                   background: paymentMethod === 'bank_transfer' ? 'rgba(212, 163, 115, 0.15)' : 'rgba(30, 26, 23, 0.6)',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.75rem',
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <input
@@ -439,7 +455,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
           {/* Upload Proof (If QRIS / Transfer) */}
           {(paymentMethod === 'qris_static' || paymentMethod === 'bank_transfer') && (
-            <div style={{ background: 'rgba(30, 26, 23, 0.8)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px dashed rgba(212, 163, 115, 0.3)' }}>
+            <div style={{ background: 'rgba(30, 26, 23, 0.8)', padding: '1rem', borderRadius: '12px', border: '1px dashed rgba(212, 163, 115, 0.3)' }}>
               <label style={{ fontSize: '0.85rem', color: '#D4A373', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
                 <Upload size={16} />
                 <span>Upload Bukti Transfer / QRIS (Opsional sekarang, bisa di tracker):</span>
@@ -454,10 +470,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           )}
 
           {/* Order Summary & Final CTA */}
-          <div style={{ paddingTop: '1rem', borderTop: '1px solid rgba(212, 163, 115, 0.15)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ paddingTop: '1.25rem', borderTop: '1px solid rgba(212, 163, 115, 0.15)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
               <span style={{ fontSize: '0.8rem', color: '#8E847C', display: 'block' }}>Total Pembayaran:</span>
-              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#D4A373' }}>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#D4A373', fontFamily: 'serif' }}>
                 Rp {estimatedSubtotal.toLocaleString('id-ID')}
               </span>
             </div>
@@ -466,9 +482,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               type="submit"
               disabled={isSubmitting}
               className="btn btn-primary"
-              style={{ padding: '0.85rem 1.5rem', opacity: isSubmitting ? 0.7 : 1 }}
+              style={{
+                display: 'inline-flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                whiteSpace: 'nowrap',
+                padding: '0.85rem 1.6rem',
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                opacity: isSubmitting ? 0.7 : 1,
+                cursor: isSubmitting ? 'not-allowed' : 'pointer'
+              }}
             >
-              <CheckCircle size={18} />
+              <CheckCircle size={18} strokeWidth={2.5} />
               <span>{isSubmitting ? 'Memproses...' : 'Buat Pesanan'}</span>
             </button>
           </div>
@@ -478,3 +506,4 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
     </div>
   );
 };
+

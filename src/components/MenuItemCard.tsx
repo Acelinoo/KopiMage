@@ -101,9 +101,21 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
             onClick={() => setIsCustomizerOpen(true)}
             className="btn btn-primary btn-sm"
             title={`Pilih varian ${item.name}`}
-            style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', borderRadius: 'var(--radius-md)' }}
+            style={{
+              display: 'inline-flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.4rem',
+              whiteSpace: 'nowrap',
+              padding: '0.5rem 0.95rem',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              borderRadius: '10px',
+              cursor: 'pointer'
+            }}
           >
-            <Plus size={14} />
+            <Plus size={14} strokeWidth={2.5} />
             <span>Tambah</span>
           </button>
         </div>

@@ -151,7 +151,8 @@ export default function KitchenDisplayPage() {
 
     // Station Filter
     if (stationFilter !== 'ALL') {
-      const hasStationItem = (o.order_items || []).some(
+      const itemsList = o.order_items || o.items || [];
+      const hasStationItem = itemsList.some(
         (item: any) => getItemStation(item.item_name) === stationFilter
       );
       if (!hasStationItem) return false;
@@ -366,7 +367,7 @@ export default function KitchenDisplayPage() {
                         <span className="text-[0.65rem] font-mono uppercase text-[#A89F91] tracking-wider block mb-1">
                           ITEM PESANAN DIBUAT:
                         </span>
-                        {(order.order_items || []).map((item: any, idx: number) => {
+                        {(order.order_items || order.items || []).map((item: any, idx: number) => {
                           const station = getItemStation(item.item_name);
                           return (
                             <div

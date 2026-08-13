@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Coffee, ShoppingBag, Menu as MenuIcon, X } from 'lucide-react';
+import { ShoppingBag, Menu as MenuIcon, X } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 export const Header: React.FC = () => {
@@ -16,6 +16,8 @@ export const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const isTableMode = Boolean(activeTableId);
 
   return (
     <header
@@ -32,45 +34,59 @@ export const Header: React.FC = () => {
         padding: isScrolled ? '0.85rem 0' : '1.25rem 0',
       }}
     >
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        {/* Brand Logo */}
-        <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', textDecoration: 'none', color: '#F7F4EF' }}>
-          <div
-            style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #D4A373 0%, #C67D5A 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(212, 163, 115, 0.25)'
-            }}
-          >
-            <Coffee size={22} color="#0F0D0C" strokeWidth={2.5} />
-          </div>
+      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1rem', maxWidth: '1200px', margin: '0 auto' }}>
+        {/* Brand Logo - Pure Editorial Typography (No AI Icon Box) */}
+        <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', color: '#F7F4EF' }}>
           <div>
-            <span style={{ fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', display: 'block', lineHeight: 1 }}>
-              KOPIMAGE
-            </span>
-            <span style={{ fontSize: '0.68rem', color: '#D4A373', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D4A373', display: 'inline-block' }} />
+              <span style={{ fontSize: '1.45rem', fontWeight: 900, letterSpacing: '-0.02em', display: 'block', lineHeight: 1, fontFamily: 'serif' }}>
+                KOPIMAGE
+              </span>
+            </div>
+            <span style={{ fontSize: '0.68rem', color: '#D4A373', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 600, display: 'block', marginTop: '0.2rem' }}>
               {activeTableId ? `Meja ${activeTableId} • Soreang` : 'Gading Tutuka • Soreang'}
             </span>
           </div>
         </a>
 
-        {/* Desktop Navigation Links */}
-        <nav style={{ display: 'none', gap: '2rem', alignItems: 'center' }} className="desktop-nav">
-          <a href="#menu" style={{ color: '#C4BBB4', textDecoration: 'none', fontSize: '0.92rem', fontWeight: 500, transition: 'color 0.2s' }}>
-            Daftar Menu
-          </a>
-          <a href="#about" style={{ color: '#C4BBB4', textDecoration: 'none', fontSize: '0.92rem', fontWeight: 500, transition: 'color 0.2s' }}>
-            Tentang Kami
-          </a>
-          <a href="#location" style={{ color: '#C4BBB4', textDecoration: 'none', fontSize: '0.92rem', fontWeight: 500, transition: 'color 0.2s' }}>
-            Lokasi & Jam Buka
-          </a>
-        </nav>
+        {/* Desktop Navigation Links - Hidden when in Table Order Mode */}
+        {!isTableMode && (
+          <nav style={{ display: 'none', gap: '2rem', alignItems: 'center' }} className="desktop-nav">
+            <a href="#menu" style={{ color: '#C4BBB4', textDecoration: 'none', fontSize: '0.92rem', fontWeight: 500, transition: 'color 0.2s' }}>
+              Daftar Menu
+            </a>
+            <a href="#about" style={{ color: '#C4BBB4', textDecoration: 'none', fontSize: '0.92rem', fontWeight: 500, transition: 'color 0.2s' }}>
+              Tentang Kami
+            </a>
+            <a href="#location" style={{ color: '#C4BBB4', textDecoration: 'none', fontSize: '0.92rem', fontWeight: 500, transition: 'color 0.2s' }}>
+              Lokasi & Jam Buka
+            </a>
+          </nav>
+        )}
+
+        {/* In Table Order Mode: Show Sleek Table Badge Indicator */}
+        {isTableMode && (
+          <div
+            className="desktop-nav"
+            style={{
+              display: 'none',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: 'rgba(212, 163, 115, 0.1)',
+              border: '1px solid rgba(212, 163, 115, 0.25)',
+              padding: '0.4rem 0.9rem',
+              borderRadius: '9999px',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              color: '#D4A373',
+              letterSpacing: '0.05em'
+            }}
+          >
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2ECC71' }} />
+            <span>ORDERING AKTIF MEJA {activeTableId}</span>
+          </div>
+        )}
 
         {/* Header Action Button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
@@ -78,7 +94,7 @@ export const Header: React.FC = () => {
           <button
             onClick={() => setIsCartOpen(true)}
             className="btn btn-primary btn-sm"
-            style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
+            style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem' }}
           >
             <ShoppingBag size={18} />
             <span>Keranjang</span>
@@ -100,29 +116,31 @@ export const Header: React.FC = () => {
             )}
           </button>
 
-          {/* Mobile Menu Trigger */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#F7F4EF',
-              cursor: 'pointer',
-              padding: '0.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            aria-label="Toggle menu"
-            className="mobile-toggle"
-          >
-            {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
-          </button>
+          {/* Mobile Menu Trigger (Only show if not in Table Order Mode or if drawer links exist) */}
+          {!isTableMode && (
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#F7F4EF',
+                cursor: 'pointer',
+                padding: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              aria-label="Toggle menu"
+              className="mobile-toggle"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+            </button>
+          )}
         </div>
       </div>
 
       {/* Mobile Drawer */}
-      {mobileMenuOpen && (
+      {!isTableMode && mobileMenuOpen && (
         <div
           style={{
             position: 'absolute',
@@ -175,3 +193,4 @@ export const Header: React.FC = () => {
     </header>
   );
 };
+

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
 import { MENU_ITEMS } from '@/data/menuData';
+import { addOrderToStore, OrderRecord } from '@/lib/ordersStore';
 
 export async function POST(request: Request) {
   try {
@@ -124,8 +125,8 @@ export async function POST(request: Request) {
     const orderId = crypto.randomUUID();
 
     // Initial Status Determination according to Dual Status Machine
-    const initialOrderStatus = 'NEW_ORDER';
-    const initialPaymentStatus = payment_method === 'cashier' ? 'UNPAID' : 'VERIFYING';
+    const initialOrderStatus: 'NEW_ORDER' = 'NEW_ORDER';
+    const initialPaymentStatus: 'UNPAID' | 'VERIFYING' = payment_method === 'cashier' ? 'UNPAID' : 'VERIFYING';
 
     // 5. Insert into database
     const insertPayload: any = {
@@ -152,24 +153,56 @@ export async function POST(request: Request) {
       .select()
       .maybeSingle();
 
-    // If Supabase table isn't created in remote DB yet, respond with verified calculated payload
+    if (orderError) {
+      console.warn('Supabase DB order insert warning:', orderError.message);
+    }
+
+    // 6. Insert order items into order_items table in Supabase
+    if (processedItems.length > 0) {
+      const itemsToInsert = processedItems.map((item) => ({
+        id: crypto.randomUUID(),
+        order_id: orderData ? orderData.id : orderId,
+        menu_item_id: item.menu_item_id || null,
+        item_name: item.item_name,
+        unit_price: item.unit_price,
+        quantity: item.quantity,
+        subtotal: item.subtotal,
+        notes: item.notes || '',
+        modifiers: item.modifiers || [],
+      }));
+
+      const { error: itemsError } = await supabase.from('order_items').insert(itemsToInsert);
+      if (itemsError) {
+        console.warn('Supabase DB order_items insert warning:', itemsError.message);
+      }
+    }
+
+    const createdRecordPayload: OrderRecord = {
+      id: orderData ? orderData.id : orderId,
+      order_number: orderNumber,
+      tracking_secret: trackingSecret,
+      mode: mode === 'takeaway' ? 'takeaway' : 'dine-in',
+      table_id: mode === 'dine-in' ? cleanTableCode : null,
+      customer_name,
+      customer_phone,
+      payment_method,
+      payment_proof_url,
+      subtotal: calculatedSubtotal,
+      total_amount: calculatedSubtotal,
+      order_status: initialOrderStatus,
+      payment_status: initialPaymentStatus,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      items: processedItems,
+      order_items: processedItems,
+    };
+
+    // Synchronize to shared order store
+    addOrderToStore(createdRecordPayload);
+
     return NextResponse.json({
       success: true,
-      order: {
-        id: orderData ? orderData.id : orderId,
-        order_number: orderNumber,
-        tracking_secret: trackingSecret,
-        mode,
-        table_id,
-        customer_name,
-        customer_phone,
-        subtotal: calculatedSubtotal,
-        payment_method,
-        payment_status: initialPaymentStatus,
-        order_status: initialOrderStatus,
-        items: processedItems,
-        created_at: new Date().toISOString(),
-      },
+      order: createdRecordPayload,
     });
   } catch (err: any) {
     console.error('Error creating order:', err);
