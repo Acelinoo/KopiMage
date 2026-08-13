@@ -42,35 +42,35 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --bg-main: #FAF8F5;
-  --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F3EFEA;
+  --bg-main: #9E1F1F;            /* Deep Crimson KopiMage Brand Red Primary Canvas */
+  --bg-surface: #FFFFFF;         /* Pure White Cards for Menu Items & Content */
+  --bg-surface-elevated: #FFFDF9; /* Cream White Elevated Cards */
 
-  --text-primary: #1E1B18;
-  --text-secondary: #4A423A;
-  --text-muted: #7A7067;
-  --text-subtle: #9E9388;
+  --text-primary: #FFFFFF;       /* Pure White Text on Red Canvas */
+  --text-secondary: #F7EFE8;     /* Soft Warm White Secondary Text */
+  --text-muted: #F2D6C6;         /* Soft Peach Muted Text */
+  --text-subtle: #E8BCA4;
 
-  --border-color: rgba(0, 0, 0, 0.08);
-  --border-hover: rgba(0, 0, 0, 0.2);
-  --border-brand: rgba(184, 46, 46, 0.3);
+  --border-color: rgba(255, 255, 255, 0.22);
+  --border-hover: rgba(255, 255, 255, 0.45);
+  --border-brand: rgba(255, 255, 255, 0.6);
 
-  --brand-red: #B82E2E;
-  --brand-red-hover: #A12424;
-  --brand-red-dark: #7A1A1A;
-  --brand-copper: #A3734C;
+  --brand-red: #FFFFFF;          /* Highlight Accent in Red Mode */
+  --brand-red-hover: #FFFDF9;
+  --brand-red-dark: #6B1313;
+  --brand-copper: #FFD5B8;       /* Cream Copper Accent */
 
-  --status-success: #27AE60;
-  --status-warning: #D35400;
-  --status-error: #C0392B;
+  --status-success: #2ECC71;
+  --status-warning: #F39C12;
+  --status-error: #FF4D4D;
 }
 
 /* ----------------------------------------------------
-   LIGHT MODE AUTOMATIC THEME OVERRIDES
-   Ensures hardcoded dark classes map to high-contrast Light Theme
+   LIGHT MODE RED-DOMINANT AUTOMATIC THEME OVERRIDES
+   Red Canvas (#9E1F1F) + White Surface Cards + Crisp White Typography
    ---------------------------------------------------- */
 [data-theme="light"] {
-  /* Container & Section Backgrounds */
+  /* Primary Red Canvas for Main Containers & Headers */
   .bg-\[\#0C0A09\],
   .bg-\[\#0E0B0A\],
   .bg-\[\#0E0C0A\],
@@ -80,32 +80,48 @@
   .bg-\[\#120F0D\],
   .bg-bgDark {
     background-color: var(--bg-main) !important;
-    color: var(--text-primary) !important;
+    color: #FFFFFF !important;
   }
 
+  /* Crisp White Surface Cards for Menu Items, Inputs & Modals */
   .bg-\[\#14110F\],
   .bg-\[\#161210\],
   .bg-\[\#171311\],
-  .bg-bgDarkPaper {
-    background-color: var(--bg-surface) !important;
-    color: var(--text-primary) !important;
-  }
-
+  .bg-bgDarkPaper,
   .bg-\[\#1C1815\],
   .bg-\[\#1E1815\],
   .bg-bgDarkSurface {
-    background-color: var(--bg-surface-elevated) !important;
-    color: var(--text-primary) !important;
+    background-color: #FFFFFF !important;
+    color: #1E1B18 !important;
+    border-color: rgba(184, 46, 46, 0.15) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
   }
 
-  /* Typography Colors */
+  /* Text inside White Cards turns to readable Deep Charcoal (#1E1B18) */
+  .bg-\[\#161210\] .text-\[\#FFFFFF\],
+  .bg-\[\#161210\] .text-\[\#F3EFEA\],
+  .bg-\[\#161210\] .text-\[\#F7F4EF\],
+  .bg-\[\#161210\] .text-white,
+  .bg-\[\#14110F\] .text-\[\#FFFFFF\],
+  .bg-\[\#14110F\] .text-\[\#F3EFEA\],
+  .bg-bgDarkPaper .text-white {
+    color: #1E1B18 !important;
+  }
+
+  .bg-\[\#161210\] .text-\[\#A89F91\],
+  .bg-\[\#161210\] .text-\[\#9E9287\],
+  .bg-\[\#14110F\] .text-\[\#A89F91\] {
+    color: #5C5248 !important;
+  }
+
+  /* Typography Colors on Main Red Canvas */
   .text-\[\#FFFFFF\],
   .text-\[\#F3EFEA\],
   .text-\[\#F7F4EF\],
   .text-\[\#F8F6F0\],
   .text-white,
   .text-textLight {
-    color: var(--text-primary) !important;
+    color: #FFFFFF !important;
   }
 
   .text-\[\#A89F91\],
@@ -115,10 +131,15 @@
   .text-\[\#6E6358\],
   .text-textMuted,
   .text-textSubtle {
-    color: var(--text-muted) !important;
+    color: #F2D6C6 !important;
   }
 
-  /* Borders */
+  /* Copper Text on Red Canvas */
+  .text-\[\#C29B7F\] {
+    color: #FFD5B8 !important;
+  }
+
+  /* Borders on Main Red Canvas */
   .border-\[\#FFFFFF\]\/10,
   .border-\[\#FFFFFF\]\/15,
   .border-\[\#FFFFFF\]\/20,
@@ -127,7 +148,7 @@
   .border-white\/20,
   .border-white\/30,
   .editorial-border-b {
-    border-color: var(--border-color) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
   }
 }
 
