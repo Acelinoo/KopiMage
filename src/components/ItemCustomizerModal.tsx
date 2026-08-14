@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { MenuItem, SelectedModifierOption } from '@/types/menu';
 import { useCart, parseDisplayPrice } from '@/context/CartContext';
-import { X, Thermometer, Coffee, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
+import { X, Plus, Minus } from 'lucide-react';
 
 interface ItemCustomizerModalProps {
   item: MenuItem | null;
@@ -12,12 +13,15 @@ interface ItemCustomizerModalProps {
 
 export const ItemCustomizerModal: React.FC<ItemCustomizerModalProps> = ({ item, onClose }) => {
   const { addToCart } = useCart();
+  const { theme } = useTheme();
   const [quantity, setQuantity] = useState(1);
   const [selectedTemp, setSelectedTemp] = useState<string>('Cold');
   const [selectedSize, setSelectedSize] = useState<string>('Normal');
   const [notes, setNotes] = useState('');
 
   if (!item) return null;
+
+  const isDark = theme === 'dark';
 
   // Determine available modifiers based on category and item properties
   const isCoffeeOrDrink = item.category === 'coffee' || item.category === 'non-coffee';
@@ -70,17 +74,18 @@ export const ItemCustomizerModal: React.FC<ItemCustomizerModalProps> = ({ item, 
       }}
     >
       <div
-        className="glass-panel"
         style={{
           width: '100%',
           maxWidth: '480px',
-          borderRadius: 'var(--radius-lg)',
+          borderRadius: '16px',
           padding: '1.75rem',
           position: 'relative',
-          background: '#161311',
-          border: '1px solid var(--border-active)',
+          background: isDark ? '#161210' : '#FFFFFF',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid #9E1F1F',
+          color: isDark ? '#FFFFFF' : '#1A1A1A',
           maxHeight: '90vh',
           overflowY: 'auto',
+          boxShadow: isDark ? '0 16px 40px rgba(0, 0, 0, 0.7)' : '0 16px 40px rgba(0, 0, 0, 0.15)',
         }}
       >
         {/* Close Button */}
@@ -90,9 +95,9 @@ export const ItemCustomizerModal: React.FC<ItemCustomizerModalProps> = ({ item, 
             position: 'absolute',
             top: '1.25rem',
             right: '1.25rem',
-            background: 'rgba(255, 255, 255, 0.05)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            color: '#C4BBB4',
+            background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F5EBEB',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+            color: isDark ? '#FFFFFF' : '#1A1A1A',
             borderRadius: '9999px',
             padding: '0.4rem',
             cursor: 'pointer',
@@ -101,64 +106,73 @@ export const ItemCustomizerModal: React.FC<ItemCustomizerModalProps> = ({ item, 
             justifyContent: 'center',
           }}
         >
-          <X size={20} />
+          <X size={18} />
         </button>
 
         {/* Title */}
         <div style={{ marginBottom: '1.25rem', paddingRight: '2rem' }}>
-          <h3 style={{ fontSize: '1.35rem', color: '#F7F4EF', fontWeight: 800, marginBottom: '0.3rem' }}>
+          <h3 style={{ fontSize: '1.35rem', color: isDark ? '#FFFFFF' : '#1A1A1A', fontWeight: 800, fontFamily: 'serif', marginBottom: '0.3rem' }}>
             {item.name}
           </h3>
-          <div style={{ fontSize: '1.25rem', color: '#D4A373', fontWeight: 800 }}>
+          <div style={{ fontSize: '1.2rem', color: isDark ? '#D4A373' : '#9E1F1F', fontWeight: 800, fontFamily: 'monospace' }}>
             {item.price}
           </div>
         </div>
 
         {/* Temperature Modifier Selector */}
         {isCoffeeOrDrink && (
-          <div style={{ marginBottom: '1.5rem', paddingBottom: '1.25rem', borderBottom: '1px solid rgba(212, 163, 115, 0.12)' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.88rem', color: '#C4BBB4', fontWeight: 600, marginBottom: '0.75rem' }}>
-              <Thermometer size={16} color="#D4A373" />
-              <span>Pilihan Suhu Minuman:</span>
+          <div style={{ marginBottom: '1.5rem', paddingBottom: '1.25rem', borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(158, 31, 31, 0.15)' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+              PILIHAN PENYAJIAN:
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <button
                 onClick={() => setSelectedTemp('Cold')}
                 style={{
                   padding: '0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  fontFamily: 'monospace',
                   cursor: 'pointer',
-                  border: selectedTemp === 'Cold' ? '1px solid #D4A373' : '1px solid rgba(255, 255, 255, 0.08)',
-                  background: selectedTemp === 'Cold' ? 'rgba(212, 163, 115, 0.2)' : 'rgba(30, 26, 23, 0.6)',
-                  color: selectedTemp === 'Cold' ? '#D4A373' : '#C4BBB4',
+                  border: selectedTemp === 'Cold'
+                    ? (isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.15)'),
+                  background: selectedTemp === 'Cold'
+                    ? (isDark ? '#B82E2E' : '#9E1F1F')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
+                  color: selectedTemp === 'Cold' ? '#FFFFFF' : (isDark ? '#A89F91' : '#1A1A1A'),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '0.4rem',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                <span>🧊 Cold (Es)</span>
+                <span>COLD (DINGIN / ES)</span>
               </button>
               <button
                 onClick={() => setSelectedTemp('Hot')}
                 style={{
                   padding: '0.75rem',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  fontFamily: 'monospace',
                   cursor: 'pointer',
-                  border: selectedTemp === 'Hot' ? '1px solid #D4A373' : '1px solid rgba(255, 255, 255, 0.08)',
-                  background: selectedTemp === 'Hot' ? 'rgba(212, 163, 115, 0.2)' : 'rgba(30, 26, 23, 0.6)',
-                  color: selectedTemp === 'Hot' ? '#D4A373' : '#C4BBB4',
+                  border: selectedTemp === 'Hot'
+                    ? (isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.15)'),
+                  background: selectedTemp === 'Hot'
+                    ? (isDark ? '#B82E2E' : '#9E1F1F')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
+                  color: selectedTemp === 'Hot' ? '#FFFFFF' : (isDark ? '#A89F91' : '#1A1A1A'),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '0.4rem',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                <span>☕ Hot (Panas)</span>
+                <span>HOT (HANGAT / PANAS)</span>
               </button>
             </div>
           </div>
@@ -166,23 +180,27 @@ export const ItemCustomizerModal: React.FC<ItemCustomizerModalProps> = ({ item, 
 
         {/* Size Variant Selector */}
         {hasLiterOption && (
-          <div style={{ marginBottom: '1.5rem', paddingBottom: '1.25rem', borderBottom: '1px solid rgba(212, 163, 115, 0.12)' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.88rem', color: '#C4BBB4', fontWeight: 600, marginBottom: '0.75rem' }}>
-              <Coffee size={16} color="#D4A373" />
-              <span>Varian Ukuran / Porsi:</span>
+          <div style={{ marginBottom: '1.5rem', paddingBottom: '1.25rem', borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(158, 31, 31, 0.15)' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555', fontWeight: 700, fontFamily: 'monospace', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>
+              VARIAN UKURAN / PORSI:
             </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               <button
                 onClick={() => setSelectedSize('Normal')}
                 style={{
                   padding: '0.75rem 1rem',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.88rem',
-                  fontWeight: 600,
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  fontFamily: 'monospace',
                   cursor: 'pointer',
-                  border: selectedSize === 'Normal' ? '1px solid #D4A373' : '1px solid rgba(255, 255, 255, 0.08)',
-                  background: selectedSize === 'Normal' ? 'rgba(212, 163, 115, 0.2)' : 'rgba(30, 26, 23, 0.6)',
-                  color: selectedSize === 'Normal' ? '#D4A373' : '#C4BBB4',
+                  border: selectedSize === 'Normal'
+                    ? (isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.15)'),
+                  background: selectedSize === 'Normal'
+                    ? (isDark ? '#B82E2E' : '#9E1F1F')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
+                  color: selectedSize === 'Normal' ? '#FFFFFF' : (isDark ? '#A89F91' : '#1A1A1A'),
                   display: 'flex',
                   justifyContent: 'space-between',
                 }}
@@ -194,13 +212,18 @@ export const ItemCustomizerModal: React.FC<ItemCustomizerModalProps> = ({ item, 
                 onClick={() => setSelectedSize('Literan')}
                 style={{
                   padding: '0.75rem 1rem',
-                  borderRadius: 'var(--radius-md)',
-                  fontSize: '0.88rem',
-                  fontWeight: 600,
+                  borderRadius: '8px',
+                  fontSize: '0.85rem',
+                  fontWeight: 700,
+                  fontFamily: 'monospace',
                   cursor: 'pointer',
-                  border: selectedSize === 'Literan' ? '1px solid #D4A373' : '1px solid rgba(255, 255, 255, 0.08)',
-                  background: selectedSize === 'Literan' ? 'rgba(212, 163, 115, 0.2)' : 'rgba(30, 26, 23, 0.6)',
-                  color: selectedSize === 'Literan' ? '#D4A373' : '#C4BBB4',
+                  border: selectedSize === 'Literan'
+                    ? (isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.15)'),
+                  background: selectedSize === 'Literan'
+                    ? (isDark ? '#B82E2E' : '#9E1F1F')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
+                  color: selectedSize === 'Literan' ? '#FFFFFF' : (isDark ? '#A89F91' : '#1A1A1A'),
                   display: 'flex',
                   justifyContent: 'space-between',
                 }}
@@ -214,20 +237,32 @@ export const ItemCustomizerModal: React.FC<ItemCustomizerModalProps> = ({ item, 
 
         {/* Quantity Controller */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-          <span style={{ fontSize: '0.92rem', color: '#F7F4EF', fontWeight: 600 }}>Jumlah Porsi:</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(30, 26, 23, 0.8)', border: '1px solid rgba(255,255,255,0.1)', padding: '0.3rem 0.6rem', borderRadius: 'var(--radius-full)' }}>
+          <span style={{ fontSize: '0.88rem', color: isDark ? '#FFFFFF' : '#1A1A1A', fontWeight: 700, fontFamily: 'monospace', textTransform: 'uppercase' }}>
+            JUMLAH PESANAN:
+          </span>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              background: isDark ? '#0E0B0A' : '#F0EBE8',
+              border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.15)',
+              padding: '0.3rem 0.6rem',
+              borderRadius: '8px',
+            }}
+          >
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              style={{ background: 'none', border: 'none', color: '#F7F4EF', cursor: 'pointer', padding: '0.3rem', display: 'flex' }}
+              style={{ background: 'none', border: 'none', color: isDark ? '#FFFFFF' : '#1A1A1A', cursor: 'pointer', padding: '0.3rem', display: 'flex' }}
             >
               <Minus size={16} />
             </button>
-            <span style={{ fontWeight: 800, fontSize: '1rem', minWidth: '24px', textAlign: 'center', color: '#D4A373' }}>
+            <span style={{ fontWeight: 800, fontSize: '1rem', fontFamily: 'monospace', minWidth: '24px', textAlign: 'center', color: isDark ? '#FFFFFF' : '#1A1A1A' }}>
               {quantity}
             </span>
             <button
               onClick={() => setQuantity(quantity + 1)}
-              style={{ background: 'none', border: 'none', color: '#F7F4EF', cursor: 'pointer', padding: '0.3rem', display: 'flex' }}
+              style={{ background: 'none', border: 'none', color: isDark ? '#FFFFFF' : '#1A1A1A', cursor: 'pointer', padding: '0.3rem', display: 'flex' }}
             >
               <Plus size={16} />
             </button>
@@ -237,10 +272,23 @@ export const ItemCustomizerModal: React.FC<ItemCustomizerModalProps> = ({ item, 
         {/* Add to Cart CTA */}
         <button
           onClick={handleAddToCart}
-          className="btn btn-primary"
-          style={{ width: '100%', padding: '0.9rem', justifyContent: 'center', fontSize: '1rem' }}
+          style={{
+            width: '100%',
+            padding: '0.9rem',
+            justifyContent: 'center',
+            fontSize: '0.95rem',
+            fontWeight: 700,
+            borderRadius: '10px',
+            backgroundColor: isDark ? '#B82E2E' : '#9E1F1F',
+            color: '#FFFFFF',
+            border: isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            transition: 'all 0.2s ease',
+          }}
         >
-          <ShoppingBag size={18} />
           <span>Tambah ke Keranjang</span>
         </button>
 

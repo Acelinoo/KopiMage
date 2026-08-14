@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
+import { useTheme } from '@/context/ThemeContext';
 import { OrderMode, PaymentMethod } from '@/types/order';
 import { compressImageFile } from '@/lib/imageCompressor';
 import { isSameTable, isActiveCustomerOrder, isCompletedOrCancelledOrder } from '@/lib/tableUtils';
@@ -14,6 +15,8 @@ interface CheckoutModalProps {
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess }) => {
   const { cartItems, estimatedSubtotal, clearCart, activeTableId } = useCart();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const [mode, setMode] = useState<OrderMode>(activeTableId ? 'dine-in' : 'dine-in');
   const formattedInitialTable = activeTableId ? String(activeTableId).padStart(2, '0') : '01';
@@ -874,33 +877,33 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
       }}
     >
       <div
-        className="glass-panel"
         style={{
           width: '100%',
           maxWidth: '540px',
           borderRadius: '24px',
           padding: '1.25rem 1.5rem',
           position: 'relative',
-          background: '#161311',
-          border: '1px solid rgba(212, 163, 115, 0.3)',
+          background: isDark ? '#161210' : '#FFFFFF',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+          color: isDark ? '#FFFFFF' : '#1A1A1A',
           maxHeight: '88vh',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
+          boxShadow: isDark ? '0 20px 50px rgba(0,0,0,0.8)' : '0 20px 50px rgba(0,0,0,0.15)',
         }}
       >
         {/* Header (Fixed at Top - Never cut off) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.85rem', flexShrink: 0 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F', paddingBottom: '0.85rem', flexShrink: 0 }}>
           <div>
-            <h3 style={{ fontSize: '1.35rem', color: '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif' }}>Checkout Pesanan</h3>
-            <span style={{ fontSize: '0.78rem', color: '#D4A373', fontWeight: 600 }}>Kedai KOPIMAGE Soreang</span>
+            <h3 style={{ fontSize: '1.35rem', color: isDark ? '#FFFFFF' : '#1A1A1A', fontWeight: 800, margin: 0, fontFamily: 'serif' }}>Checkout Pesanan</h3>
+            <span style={{ fontSize: '0.78rem', color: isDark ? '#D4A373' : '#9E1F1F', fontWeight: 600, fontFamily: 'monospace' }}>KEDAI KOPIMAGE SOREANG</span>
           </div>
           <button
             onClick={onClose}
             style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: 'none',
-              color: '#F7F4EF',
+              background: isDark ? 'rgba(255, 255, 255, 0.1)' : '#F5EBEB',
+              border: isDark ? 'none' : '1px solid #9E1F1F',
+              color: isDark ? '#F7F4EF' : '#1A1A1A',
               padding: '0.4rem',
               borderRadius: '50%',
               cursor: 'pointer',
@@ -910,7 +913,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               marginTop: '-0.2rem',
             }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
@@ -926,8 +929,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           
           {/* Mode Pemesanan */}
           <div>
-            <label style={{ fontSize: '0.88rem', color: '#C4BBB4', fontWeight: 600, display: 'block', marginBottom: '0.5rem' }}>
-              Mode Pemesanan:
+            <label style={{ fontSize: '0.82rem', color: isDark ? '#A89F91' : '#555555', fontWeight: 700, fontFamily: 'monospace', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              MODE PEMESANAN:
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
               <button
@@ -936,22 +939,27 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   padding: '0.8rem 0.5rem',
                   borderRadius: '12px',
-                  fontSize: '0.88rem',
+                  fontSize: '0.85rem',
                   fontWeight: 700,
+                  fontFamily: 'monospace',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.45rem',
                   whiteSpace: 'nowrap',
-                  border: mode === 'dine-in' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
-                  background: mode === 'dine-in' ? 'rgba(212, 163, 115, 0.2)' : 'rgba(30, 26, 23, 0.6)',
-                  color: mode === 'dine-in' ? '#D4A373' : '#C4BBB4',
+                  border: mode === 'dine-in'
+                    ? (isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.15)'),
+                  background: mode === 'dine-in'
+                    ? (isDark ? '#B82E2E' : '#9E1F1F')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
+                  color: mode === 'dine-in' ? '#FFFFFF' : (isDark ? '#A89F91' : '#1A1A1A'),
                   transition: 'all 0.2s ease',
                 }}
               >
                 <UtensilsCrossed size={16} />
-                <span>Makan di Tempat (Dine-In)</span>
+                <span>Makan di Tempat</span>
               </button>
               <button
                 type="button"
@@ -959,22 +967,27 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   padding: '0.8rem 0.5rem',
                   borderRadius: '12px',
-                  fontSize: '0.88rem',
+                  fontSize: '0.85rem',
                   fontWeight: 700,
+                  fontFamily: 'monospace',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.45rem',
                   whiteSpace: 'nowrap',
-                  border: mode === 'takeaway' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
-                  background: mode === 'takeaway' ? 'rgba(212, 163, 115, 0.2)' : 'rgba(30, 26, 23, 0.6)',
-                  color: mode === 'takeaway' ? '#D4A373' : '#C4BBB4',
+                  border: mode === 'takeaway'
+                    ? (isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.15)'),
+                  background: mode === 'takeaway'
+                    ? (isDark ? '#B82E2E' : '#9E1F1F')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
+                  color: mode === 'takeaway' ? '#FFFFFF' : (isDark ? '#A89F91' : '#1A1A1A'),
                   transition: 'all 0.2s ease',
                 }}
               >
                 <ShoppingBag size={16} />
-                <span>Dibawa Pulang (Takeaway)</span>
+                <span>Dibawa Pulang</span>
               </button>
             </div>
           </div>

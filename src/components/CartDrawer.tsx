@@ -2,17 +2,22 @@
 
 import React, { useState } from 'react';
 import { useCart } from '@/context/CartContext';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
+import { X, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { CheckoutModal } from './CheckoutModal';
 
 export const CartDrawer: React.FC = () => {
   const { cartItems, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, estimatedSubtotal, totalItemsCount } = useCart();
+  const { theme } = useTheme();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   if (!isCartOpen) return null;
 
+  const isDark = theme === 'dark';
+
   return (
     <>
+      {/* Backdrop */}
       <div
         style={{
           position: 'fixed',
@@ -27,6 +32,7 @@ export const CartDrawer: React.FC = () => {
         onClick={() => setIsCartOpen(false)}
       />
 
+      {/* Drawer Container */}
       <div
         style={{
           position: 'fixed',
@@ -36,28 +42,67 @@ export const CartDrawer: React.FC = () => {
           width: '100%',
           maxWidth: '440px',
           zIndex: 950,
-          background: '#161311',
-          borderLeft: '1px solid var(--border-active)',
+          background: isDark ? '#161210' : '#FFFFFF',
+          borderLeft: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+          color: isDark ? '#FFFFFF' : '#1A1A1A',
           padding: '1.75rem 1.5rem',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.7)',
+          boxShadow: isDark ? '-8px 0 32px rgba(0, 0, 0, 0.7)' : '-8px 0 32px rgba(0, 0, 0, 0.15)',
+          transition: 'background-color 0.2s ease, color 0.2s ease',
         }}
       >
-        {/* Drawer Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '1.25rem', borderBottom: '1px solid rgba(212, 163, 115, 0.15)', marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(212, 163, 115, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ShoppingBag size={20} color="#D4A373" />
-            </div>
-            <div>
-              <h3 style={{ fontSize: '1.2rem', color: '#F7F4EF', fontWeight: 800, margin: 0, lineHeight: 1 }}>Keranjang Pesanan</h3>
-              <span style={{ fontSize: '0.78rem', color: '#8E847C' }}>{totalItemsCount} item terpilih</span>
-            </div>
+        {/* Drawer Header (No AI icon box) */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            paddingBottom: '1.25rem',
+            borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+            marginBottom: '1.25rem',
+          }}
+        >
+          <div>
+            <h3
+              style={{
+                fontSize: '1.25rem',
+                color: isDark ? '#FFFFFF' : '#1A1A1A',
+                fontWeight: 800,
+                fontFamily: 'serif',
+                margin: 0,
+                lineHeight: 1.1,
+              }}
+            >
+              Keranjang Pesanan
+            </h3>
+            <span
+              style={{
+                fontSize: '0.75rem',
+                color: isDark ? '#A89F91' : '#666666',
+                fontFamily: 'monospace',
+                letterSpacing: '0.05em',
+                display: 'block',
+                marginTop: '0.25rem',
+              }}
+            >
+              {totalItemsCount} ITEM TERPILIH
+            </span>
           </div>
+
           <button
             onClick={() => setIsCartOpen(false)}
-            style={{ background: 'none', border: 'none', color: '#C4BBB4', cursor: 'pointer', padding: '0.4rem' }}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: isDark ? '#FFFFFF' : '#1A1A1A',
+              cursor: 'pointer',
+              padding: '0.4rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            title="Tutup Keranjang"
           >
             <X size={22} />
           </button>
@@ -66,34 +111,55 @@ export const CartDrawer: React.FC = () => {
         {/* Cart Item List */}
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem', paddingRight: '0.25rem' }}>
           {cartItems.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#8E847C' }}>
-              <ShoppingBag size={48} color="rgba(212, 163, 115, 0.3)" style={{ marginBottom: '1rem' }} />
-              <p style={{ fontSize: '0.95rem', color: '#C4BBB4' }}>Keranjangmu masih kosong nih.</p>
-              <span style={{ fontSize: '0.8rem' }}>Yuk pilih racikan kopi atau cemilan favoritmu dari menu!</span>
+            <div style={{ textAlign: 'center', padding: '4rem 1rem', color: isDark ? '#A89F91' : '#666666' }}>
+              <p style={{ fontSize: '1rem', color: isDark ? '#FFFFFF' : '#1A1A1A', fontWeight: 700, marginBottom: '0.5rem' }}>
+                Keranjang Anda masih kosong.
+              </p>
+              <span style={{ fontSize: '0.82rem', lineHeight: 1.5, display: 'block' }}>
+                Silakan pilih racikan kopi atau hidangan favorit Anda dari katalog meja.
+              </span>
             </div>
           ) : (
             cartItems.map((ci) => (
               <div
                 key={ci.cartItemId}
                 style={{
-                  background: 'rgba(30, 26, 23, 0.7)',
-                  border: '1px solid rgba(212, 163, 115, 0.12)',
-                  borderRadius: 'var(--radius-md)',
+                  background: isDark ? 'rgba(30, 26, 23, 0.7)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #9E1F1F',
+                  borderRadius: '12px',
                   padding: '1rem',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '0.6rem',
+                  gap: '0.65rem',
+                  boxShadow: isDark ? 'none' : '0 2px 8px rgba(0, 0, 0, 0.04)',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <h4 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.2rem' }}>
+                    <h4
+                      style={{
+                        fontSize: '1rem',
+                        fontWeight: 700,
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                        marginBottom: '0.25rem',
+                      }}
+                    >
                       {ci.menuItem.name}
                     </h4>
                     {ci.selectedModifiers.length > 0 && (
-                      <div style={{ fontSize: '0.78rem', color: '#D4A373', display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                      <div style={{ fontSize: '0.72rem', display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
                         {ci.selectedModifiers.map((m, idx) => (
-                          <span key={idx} style={{ background: 'rgba(212, 163, 115, 0.12)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                          <span
+                            key={idx}
+                            style={{
+                              background: isDark ? 'rgba(212, 163, 115, 0.12)' : '#F7EBEB',
+                              color: isDark ? '#D4A373' : '#9E1F1F',
+                              border: isDark ? '1px solid rgba(212, 163, 115, 0.25)' : '1px solid #9E1F1F',
+                              padding: '0.1rem 0.4rem',
+                              borderRadius: '4px',
+                              fontFamily: 'monospace',
+                            }}
+                          >
                             {m.optionLabel}
                           </span>
                         ))}
@@ -102,29 +168,82 @@ export const CartDrawer: React.FC = () => {
                   </div>
                   <button
                     onClick={() => removeFromCart(ci.cartItemId)}
-                    style={{ background: 'none', border: 'none', color: '#8E847C', cursor: 'pointer', padding: '0.2rem' }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: isDark ? '#A89F91' : '#9E1F1F',
+                      cursor: 'pointer',
+                      padding: '0.2rem',
+                    }}
+                    title="Hapus item"
                   >
                     <Trash2 size={16} />
                   </button>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.4rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                  <span style={{ fontSize: '0.92rem', fontWeight: 800, color: '#D4A373' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    paddingTop: '0.5rem',
+                    borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(158, 31, 31, 0.15)',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: '1rem',
+                      fontWeight: 800,
+                      fontFamily: 'monospace',
+                      color: isDark ? '#D4A373' : '#9E1F1F',
+                    }}
+                  >
                     Rp {(ci.unitPrice * ci.quantity).toLocaleString('id-ID')}
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0,0,0,0.4)', padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-full)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      background: isDark ? 'rgba(0,0,0,0.5)' : '#F0EBE8',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0,0,0,0.12)',
+                      padding: '0.2rem 0.5rem',
+                      borderRadius: '8px',
+                    }}
+                  >
                     <button
                       onClick={() => updateQuantity(ci.cartItemId, ci.quantity - 1)}
-                      style={{ background: 'none', border: 'none', color: '#F7F4EF', cursor: 'pointer', display: 'flex' }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                        cursor: 'pointer',
+                        display: 'flex',
+                      }}
                     >
                       <Minus size={14} />
                     </button>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 700, minWidth: '18px', textAlign: 'center', color: '#F7F4EF' }}>
+                    <span
+                      style={{
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        fontFamily: 'monospace',
+                        minWidth: '18px',
+                        textAlign: 'center',
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                      }}
+                    >
                       {ci.quantity}
                     </span>
                     <button
                       onClick={() => updateQuantity(ci.cartItemId, ci.quantity + 1)}
-                      style={{ background: 'none', border: 'none', color: '#F7F4EF', cursor: 'pointer', display: 'flex' }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                        cursor: 'pointer',
+                        display: 'flex',
+                      }}
                     >
                       <Plus size={14} />
                     </button>
@@ -137,18 +256,45 @@ export const CartDrawer: React.FC = () => {
 
         {/* Drawer Footer & Total Summary */}
         {cartItems.length > 0 && (
-          <div style={{ paddingTop: '1.25rem', borderTop: '1px solid rgba(212, 163, 115, 0.15)', marginTop: 'auto' }}>
+          <div
+            style={{
+              paddingTop: '1.25rem',
+              borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+              marginTop: 'auto',
+            }}
+          >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <span style={{ color: '#C4BBB4', fontSize: '0.92rem' }}>Estimasi Total Belanja:</span>
-              <span style={{ fontSize: '1.3rem', fontWeight: 800, color: '#D4A373' }}>
+              <span style={{ color: isDark ? '#C4BBB4' : '#555555', fontSize: '0.88rem' }}>Estimasi Total Belanja:</span>
+              <span
+                style={{
+                  fontSize: '1.35rem',
+                  fontWeight: 800,
+                  fontFamily: 'monospace',
+                  color: isDark ? '#FFFFFF' : '#9E1F1F',
+                }}
+              >
                 Rp {estimatedSubtotal.toLocaleString('id-ID')}
               </span>
             </div>
 
             <button
               onClick={() => setIsCheckoutOpen(true)}
-              className="btn btn-primary"
-              style={{ width: '100%', padding: '0.9rem', justifyContent: 'center', fontSize: '1rem' }}
+              style={{
+                width: '100%',
+                padding: '0.9rem',
+                justifyContent: 'center',
+                fontSize: '0.95rem',
+                fontWeight: 700,
+                borderRadius: '10px',
+                backgroundColor: isDark ? '#B82E2E' : '#9E1F1F',
+                color: '#FFFFFF',
+                border: isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                transition: 'all 0.2s ease',
+              }}
             >
               <span>Lanjut ke Checkout</span>
               <ArrowRight size={18} />
