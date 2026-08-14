@@ -36,13 +36,13 @@ export function isSameTable(tableA: string | null | undefined, tableB: string | 
 
 /**
  * Single source of truth for Active Customer Order status.
- * Active: NEW_ORDER, PREPARING, READY
+ * Active: NEW_ORDER, PREPARING, READY, DELIVERING
  * Inactive: COMPLETED, CANCELLED, CANCELLATION_REQUESTED (after confirmation)
  */
 export function isActiveCustomerOrder(order: any): boolean {
   if (!order || !order.id || !order.order_status) return false;
   const status = String(order.order_status).toUpperCase();
-  return status === 'NEW_ORDER' || status === 'PREPARING' || status === 'READY';
+  return status === 'NEW_ORDER' || status === 'PREPARING' || status === 'READY' || status === 'DELIVERING';
 }
 
 /**
@@ -53,3 +53,4 @@ export function isCompletedOrCancelledOrder(order: any): boolean {
   const status = String(order.order_status).toUpperCase();
   return status === 'COMPLETED' || status === 'CANCELLED';
 }
+

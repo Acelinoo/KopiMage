@@ -26,7 +26,7 @@ export interface OrderRecord {
   payment_proof_url?: string | null;
   subtotal: number;
   total_amount: number;
-  order_status: 'NEW_ORDER' | 'PREPARING' | 'READY' | 'COMPLETED' | 'CANCELLED' | 'CANCELLATION_REQUESTED';
+  order_status: 'NEW_ORDER' | 'PREPARING' | 'READY' | 'DELIVERING' | 'COMPLETED' | 'CANCELLED' | 'CANCELLATION_REQUESTED';
   payment_status: 'UNPAID' | 'VERIFYING' | 'PAID' | 'REJECTED' | 'REFUND_REQUIRED' | 'REFUNDED';
   rejection_reason?: string | null;
   cancellation_reason?: string | null;

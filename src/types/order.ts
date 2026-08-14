@@ -5,10 +5,20 @@ export type OrderStatus =
   | 'new'               // Approved/Cashier order ready for Barista kitchen production
   | 'preparing'         // Barista is crafting the order
   | 'ready'             // Ready for waiter delivery / counter pickup
-  | 'completed'         // Delivered / picked up
+  | 'delivering'        // Waiter is delivering order to customer table
+  | 'completed'         // Delivered to customer table
   | 'rejected'          // Payment proof rejected
   | 'cancelled'         // Cancelled by Admin/Barista
   | 'cancellation_requested'; // Customer requested cancellation, awaiting admin approval
+
+export type DbOrderStatus =
+  | 'NEW_ORDER'
+  | 'PREPARING'
+  | 'READY'
+  | 'DELIVERING'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'CANCELLATION_REQUESTED';
 
 export interface SelectedModifierOption {
   modifierId: string;
