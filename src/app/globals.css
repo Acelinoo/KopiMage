@@ -80,35 +80,61 @@
 [data-theme="light"] .bg-\[\#120F0D\],
 [data-theme="light"] .bg-bgDark,
 [data-theme="light"] [class*="bg-[#0E0B0A]"],
-[data-theme="light"] [class*="bg-[#0C0A09]"] {
+[data-theme="light"] [class*="bg-[#0C0A09]"],
+[data-theme="light"] [class*="bg-[#0E0C0A]"] {
   background-color: var(--bg-main) !important;
   color: #FFFFFF !important;
 }
 
-/* B. WHITE SURFACE CARDS (#161210 / #14110F / #171311 / #1C1815 / #1E1815) */
+/* B. WHITE SURFACE CARDS ACROSS ALL PAGES (/admin, /kitchen, /table, /visit, /about, /space, landing) */
 [data-theme="light"] .bg-\[\#14110F\],
 [data-theme="light"] .bg-\[\#161210\],
 [data-theme="light"] .bg-\[\#171311\],
 [data-theme="light"] .bg-\[\#1C1815\],
 [data-theme="light"] .bg-\[\#1E1815\],
+[data-theme="light"] .bg-\[\#120E0C\],
 [data-theme="light"] .bg-bgDarkPaper,
 [data-theme="light"] .bg-bgDarkSurface,
 [data-theme="light"] .bg-surface,
 [data-theme="light"] .bg-bgSurface,
+[data-theme="light"] .glass-panel,
+[data-theme="light"] .modal-card,
+[data-theme="light"] .drawer-content,
 [data-theme="light"] [class*="bg-[#161210]"],
 [data-theme="light"] [class*="bg-[#14110F]"],
 [data-theme="light"] [class*="bg-[#171311]"],
 [data-theme="light"] [class*="bg-[#1C1815]"],
-[data-theme="light"] [class*="bg-[#1E1815]"] {
+[data-theme="light"] [class*="bg-[#1E1815]"],
+[data-theme="light"] [class*="bg-[#120E0C]"] {
   background-color: #FFFFFF !important;
   color: #1A1A1A !important;
-  border-color: rgba(158, 31, 31, 0.18) !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #9E1F1F !important;
+  border-color: #9E1F1F !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* C. INPUTS, SEARCH BARS & FORMS IN ALL PAGES */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select,
+[data-theme="light"] input.bg-\[\#120E0C\],
+[data-theme="light"] input.bg-\[\#161210\],
+[data-theme="light"] textarea.bg-\[\#161210\],
+[data-theme="light"] select.bg-\[\#161210\] {
+  background-color: #FFFFFF !important;
+  color: #1A1A1A !important;
+  border: 1px solid #9E1F1F !important;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: #777777 !important;
 }
 
 /* Headings Inside White Cards — Black Text */
 [data-theme="light"] .bg-\[\#14110F\] h1, [data-theme="light"] .bg-\[\#14110F\] h2, [data-theme="light"] .bg-\[\#14110F\] h3, [data-theme="light"] .bg-\[\#14110F\] h4,
 [data-theme="light"] .bg-\[\#161210\] h1, [data-theme="light"] .bg-\[\#161210\] h2, [data-theme="light"] .bg-\[\#161210\] h3, [data-theme="light"] .bg-\[\#161210\] h4,
+[data-theme="light"] .glass-panel h1, [data-theme="light"] .glass-panel h2, [data-theme="light"] .glass-panel h3, [data-theme="light"] .glass-panel h4,
 [data-theme="light"] [class*="bg-[#161210]"] h1, [data-theme="light"] [class*="bg-[#161210]"] h2, [data-theme="light"] [class*="bg-[#161210]"] h3, [data-theme="light"] [class*="bg-[#161210]"] h4,
 [data-theme="light"] [class*="bg-[#14110F]"] h1, [data-theme="light"] [class*="bg-[#14110F]"] h2, [data-theme="light"] [class*="bg-[#14110F]"] h3, [data-theme="light"] [class*="bg-[#14110F]"] h4 {
   color: #1A1A1A !important;
@@ -117,6 +143,8 @@
 /* Titles and White Texts Inside White Cards — Black Text */
 [data-theme="light"] .bg-\[\#161210\] .text-\[\#FFFFFF\],
 [data-theme="light"] .bg-\[\#161210\] .text-white,
+[data-theme="light"] .glass-panel .text-\[\#F7F4EF\],
+[data-theme="light"] .glass-panel .text-white,
 [data-theme="light"] [class*="bg-[#161210]"] .text-\[\#FFFFFF\],
 [data-theme="light"] [class*="bg-[#161210]"] .text-white,
 [data-theme="light"] [class*="bg-[#14110F]"] .text-\[\#FFFFFF\],
@@ -127,14 +155,18 @@
 /* Paragraphs & Muted text inside white cards — Charcoal / Dark Gray */
 [data-theme="light"] .bg-\[\#14110F\] p, [data-theme="light"] .bg-\[\#14110F\] .text-\[\#A89F91\],
 [data-theme="light"] .bg-\[\#161210\] p, [data-theme="light"] .bg-\[\#161210\] .text-\[\#A89F91\], [data-theme="light"] .bg-\[\#161210\] .text-\[\#9E9287\],
+[data-theme="light"] .glass-panel p, [data-theme="light"] .glass-panel .text-\[\#C4BBB4\], [data-theme="light"] .glass-panel .text-\[\#8E847C\],
 [data-theme="light"] [class*="bg-[#161210]"] p, [data-theme="light"] [class*="bg-[#161210]"] .text-\[\#A89F91\], [data-theme="light"] [class*="bg-[#161210]"] .text-\[\#9E9287\],
-[data-theme="light"] [class*="bg-[#14110F]"] p, [data-theme="light"] [class*="bg-[#14110F]"] .text-\[\#A89F91\] {
-  color: #4A4543 !important;
+[data-theme="light"] [class*="bg-[#14110F]"] p, [data-theme="light"] [class*="bg-[#14110F]"] .text-\[\#A89F91\],
+[data-theme="light"] [class*="bg-[#161210]"] span:not(.badge):not(.font-bold) {
+  color: #333333 !important;
 }
 
-/* Accent copper inside white cards -> Deep Red */
+/* Accent copper / Price inside white cards -> Deep Red #9E1F1F */
 [data-theme="light"] .bg-\[\#14110F\] .text-\[\#C29B7F\],
 [data-theme="light"] .bg-\[\#161210\] .text-\[\#C29B7F\],
+[data-theme="light"] .glass-panel .text-\[\#D4A373\],
+[data-theme="light"] .glass-panel .text-\[\#C67D5A\],
 [data-theme="light"] [class*="bg-[#161210]"] .text-\[\#C29B7F\],
 [data-theme="light"] [class*="bg-[#14110F]"] .text-\[\#C29B7F\],
 [data-theme="light"] .bg-bgDarkPaper .text-\[\#C29B7F\],
@@ -413,6 +445,36 @@ h1, h2, h3, h4 {
 /* ----------------------------------------------------
    DESIGN SYSTEM UTILITIES & BUTTONS
    ---------------------------------------------------- */
+.editorial-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background-color: #B82E2E;
+  color: #FFFFFF !important;
+  border: 1px solid #B82E2E;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.editorial-btn:hover {
+  background-color: #D63434;
+  transform: translateY(-1px);
+}
+
+[data-theme="light"] .editorial-btn {
+  background-color: #9E1F1F !important;
+  color: #FFFFFF !important;
+  border-color: #9E1F1F !important;
+}
+
 .btn {
   display: inline-flex !important;
   align-items: center !important;
