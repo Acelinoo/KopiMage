@@ -28,7 +28,8 @@ import {
   CheckSquare,
   FileText,
   Upload as ImageIcon,
-  XCircle
+  XCircle,
+  Zap,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
@@ -48,6 +49,10 @@ export default function AdminDashboardPage() {
   const [rejectingOrder, setRejectingOrder] = useState<any | null>(null);
   const [rejectionReason, setRejectionReason] = useState('Bukti transfer buram / tidak terbaca');
   const [customReason, setCustomReason] = useState('');
+
+  // Manual Override Modal State (Phase P-4)
+  const [overrideOrder, setOverrideOrder] = useState<any | null>(null);
+  const [overrideReason, setOverrideReason] = useState('Verifikasi Manual Tunai / Offline Terkonfirmasi');
 
   // Stock & Table State
   const [menuItemsState, setMenuItemsState] = useState<any[]>([]);
@@ -165,12 +170,47 @@ export default function AdminDashboardPage() {
     fetchAdminOrders(true);
     fetchAuxiliaryData();
 
-    // Auto-polling every 4 seconds for live sync
-    const interval = setInterval(() => fetchAdminOrders(false), 4000);
-    return () => clearInterval(interval);
+    // 1. Supabase Realtime WebSocket Listener for Instant Payment & Order Sync (<100ms)
+    let channel: any = null;
+    try {
+      import('@/lib/supabase/client').then(({ createClient }) => {
+        const supabase = createClient();
+        channel = supabase
+          .channel('admin-orders-realtime-hub')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'orders' },
+            () => {
+              fetchAdminOrders(false);
+            }
+          )
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              fetchAdminOrders(false);
+            }
+          });
+      });
+    } catch (e) {
+      console.warn('Admin realtime subscription fallback:', e);
+    }
+
+    // 2. Slow Fallback polling (10 seconds) as safety net
+    const interval = setInterval(() => fetchAdminOrders(false), 10000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel) {
+        try {
+          import('@/lib/supabase/client').then(({ createClient }) => {
+            const supabase = createClient();
+            supabase.removeChannel(channel);
+          });
+        } catch (e) {}
+      }
+    };
   }, []);
 
-  // Real-time Approve Handler (100% DB Persistent)
+  // Real-time Approve Handler for Manual Payments (100% DB Persistent)
   const handleApprovePayment = async (orderId: string) => {
     try {
       // Optimistic UI update
@@ -196,6 +236,39 @@ export default function AdminDashboardPage() {
       console.error('Approve error:', err);
       alert('Gagal memverifikasi pembayaran. Silakan coba lagi.');
       fetchAdminOrders(false);
+    }
+  };
+
+  // Administrative Manual Override Handler for Online/Gateways (Phase P-4)
+  const handleConfirmOverride = async () => {
+    if (!overrideOrder) return;
+
+    try {
+      // Optimistic UI update
+      setOrdersList((prev) => prev.map((o) => (o.id === overrideOrder.id ? { ...o, payment_status: 'PAID' } : o)));
+
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: overrideOrder.id,
+          payment_status: 'PAID',
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Gagal melakukan manual override di server');
+      }
+
+      fetchAdminOrders(false);
+    } catch (err: any) {
+      console.error('Manual override error:', err);
+      alert('Gagal melakukan manual override. Silakan coba lagi.');
+      fetchAdminOrders(false);
+    } finally {
+      setOverrideOrder(null);
+      setOverrideReason('');
     }
   };
 
@@ -1066,14 +1139,29 @@ export default function AdminDashboardPage() {
                               Rp {order.subtotal?.toLocaleString('id-ID')}
                             </strong>
                           </div>
-                          <div className="flex justify-between">
+                          <div className="flex justify-between items-center">
                             <span>Metode:</span>
-                            <span
-                              style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
-                              className="uppercase font-mono font-bold"
-                            >
-                              {order.payment_method}
-                            </span>
+                            {order.payment_method === 'midtrans_online' || order.payment_method === 'qris' ? (
+                              <span className="px-2 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-mono text-[0.7rem] font-bold uppercase flex items-center gap-1">
+                                <Zap className="w-3 h-3 text-emerald-400" />
+                                <span>ONLINE (MIDTRANS)</span>
+                              </span>
+                            ) : order.payment_method === 'cashier' ? (
+                              <span className="px-2 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 font-mono text-[0.7rem] font-bold uppercase flex items-center gap-1">
+                                <Coffee className="w-3 h-3 text-amber-400" />
+                                <span>KASIR / TUNAI</span>
+                              </span>
+                            ) : order.payment_method === 'qris_static' ? (
+                              <span className="px-2 py-0.5 rounded-lg bg-orange-500/15 border border-orange-500/30 text-orange-400 font-mono text-[0.7rem] font-bold uppercase flex items-center gap-1">
+                                <QrCode className="w-3 h-3 text-orange-400" />
+                                <span>QRIS MANUAL</span>
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-400 font-mono text-[0.7rem] font-bold uppercase flex items-center gap-1">
+                                <FileText className="w-3 h-3 text-blue-400" />
+                                <span>TRANSFER BANK</span>
+                              </span>
+                            )}
                           </div>
 
                           {isRejected && order.rejection_reason && (
@@ -1099,12 +1187,12 @@ export default function AdminDashboardPage() {
                               }}
                               className="p-2.5 rounded-xl border text-[0.72rem] mt-2"
                             >
-                              <div className="flex items-center gap-1.5 mb-1">
-                                <XCircle className="w-3.5 h-3.5" />
-                                <strong className="font-mono uppercase tracking-wider">PEMBATALAN DIMINTA</strong>
+                              <div className="flex items-center gap-1.5 text-orange-500 font-bold font-mono">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                <span>CUSTOMER MEMINTA PEMBATALAN</span>
                               </div>
                               {order.cancellation_reason && (
-                                <span style={{ color: isDark ? '#F39C12' : '#C0392B' }}>
+                                <span style={{ color: isDark ? '#A89F91' : '#666666' }} className="block text-[0.68rem] mt-0.5 italic">
                                   Alasan: "{order.cancellation_reason}"
                                 </span>
                               )}
@@ -1129,49 +1217,91 @@ export default function AdminDashboardPage() {
                           )}
                         </div>
 
-                        {/* Payment Proof Photo Box */}
-                        <div
-                          style={{
-                            background: isDark ? '#0B0908' : '#FAF7F5',
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(158, 31, 31, 0.3)',
-                          }}
-                          className="p-3 rounded-xl border border-dashed text-center mb-6"
-                        >
-                          {proofImg ? (
-                            <div>
-                              <div
-                                style={{ background: isDark ? '#161210' : '#FFFFFF' }}
-                                className="relative h-48 w-full rounded-lg overflow-hidden mb-2 cursor-pointer group"
-                                onClick={() => setSelectedImageModal(proofImg)}
-                              >
-                                <img
-                                  src={proofImg}
-                                  alt="Bukti Transfer"
-                                  className="w-full h-full object-contain group-hover:scale-105 transition-transform"
-                                />
-                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-mono font-semibold gap-1.5">
-                                  <Eye className="w-4 h-4 text-white" />
-                                  <span>KLIK PERBESAR</span>
+                        {/* Payment Proof Photo Box (Only for manual QRIS / Transfer) */}
+                        {order.payment_method !== 'midtrans_online' && order.payment_method !== 'qris' && order.payment_method !== 'cashier' ? (
+                          <div
+                            style={{
+                              background: isDark ? '#0B0908' : '#FAF7F5',
+                              borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(158, 31, 31, 0.3)',
+                            }}
+                            className="p-3 rounded-xl border border-dashed text-center mb-6"
+                          >
+                            {proofImg ? (
+                              <div>
+                                <div
+                                  style={{ background: isDark ? '#161210' : '#FFFFFF' }}
+                                  className="relative h-48 w-full rounded-lg overflow-hidden mb-2 cursor-pointer group"
+                                  onClick={() => setSelectedImageModal(proofImg)}
+                                >
+                                  <img
+                                    src={proofImg}
+                                    alt="Bukti Transfer"
+                                    className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                                  />
+                                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-mono font-semibold gap-1.5">
+                                    <Eye className="w-4 h-4 text-white" />
+                                    <span>KLIK PERBESAR</span>
+                                  </div>
                                 </div>
+                                <a
+                                  href={proofImg}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                  className="inline-flex items-center gap-1 text-[0.72rem] hover:underline font-mono font-bold"
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                  <span>BUKA UKURAN FULL</span>
+                                </a>
                               </div>
-                              <a
-                                href={proofImg}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
-                                className="inline-flex items-center gap-1 text-[0.72rem] hover:underline font-mono font-bold"
-                              >
-                                <ExternalLink className="w-3 h-3" />
-                                <span>BUKA UKURAN FULL</span>
-                              </a>
-                            </div>
-                          ) : (
-                            <div style={{ color: isDark ? '#A89F91' : '#777777' }} className="py-6">
-                              <AlertCircle className="w-6 h-6 text-[#9E1F1F] mx-auto mb-1.5" />
-                              <span className="text-xs font-mono">Foto bukti bayar tidak terlampir</span>
-                            </div>
-                          )}
-                        </div>
+                            ) : (
+                              <div style={{ color: isDark ? '#A89F91' : '#777777' }} className="py-6">
+                                <AlertCircle className="w-6 h-6 text-[#9E1F1F] mx-auto mb-1.5" />
+                                <span className="text-xs font-mono">Foto bukti transfer manual tidak terlampir</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : order.payment_method === 'midtrans_online' || order.payment_method === 'qris' ? (
+                          <div
+                            style={{
+                              background: isPaid ? 'rgba(39, 174, 96, 0.1)' : 'rgba(243, 156, 18, 0.08)',
+                              borderColor: isPaid ? 'rgba(39, 174, 96, 0.3)' : 'rgba(243, 156, 18, 0.3)',
+                            }}
+                            className="p-3.5 rounded-xl border text-center mb-6"
+                          >
+                            {isPaid ? (
+                              <div className="flex items-center justify-center gap-2 text-emerald-400 font-mono text-xs font-bold">
+                                <ShieldCheck className="w-4 h-4" />
+                                <span>LUNAS VIA MIDTRANS WEBHOOK</span>
+                              </div>
+                            ) : (
+                              <div>
+                                <div className="flex items-center justify-center gap-2 text-amber-400 font-mono text-xs font-bold mb-1">
+                                  <Clock className="w-4 h-4 animate-spin" />
+                                  <span>MENUNGGU SETTLEMENT GATEWAY</span>
+                                </div>
+                                <span style={{ color: isDark ? '#A89F91' : '#777777' }} className="text-[0.68rem] font-mono block">
+                                  Status akan otomatis LUNAS saat customer membayar Snap.
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              background: isDark ? '#0B0908' : '#FAF7F5',
+                              borderColor: isDark ? 'rgba(212, 163, 115, 0.3)' : 'rgba(158, 31, 31, 0.2)',
+                            }}
+                            className="p-3.5 rounded-xl border text-center mb-6"
+                          >
+                            <span style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} className="text-xs font-mono font-bold block mb-0.5">
+                              PEMBAYARAN KASIR / TUNAI
+                            </span>
+                            <span style={{ color: isDark ? '#A89F91' : '#777777' }} className="text-[0.68rem] font-mono block">
+                              {isPaid ? 'Sudah diselesaikan di kasir.' : 'Terima uang tunai atau EDC di kasir lalu tandai lunas.'}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Action Buttons */}
@@ -1197,6 +1327,49 @@ export default function AdminDashboardPage() {
                               <X className="w-4 h-4" />
                               <span>TOLAK BATAL</span>
                             </button>
+                          </>
+                        ) : (order.payment_method === 'midtrans_online' || order.payment_method === 'qris') ? (
+                          <>
+                            <div
+                              style={{
+                                background: isPaid ? (isDark ? 'rgba(39, 174, 96, 0.2)' : '#E8F6ED') : (isDark ? '#0E0B0A' : '#FAF7F5'),
+                                color: isPaid ? '#27AE60' : (isDark ? '#A89F91' : '#777777'),
+                                border: isPaid ? '1px solid #27AE60' : '1px solid rgba(255,255,255,0.1)',
+                              }}
+                              className="w-full py-2.5 rounded-xl text-xs font-mono tracking-wider uppercase font-bold flex items-center justify-center gap-1.5 text-center"
+                            >
+                              <ShieldCheck className="w-4 h-4" />
+                              <span>{isPaid ? 'LUNAS (AUTO)' : 'SETTLEMENT'}</span>
+                            </div>
+
+                            {!isPaid ? (
+                              <button
+                                onClick={() => setOverrideOrder(order)}
+                                style={{
+                                  background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                  borderColor: '#F39C12',
+                                  color: '#F39C12',
+                                }}
+                                className="w-full py-2.5 rounded-xl border hover:bg-amber-500/10 text-xs font-mono tracking-wider uppercase font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                title="Buka modal Manual Override Administratif"
+                              >
+                                <CheckSquare className="w-4 h-4" />
+                                <span>OVERRIDE</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setRejectingOrder(order)}
+                                style={{
+                                  background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                                  color: isDark ? '#A89F91' : '#777777',
+                                }}
+                                className="w-full py-2.5 rounded-xl border text-xs font-mono tracking-wider uppercase font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                              >
+                                <X className="w-4 h-4" />
+                                <span>BATALKAN</span>
+                              </button>
+                            )}
                           </>
                         ) : (
                           <>
@@ -1622,6 +1795,121 @@ export default function AdminDashboardPage() {
                 <Send className="w-4 h-4" />
                 <span>SIMPAN &amp; BUKA CHAT WHATSAPP</span>
               </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* MODAL 1B: ADMINISTRATIVE MANUAL OVERRIDE (PHASE P-4) */}
+      <AnimatePresence>
+        {overrideOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOverrideOrder(null)}
+              className="fixed inset-0 bg-black/85 backdrop-blur-md"
+            />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              style={{
+                background: isDark ? '#161210' : '#FFFFFF',
+                border: '2px solid #F39C12',
+                color: isDark ? '#FFFFFF' : '#1A1A1A',
+              }}
+              className="relative z-10 w-full max-w-lg rounded-3xl p-6 shadow-2xl"
+            >
+              <div
+                style={{
+                  borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(243, 156, 18, 0.2)',
+                }}
+                className="flex items-center justify-between mb-4 pb-3"
+              >
+                <div className="flex items-center gap-2 text-amber-500 font-serif text-lg font-bold">
+                  <CheckSquare className="w-5 h-5" />
+                  <span>Manual Override Pembayaran Online</span>
+                </div>
+                <button
+                  onClick={() => setOverrideOrder(null)}
+                  style={{ color: isDark ? '#A89F91' : '#1A1A1A' }}
+                  className="cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Warning Banner */}
+              <div
+                style={{
+                  background: 'rgba(243, 156, 18, 0.12)',
+                  borderColor: 'rgba(243, 156, 18, 0.35)',
+                  color: '#F39C12',
+                }}
+                className="p-3.5 rounded-2xl border text-xs font-mono mb-4 leading-relaxed"
+              >
+                <strong className="block mb-1 text-sm font-serif font-bold">PERINGATAN ADMINISTRATIF:</strong>
+                Pesanan <strong>#{overrideOrder.order_number}</strong> menggunakan metode pembayaran Midtrans Online. Transaksi online idealnya diselesaikan secara otomatis melalui notifikasi Webhook resmi Midtrans.
+                Gunakan Manual Override hanya jika Anda telah memvalidasi bukti pembayaran pelanggan secara langsung di kasir atau mutasi rekening.
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label
+                    style={{ color: isDark ? '#A89F91' : '#555555' }}
+                    className="text-[0.68rem] font-mono uppercase font-bold block mb-2"
+                  >
+                    ALASAN MANUAL OVERRIDE:
+                  </label>
+                  <input
+                    type="text"
+                    value={overrideReason}
+                    onChange={(e) => setOverrideReason(e.target.value)}
+                    placeholder="misal: Pembayaran tunai darurat dikonfirmasi kasir..."
+                    style={{
+                      background: isDark ? '#0E0B0A' : '#FAF7F5',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #F39C12',
+                      color: isDark ? '#FFFFFF' : '#1A1A1A',
+                    }}
+                    className="w-full p-3 rounded-xl text-xs focus:outline-none focus:border-[#F39C12]"
+                  />
+                </div>
+
+                <div className="flex justify-between items-center text-xs font-mono p-3 rounded-xl bg-white/5">
+                  <span style={{ color: isDark ? '#A89F91' : '#666' }}>Nominal Tagihan:</span>
+                  <strong style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} className="text-sm font-bold">
+                    Rp {overrideOrder.subtotal?.toLocaleString('id-ID')}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOverrideOrder(null)}
+                  style={{
+                    background: isDark ? '#0E0B0A' : '#FAF7F5',
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#CCC',
+                    color: isDark ? '#A89F91' : '#555',
+                  }}
+                  className="py-3 rounded-xl border text-xs font-mono font-bold uppercase tracking-wider cursor-pointer"
+                >
+                  BATALKAN
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleConfirmOverride}
+                  style={{ background: '#27AE60', color: '#FFFFFF' }}
+                  className="py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md cursor-pointer hover:bg-[#2ECC71]"
+                >
+                  <Check className="w-4 h-4" />
+                  <span>SETUJUI LUNAS</span>
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

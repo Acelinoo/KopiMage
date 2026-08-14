@@ -619,21 +619,81 @@ export default function KitchenDisplayPage() {
                         </div>
                       </div>
 
-                      {/* Customer Name & Notes */}
+                      {/* Customer Name & Payment Status Badge */}
                       <div className="mb-4">
-                        <span
-                          style={{ color: isDark ? '#A89F91' : '#555555' }}
-                          className="text-[0.75rem] block font-mono"
-                        >
-                          Pemesan:{' '}
-                          <strong
-                            style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
-                            className="font-serif font-bold"
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <span
+                            style={{ color: isDark ? '#A89F91' : '#555555' }}
+                            className="text-[0.75rem] font-mono"
                           >
-                            {order.customer_name || 'Pelanggan'}
-                          </strong>{' '}
-                          ({order.customer_phone || '-'})
+                            Pemesan:{' '}
+                            <strong
+                              style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                              className="font-serif font-bold"
+                            >
+                              {order.customer_name || 'Pelanggan'}
+                            </strong>
+                          </span>
+
+                          {/* Payment Awareness Badge */}
+                          {order.payment_status === 'PAID' ? (
+                            <span
+                              style={{
+                                background: isDark ? 'rgba(39, 174, 96, 0.15)' : '#F2FAF5',
+                                borderColor: '#27AE60',
+                                color: '#27AE60',
+                              }}
+                              className="px-2 py-0.5 rounded-lg border text-[0.62rem] font-mono font-bold uppercase tracking-wider flex items-center gap-1"
+                            >
+                              <CheckCircle2 className="w-3 h-3" />
+                              <span>{order.payment_method === 'midtrans_online' ? 'LUNAS (ONLINE)' : 'LUNAS'}</span>
+                            </span>
+                          ) : (order.payment_method === 'midtrans_online' || order.payment_method === 'qris') ? (
+                            <span
+                              style={{
+                                background: isDark ? 'rgba(230, 126, 34, 0.15)' : '#FFF9F4',
+                                borderColor: '#E67E22',
+                                color: '#E67E22',
+                              }}
+                              className="px-2 py-0.5 rounded-lg border text-[0.62rem] font-mono font-bold uppercase tracking-wider flex items-center gap-1 animate-pulse"
+                            >
+                              <Clock className="w-3 h-3" />
+                              <span>MENUNGGU BAYAR ONLINE</span>
+                            </span>
+                          ) : order.payment_method === 'cashier' ? (
+                            <span
+                              style={{
+                                background: isDark ? 'rgba(212, 163, 115, 0.15)' : '#FAF7F5',
+                                borderColor: isDark ? 'rgba(212, 163, 115, 0.4)' : '#9E1F1F',
+                                color: isDark ? '#D4A373' : '#9E1F1F',
+                              }}
+                              className="px-2 py-0.5 rounded-lg border text-[0.62rem] font-mono font-bold uppercase tracking-wider flex items-center gap-1"
+                            >
+                              <Coffee className="w-3 h-3" />
+                              <span>BAYAR DI KASIR</span>
+                            </span>
+                          ) : (
+                            <span
+                              style={{
+                                background: isDark ? 'rgba(230, 126, 34, 0.15)' : '#FFF9F4',
+                                borderColor: '#E67E22',
+                                color: '#E67E22',
+                              }}
+                              className="px-2 py-0.5 rounded-lg border text-[0.62rem] font-mono font-bold uppercase tracking-wider flex items-center gap-1"
+                            >
+                              <Clock className="w-3 h-3" />
+                              <span>VERIFIKASI MANUAL</span>
+                            </span>
+                          )}
+                        </div>
+
+                        <span
+                          style={{ color: isDark ? '#A89F91' : '#777777' }}
+                          className="text-[0.7rem] block font-mono"
+                        >
+                          No. HP: {order.customer_phone || '-'}
                         </span>
+
                         {currentStatus === 'CANCELLATION_REQUESTED' && (
                           <div
                             style={{

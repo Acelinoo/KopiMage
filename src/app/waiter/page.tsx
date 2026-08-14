@@ -1017,12 +1017,27 @@ export default function WaiterFloorPage() {
                                 {order.order_display_number || order.order_number}
                               </span>
                             </div>
-                            <span style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} className="text-xs font-mono font-bold block">
-                              Customer: {order.customer_name}
-                            </span>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} className="text-xs font-mono font-bold block">
+                                Customer: {order.customer_name}
+                              </span>
+                              {order.payment_status === 'PAID' ? (
+                                <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[0.6rem] font-mono font-bold uppercase border border-emerald-500/40">
+                                  LUNAS
+                                </span>
+                              ) : order.payment_method === 'cashier' ? (
+                                <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[0.6rem] font-mono font-bold uppercase border border-amber-500/40">
+                                  BAYAR KASIR
+                                </span>
+                              ) : (
+                                <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 text-[0.6rem] font-mono font-bold uppercase border border-red-500/40">
+                                  BELUM LUNAS
+                                </span>
+                              )}
+                            </div>
                           </div>
 
-                          <span className="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[0.65rem] font-mono font-bold uppercase flex items-center gap-1">
+                          <span className="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[0.65rem] font-mono font-bold uppercase flex items-center gap-1 shrink-0">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
                             SEDANG DIANTAR
                           </span>
@@ -1338,9 +1353,24 @@ export default function WaiterFloorPage() {
                 if (readyOrder) {
                   return (
                     <div className="mb-4 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30">
-                      <span className="text-[0.68rem] font-mono font-bold text-orange-400 block mb-1">
-                        PESANAN MEJA INI SIAP DIANTAR:
-                      </span>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-[0.68rem] font-mono font-bold text-orange-400 block">
+                          PESANAN MEJA INI SIAP DIANTAR:
+                        </span>
+                        {readyOrder.payment_status === 'PAID' ? (
+                          <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[0.6rem] font-mono font-bold uppercase border border-emerald-500/40">
+                            LUNAS
+                          </span>
+                        ) : readyOrder.payment_method === 'cashier' ? (
+                          <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[0.6rem] font-mono font-bold uppercase border border-amber-500/40">
+                            BAYAR KASIR
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 text-[0.6rem] font-mono font-bold uppercase border border-red-500/40">
+                            BELUM LUNAS
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-white mb-2">
                         {readyOrder.order_display_number || readyOrder.order_number} • {readyOrder.customer_name}
                       </p>
@@ -1364,9 +1394,24 @@ export default function WaiterFloorPage() {
                 if (deliveringOrder) {
                   return (
                     <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
-                      <span className="text-[0.68rem] font-mono font-bold text-amber-400 block mb-1">
-                        PESANAN SEDANG MENUJU MEJA INI:
-                      </span>
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="text-[0.68rem] font-mono font-bold text-amber-400 block">
+                          PESANAN SEDANG MENUJU MEJA INI:
+                        </span>
+                        {deliveringOrder.payment_status === 'PAID' ? (
+                          <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 text-[0.6rem] font-mono font-bold uppercase border border-emerald-500/40">
+                            LUNAS
+                          </span>
+                        ) : deliveringOrder.payment_method === 'cashier' ? (
+                          <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-400 text-[0.6rem] font-mono font-bold uppercase border border-amber-500/40">
+                            BAYAR KASIR
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.2 rounded bg-red-500/20 text-red-400 text-[0.6rem] font-mono font-bold uppercase border border-red-500/40">
+                            BELUM LUNAS
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-white mb-2">
                         {deliveringOrder.order_display_number || deliveringOrder.order_number} • {deliveringOrder.customer_name}
                       </p>
