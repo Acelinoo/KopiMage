@@ -390,7 +390,7 @@ export default function OrderTrackerPage() {
         )}
 
         {/* Live Order Timeline */}
-        <div style={{ borderRadius: '24px', padding: '1.75rem', background: '#0E0C0A', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <div style={{ borderRadius: '24px', padding: '1.75rem', marginBottom: '1.5rem', background: '#0E0C0A', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <h3 style={{ fontSize: '1.15rem', color: '#F7F4EF', fontWeight: 700, marginBottom: '1.25rem' }}>
             Tahapan Pengerjaan Pesanan Real-time
           </h3>
@@ -413,41 +413,257 @@ export default function OrderTrackerPage() {
                 {isPreparing ? <CheckCircle size={16} color="#25D366" /> : <Clock size={16} color="#A89F91" />}
               </div>
               <div>
-                <div style={{ fontSize: '0.92rem', color: isPreparing ? '#25D366' : '#F7F4EF', fontWeight: 800 }}>2. Diproses Barista & Dapur (PREPARING)</div>
-                <div style={{ fontSize: '0.78rem', color: '#A89F91' }}>Barista & dapur lagi meracik hidangan favoritmu</div>
+                <div style={{ fontSize: '0.92rem', color: isPreparing ? '#25D366' : '#F7F4EF', fontWeight: 800 }}>2. Diproses Barista &amp; Dapur (PREPARING)</div>
+                <div style={{ fontSize: '0.78rem', color: '#A89F91' }}>Barista &amp; dapur lagi meracik hidangan favoritmu</div>
               </div>
             </div>
 
-            {/* STEP 3 - DYNAMICALLY HIGHLIGHTED GREEN WHEN KITCHEN PRESSES READY */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '1rem',
-                opacity: isReady ? 1 : 0.4,
-                padding: isReady ? '0.75rem 1rem' : '0',
-                borderRadius: '16px',
-                background: isReady ? 'rgba(37, 211, 102, 0.15)' : 'transparent',
-                border: isReady ? '1px solid #25D366' : 'none',
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: isReady ? '#25D366' : 'transparent', border: isReady ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <CheckCircle size={18} color={isReady ? '#070605' : '#A89F91'} />
+            {/* STEP 3 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', opacity: isReady ? 1 : 0.4 }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: isReady ? 'rgba(37, 211, 102, 0.2)' : 'transparent', border: isReady ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {isReady ? <CheckCircle size={16} color="#25D366" /> : <Clock size={16} color="#A89F91" />}
               </div>
               <div>
-                <div style={{ fontSize: '0.95rem', color: isReady ? '#27AE60' : '#F7F4EF', fontWeight: 800 }}>
-                  3. Siap Dihidangkan (READY)
-                </div>
-                <div style={{ fontSize: '0.8rem', color: isReady ? '#27AE60' : '#A89F91' }}>
-                  {isReady ? 'PESANAN SIAP DISAJIKAN / DIANTAR KE MEJA' : 'Pesanan siap diambil di counter / diantar ke meja'}
-                </div>
+                <div style={{ fontSize: '0.92rem', color: isReady ? '#25D366' : '#F7F4EF', fontWeight: 800 }}>3. Siap di Pickup Counter (READY)</div>
+                <div style={{ fontSize: '0.78rem', color: '#A89F91' }}>Pesanan selesai dan siap diambil waiter</div>
+              </div>
+            </div>
+
+            {/* STEP 4 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', opacity: isDelivering || isCompleted ? 1 : 0.4 }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: isDelivering || isCompleted ? 'rgba(230, 126, 34, 0.2)' : 'transparent', border: isDelivering || isCompleted ? '2px solid #E67E22' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {isDelivering || isCompleted ? <CheckCircle size={16} color="#E67E22" /> : <Clock size={16} color="#A89F91" />}
+              </div>
+              <div>
+                <div style={{ fontSize: '0.92rem', color: isDelivering || isCompleted ? '#E67E22' : '#F7F4EF', fontWeight: 800 }}>4. Sedang Diantar Waiter (DELIVERING)</div>
+                <div style={{ fontSize: '0.78rem', color: '#A89F91' }}>Waiter sedang membawakan pesanan ke mejamu</div>
+              </div>
+            </div>
+
+            {/* STEP 5 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', opacity: isCompleted ? 1 : 0.4 }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: isCompleted ? 'rgba(37, 211, 102, 0.2)' : 'transparent', border: isCompleted ? '2px solid #25D366' : '2px solid #A89F91', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {isCompleted ? <CheckCircle size={16} color="#25D366" /> : <Clock size={16} color="#A89F91" />}
+              </div>
+              <div>
+                <div style={{ fontSize: '0.92rem', color: isCompleted ? '#25D366' : '#F7F4EF', fontWeight: 800 }}>5. Selesai Disajikan (COMPLETED)</div>
+                <div style={{ fontSize: '0.78rem', color: '#A89F91' }}>Selamat menikmati racikan KOPIMAGE!</div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* CUSTOMER WAITER CALL / QUICK SERVICE CARD (Phase 4) */}
+        {order.mode !== 'takeaway' && (
+          <CustomerWaiterCallSection
+            tableCode={
+              order.table_code ||
+              (order.tables?.code && !order.tables.code.includes('-') ? order.tables.code : null) ||
+              (order.table_id && !String(order.table_id).includes('-') ? order.table_id : '01')
+            }
+          />
+        )}
+
       </div>
     </main>
   );
 }
+
+// Sub-component for Customer Waiter Call Controls
+function CustomerWaiterCallSection({ tableCode }: { tableCode: string }) {
+  const [activeRequests, setActiveRequests] = useState<any[]>([]);
+  const [submittingType, setSubmittingType] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ type: 'success' | 'info' | 'error'; text: string } | null>(null);
+
+  const fetchTableRequests = async () => {
+    try {
+      const res = await fetch(`/api/waiter/requests?table_code=${tableCode}&t=${Date.now()}`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.requests)) {
+        // Only active requests (OPEN or HANDLED)
+        const active = data.requests.filter((r: any) => r.status !== 'COMPLETED');
+        setActiveRequests(active);
+      }
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    fetchTableRequests();
+    const interval = setInterval(fetchTableRequests, 3500);
+    return () => clearInterval(interval);
+  }, [tableCode]);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
+  const handleCallWaiter = async (type: 'BANTUAN' | 'BILL') => {
+    setSubmittingType(type);
+    try {
+      const res = await fetch('/api/waiter/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          table_code: tableCode,
+          request_type: type,
+          notes: type === 'BILL' ? `Customer Meja ${tableCode} meminta bill pembayaran.` : `Customer Meja ${tableCode} memanggil waiter untuk bantuan.`,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        if (data.isDuplicate) {
+          setToastMessage({ type: 'info', text: 'Permintaan bantuan Anda sudah ada dalam antrean staf.' });
+        } else {
+          setToastMessage({ type: 'success', text: 'Panggilan terkirim! Staf waiter segera menuju mejamu.' });
+        }
+        fetchTableRequests();
+      } else {
+        setToastMessage({ type: 'error', text: data.error || 'Gagal mengirim panggilan.' });
+      }
+    } catch (err: any) {
+      setToastMessage({ type: 'error', text: 'Koneksi bermasalah: ' + err.message });
+    } finally {
+      setSubmittingType(null);
+    }
+  };
+
+  const hasActiveBantuan = activeRequests.some((r) => r.request_type === 'BANTUAN');
+  const hasActiveBill = activeRequests.some((r) => r.request_type === 'BILL');
+
+  return (
+    <div style={{ borderRadius: '24px', padding: '1.5rem', background: '#0E0C0A', border: '1px solid rgba(255, 255, 255, 0.1)', position: 'relative' }}>
+      {/* Toast */}
+      {toastMessage && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '-12px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: toastMessage.type === 'success' ? '#27AE60' : toastMessage.type === 'info' ? '#F39C12' : '#E74C3C',
+            color: '#FFFFFF',
+            padding: '0.4rem 1rem',
+            borderRadius: '12px',
+            fontSize: '0.75rem',
+            fontFamily: 'monospace',
+            fontWeight: 800,
+            boxShadow: '0 8px 20px rgba(0,0,0,0.5)',
+            zIndex: 10,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {toastMessage.text}
+        </div>
+      )}
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+        <div>
+          <span style={{ fontSize: '0.7rem', color: '#C29B7F', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 800 }}>
+            LAYANAN MEJA {tableCode}
+          </span>
+          <h3 style={{ fontSize: '1.1rem', color: '#F7F4EF', fontWeight: 700, margin: '0.1rem 0 0 0' }}>
+            Butuh Bantuan dari Waiter?
+          </h3>
+        </div>
+      </div>
+
+      {/* Active Requests Banner */}
+      {activeRequests.length > 0 && (
+        <div style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {activeRequests.map((req) => (
+            <div
+              key={req.id}
+              style={{
+                background: req.status === 'HANDLED' ? 'rgba(39, 174, 96, 0.15)' : 'rgba(241, 196, 15, 0.15)',
+                border: req.status === 'HANDLED' ? '1px solid #27AE60' : '1px solid #F1C40F',
+                padding: '0.65rem 1rem',
+                borderRadius: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.75rem', color: req.status === 'HANDLED' ? '#2ECC71' : '#F1C40F', fontWeight: 800, fontFamily: 'monospace' }}>
+                  {req.request_type === 'BILL' ? '🧾 MINTA BILL' : '🙋‍♂️ PANGGIL WAITER'}
+                </span>
+                <span style={{ fontSize: '0.72rem', color: '#A89F91' }}>
+                  {req.status === 'HANDLED' ? '• Staf sedang menuju meja' : '• Menunggu staf'}
+                </span>
+              </div>
+              <span
+                style={{
+                  fontSize: '0.65rem',
+                  fontFamily: 'monospace',
+                  fontWeight: 800,
+                  padding: '0.2rem 0.5rem',
+                  borderRadius: '6px',
+                  background: req.status === 'HANDLED' ? '#27AE60' : '#F1C40F',
+                  color: req.status === 'HANDLED' ? '#FFFFFF' : '#070605',
+                }}
+              >
+                {req.status === 'HANDLED' ? 'SEDANG DITANGANI' : 'DALAM ANTREAN'}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+        <button
+          onClick={() => handleCallWaiter('BANTUAN')}
+          disabled={submittingType === 'BANTUAN' || hasActiveBantuan}
+          style={{
+            padding: '0.75rem 1rem',
+            borderRadius: '14px',
+            background: hasActiveBantuan ? '#161210' : '#1A1412',
+            border: hasActiveBantuan ? '1px solid rgba(241, 196, 15, 0.4)' : '1px solid rgba(255, 255, 255, 0.15)',
+            color: hasActiveBantuan ? '#F1C40F' : '#FFFFFF',
+            fontSize: '0.8rem',
+            fontWeight: 800,
+            fontFamily: 'monospace',
+            cursor: hasActiveBantuan ? 'not-allowed' : 'pointer',
+            opacity: hasActiveBantuan ? 0.8 : 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.4rem',
+            transition: 'all 0.2s',
+          }}
+        >
+          <span>{submittingType === 'BANTUAN' ? 'Mengirim...' : hasActiveBantuan ? '✓ Bantuan Dipanggil' : '🙋‍♂️ Panggil Waiter'}</span>
+        </button>
+
+        <button
+          onClick={() => handleCallWaiter('BILL')}
+          disabled={submittingType === 'BILL' || hasActiveBill}
+          style={{
+            padding: '0.75rem 1rem',
+            borderRadius: '14px',
+            background: hasActiveBill ? '#161210' : '#1A1412',
+            border: hasActiveBill ? '1px solid rgba(230, 126, 34, 0.4)' : '1px solid rgba(255, 255, 255, 0.15)',
+            color: hasActiveBill ? '#E67E22' : '#FFFFFF',
+            fontSize: '0.8rem',
+            fontWeight: 800,
+            fontFamily: 'monospace',
+            cursor: hasActiveBill ? 'not-allowed' : 'pointer',
+            opacity: hasActiveBill ? 0.8 : 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.4rem',
+            transition: 'all 0.2s',
+          }}
+        >
+          <span>{submittingType === 'BILL' ? 'Mengirim...' : hasActiveBill ? '✓ Bill Diminta' : '🧾 Minta Bill'}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+

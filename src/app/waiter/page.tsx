@@ -25,7 +25,8 @@ import {
   Flame,
   CheckCheck,
   Send,
-  Loader2
+  Loader2,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -42,7 +43,7 @@ export default function WaiterFloorPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [areaFilter, setAreaFilter] = useState<'ALL' | 'Indoor' | 'Terrace' | 'VIP'>('ALL');
   
-  // Phase 3 Mutation States
+  // Action Loading & Toast States
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -54,7 +55,7 @@ export default function WaiterFloorPage() {
     }
   }, [alertMessage]);
 
-  // Fetch Live Orders and Tables from Server API
+  // Fetch Live Orders, Tables, and Requests from Server API
   const fetchFloorData = async (showLoader = false) => {
     if (showLoader) setLoading(true);
     setIsRefreshing(true);
@@ -73,9 +74,16 @@ export default function WaiterFloorPage() {
         if (tablesData.success && Array.isArray(tablesData.tables) && tablesData.tables.length > 0) {
           setTablesList(tablesData.tables);
         }
-      } catch (e) {
-        // Fallback to static registry
-      }
+      } catch (e) {}
+
+      // 3. Fetch Waiter Requests
+      try {
+        const reqRes = await fetch(`/api/waiter/requests?t=${Date.now()}`);
+        const reqData = await reqRes.json();
+        if (reqData.success && Array.isArray(reqData.requests)) {
+          setRequestsList(reqData.requests);
+        }
+      } catch (e) {}
     } catch (err) {
       console.error('Failed to fetch waiter floor data:', err);
     } finally {
@@ -90,14 +98,22 @@ export default function WaiterFloorPage() {
     // Live fast polling interval (3.5 seconds)
     const interval = setInterval(() => fetchFloorData(false), 3500);
 
-    // Supabase Realtime Listener (using existing channel pattern)
-    let channel: any = null;
+    // Supabase Realtime Listener
+    let channelOrders: any = null;
+    let channelRequests: any = null;
     try {
       import('@/lib/supabase/client').then(({ createClient }) => {
         const supabase = createClient();
-        channel = supabase
-          .channel('waiter-realtime-floor')
+        channelOrders = supabase
+          .channel('waiter-realtime-orders')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
+            fetchFloorData(false);
+          })
+          .subscribe();
+
+        channelRequests = supabase
+          .channel('waiter-realtime-requests')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'waiter_requests' }, () => {
             fetchFloorData(false);
           })
           .subscribe();
@@ -108,13 +124,13 @@ export default function WaiterFloorPage() {
 
     return () => {
       clearInterval(interval);
-      if (channel) {
-        try {
-          import('@/lib/supabase/client').then(({ createClient }) => {
-            createClient().removeChannel(channel);
-          });
-        } catch (e) {}
-      }
+      try {
+        import('@/lib/supabase/client').then(({ createClient }) => {
+          const supabase = createClient();
+          if (channelOrders) supabase.removeChannel(channelOrders);
+          if (channelRequests) supabase.removeChannel(channelRequests);
+        });
+      } catch (e) {}
     };
   }, []);
 
@@ -223,7 +239,6 @@ export default function WaiterFloorPage() {
           type: 'success',
           text: `Pesanan Meja ${tableCode} diambil. Sedang diantar ke meja customer.`,
         });
-        // Optimistic local update
         setOrders((prev) =>
           prev.map((o) => (o.id === orderId ? { ...o, order_status: 'DELIVERING' } : o))
         );
@@ -268,7 +283,6 @@ export default function WaiterFloorPage() {
           type: 'success',
           text: `Pesanan Meja ${tableCode} telah disajikan! Status meja: SEDANG MAKAN.`,
         });
-        // Optimistic local update
         setOrders((prev) =>
           prev.map((o) => (o.id === orderId ? { ...o, order_status: 'COMPLETED' } : o))
         );
@@ -278,6 +292,98 @@ export default function WaiterFloorPage() {
         setAlertMessage({
           type: 'error',
           text: data.error || 'Gagal mengonfirmasi penyajian.',
+        });
+      }
+    } catch (err: any) {
+      setAlertMessage({ type: 'error', text: 'Koneksi bermasalah: ' + err.message });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  // ----------------------------------------------------
+  // Phase 4 Waiter Request Handlers (With Concurrency Lock)
+  // ----------------------------------------------------
+
+  // 3. Handle Request: OPEN -> HANDLED (Atomic Lock)
+  const handleStartHandlingRequest = async (requestId: string, tableCode: string) => {
+    setActionLoadingId(requestId);
+    try {
+      const res = await fetch('/api/waiter/requests', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          request_id: requestId,
+          status: 'HANDLED',
+          expected_current_status: 'OPEN',
+          handled_by: 'Staf Waiter',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 409) {
+        setAlertMessage({
+          type: 'error',
+          text: data.error || `Panggilan Meja ${tableCode} sudah diambil oleh staf lain.`,
+        });
+        fetchFloorData(false);
+      } else if (res.ok) {
+        setAlertMessage({
+          type: 'success',
+          text: `Panggilan Meja ${tableCode} sedang Anda tangani.`,
+        });
+        setRequestsList((prev) =>
+          prev.map((r) => (r.id === requestId ? { ...r, status: 'HANDLED', handled_by: 'Staf Waiter' } : r))
+        );
+        fetchFloorData(false);
+      } else {
+        setAlertMessage({
+          type: 'error',
+          text: data.error || 'Gagal menangani panggilan.',
+        });
+      }
+    } catch (err: any) {
+      setAlertMessage({ type: 'error', text: 'Koneksi bermasalah: ' + err.message });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  // 4. Complete Request: HANDLED -> COMPLETED
+  const handleCompleteRequest = async (requestId: string, tableCode: string) => {
+    setActionLoadingId(requestId);
+    try {
+      const res = await fetch('/api/waiter/requests', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          request_id: requestId,
+          status: 'COMPLETED',
+          expected_current_status: 'HANDLED',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 409) {
+        setAlertMessage({
+          type: 'error',
+          text: data.error || `Status panggilan Meja ${tableCode} telah diperbarui sebelumnya.`,
+        });
+        fetchFloorData(false);
+      } else if (res.ok) {
+        setAlertMessage({
+          type: 'success',
+          text: `Panggilan Meja ${tableCode} selesai ditangani!`,
+        });
+        setRequestsList((prev) => prev.filter((r) => r.id !== requestId));
+        if (selectedTable) setSelectedTable(null);
+        fetchFloorData(false);
+      } else {
+        setAlertMessage({
+          type: 'error',
+          text: data.error || 'Gagal menyelesaikan panggilan.',
         });
       }
     } catch (err: any) {
@@ -384,7 +490,7 @@ export default function WaiterFloorPage() {
               <AlertCircle className="w-4 h-4 shrink-0" />
             )}
             <span className="flex-1">{alertMessage.text}</span>
-            <button onClick={() => setAlertMessage(null)} className="opacity-75 hover:opacity-100">
+            <button onClick={() => setAlertMessage(null)} className="opacity-75 hover:opacity-100 cursor-pointer">
               <X className="w-4 h-4" />
             </button>
           </motion.div>
@@ -475,7 +581,7 @@ export default function WaiterFloorPage() {
               </span>
               {deliveringOrdersCount > 0 && (
                 <span className="text-[0.68rem] font-mono font-bold text-amber-500">
-                  (+{deliveringOrdersCount} Jalan)
+                  (+{deliveringOrdersCount})
                 </span>
               )}
             </div>
@@ -506,7 +612,7 @@ export default function WaiterFloorPage() {
                 {activeRequestsCount}
               </span>
               <span style={{ color: isDark ? '#A89F91' : '#666666' }} className="text-[0.65rem] font-mono">
-                Req
+                Aktif
               </span>
             </div>
           </button>
@@ -688,7 +794,11 @@ export default function WaiterFloorPage() {
 
                       {/* Bottom Context Details */}
                       <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[0.65rem] font-mono">
-                        {tbl.activeOrderDisplay ? (
+                        {tbl.status === 'BUTUH_BANTUAN' ? (
+                          <span className="text-amber-400 font-bold truncate">
+                            {tbl.latestRequestType === 'BILL' ? 'Minta Bill' : 'Panggil Staf'}
+                          </span>
+                        ) : tbl.activeOrderDisplay ? (
                           <span className="text-orange-400 font-bold truncate">
                             {tbl.activeOrderDisplay}
                           </span>
@@ -806,7 +916,7 @@ export default function WaiterFloorPage() {
                           ))}
                         </div>
 
-                        {/* Active Action Button (Phase 3 Atomic Mutation) */}
+                        {/* Active Action Button */}
                         <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
                           <span style={{ color: isDark ? '#A89F91' : '#666666' }} className="text-[0.68rem] font-mono">
                             Total: {itemsList.length} Item
@@ -947,16 +1057,16 @@ export default function WaiterFloorPage() {
           </section>
         )}
 
-        {/* VIEW 3: WAITER REQUESTS (Panggilan Meja) */}
+        {/* VIEW 3: WAITER REQUESTS (Panggilan Meja - Phase 4 Active) */}
         {activeTab === 'REQUESTS' && (
           <section>
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <h2 style={{ color: '#FFFFFF' }} className="text-sm font-serif font-bold">
-                  Panggilan &amp; Permintaan Bantuan Meja
+                  Panggilan &amp; Permintaan Bantuan Meja ({activeRequests.length})
                 </h2>
                 <p style={{ color: isDark ? '#A89F91' : '#F3EFEA' }} className="text-[0.7rem] font-mono">
-                  Daftar customer yang memanggil waiter dari meja.
+                  Daftar customer yang membutuhkan bantuan atau tagihan bill di meja.
                 </p>
               </div>
             </div>
@@ -974,44 +1084,94 @@ export default function WaiterFloorPage() {
                   Tidak Ada Panggilan Waiter
                 </h3>
                 <p style={{ color: isDark ? '#A89F91' : '#555555' }} className="text-xs font-mono">
-                  Belum ada customer yang meminta bantuan atau tagihan bill.
+                  Semua permintaan bantuan dan tagihan meja telah diselesaikan.
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
-                {activeRequests.map((req) => (
-                  <div
-                    key={req.id}
-                    style={{
-                      background: isDark ? '#161210' : '#FFFFFF',
-                      border: '2px solid #F1C40F',
-                      boxShadow: isDark ? '0 8px 25px rgba(0,0,0,0.6)' : '0 6px 20px rgba(0,0,0,0.1)',
-                    }}
-                    className="p-4 rounded-2xl flex items-center justify-between gap-3"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-base font-serif font-black text-amber-400">
-                          MEJA {req.table_code}
-                        </span>
-                        <span className="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/30 text-amber-400 text-[0.62rem] font-mono font-bold uppercase">
-                          {req.request_type === 'BILL' ? 'MINTA BILL' : 'MINTA BANTUAN'}
+                {activeRequests.map((req) => {
+                  const isLoading = actionLoadingId === req.id;
+                  const isHandled = req.status === 'HANDLED';
+
+                  return (
+                    <div
+                      key={req.id}
+                      style={{
+                        background: isDark ? '#161210' : '#FFFFFF',
+                        border: isHandled ? '2px solid #27AE60' : '2px solid #F1C40F',
+                        boxShadow: isDark ? '0 8px 25px rgba(0,0,0,0.6)' : '0 6px 20px rgba(0,0,0,0.1)',
+                      }}
+                      className="p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-lg font-serif font-black text-amber-400">
+                            MEJA {req.table_code}
+                          </span>
+                          <span
+                            style={{
+                              background: req.request_type === 'BILL' ? 'rgba(230, 126, 34, 0.2)' : 'rgba(241, 196, 15, 0.2)',
+                              borderColor: req.request_type === 'BILL' ? '#E67E22' : '#F1C40F',
+                              color: req.request_type === 'BILL' ? '#E67E22' : '#F1C40F',
+                            }}
+                            className="px-2.5 py-0.5 rounded-md border text-[0.68rem] font-mono font-bold uppercase"
+                          >
+                            {req.request_type === 'BILL' ? '🧾 MINTA BILL' : '🙋‍♂️ MINTA BANTUAN'}
+                          </span>
+                          <span
+                            style={{
+                              background: isHandled ? '#27AE60' : '#F1C40F',
+                              color: isHandled ? '#FFFFFF' : '#070605',
+                            }}
+                            className="px-2 py-0.5 rounded-md text-[0.62rem] font-mono font-bold uppercase"
+                          >
+                            {isHandled ? 'SEDANG DITANGANI' : 'DALAM ANTREAN'}
+                          </span>
+                        </div>
+                        <p style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="text-xs font-mono mb-1 font-medium">
+                          {req.notes || 'Customer memanggil staf waiter ke meja.'}
+                        </p>
+                        <span style={{ color: isDark ? '#A89F91' : '#777777' }} className="text-[0.68rem] font-mono">
+                          Waktu: {req.created_at ? new Date(req.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Baru saja'}
+                          {req.handled_by && ` • Oleh: ${req.handled_by}`}
                         </span>
                       </div>
-                      <p style={{ color: isDark ? '#A89F91' : '#555555' }} className="text-xs font-mono">
-                        {req.notes || 'Customer membutuhkan bantuan staf di meja.'}
-                      </p>
-                    </div>
 
-                    <button
-                      disabled
-                      className="px-3.5 py-2 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-400 text-xs font-mono font-bold uppercase cursor-not-allowed"
-                      title="Aksi penanganan aktif di Fase 4"
-                    >
-                      TANGANI (FASE 4)
-                    </button>
-                  </div>
-                ))}
+                      {/* Request Action Buttons */}
+                      <div className="flex items-center gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                        {!isHandled ? (
+                          <button
+                            onClick={() => handleStartHandlingRequest(req.id, req.table_code)}
+                            disabled={isLoading}
+                            style={{ background: '#F1C40F', color: '#070605' }}
+                            className="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:bg-[#F39C12] active:scale-95 disabled:opacity-50"
+                          >
+                            {isLoading ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <User className="w-3.5 h-3.5" />
+                            )}
+                            <span>TANGANI PANGGILAN</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleCompleteRequest(req.id, req.table_code)}
+                            disabled={isLoading}
+                            style={{ background: '#27AE60', color: '#FFFFFF' }}
+                            className="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:bg-[#2ECC71] active:scale-95 disabled:opacity-50"
+                          >
+                            {isLoading ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <Check className="w-3.5 h-3.5" />
+                            )}
+                            <span>TANDAI SELESAI</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </section>
@@ -1092,7 +1252,60 @@ export default function WaiterFloorPage() {
                 );
               })()}
 
-              {/* Active Orders on this table (if any) */}
+              {/* Active Requests on this table (Phase 4) */}
+              {(() => {
+                const tableReq = activeRequests.find((r) => isSameTable(r.table_code, selectedTable.code));
+                if (tableReq) {
+                  const isHandled = tableReq.status === 'HANDLED';
+                  return (
+                    <div className="mb-4 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[0.68rem] font-mono font-bold text-amber-400">
+                          PANGGILAN AKTIF MEJA INI:
+                        </span>
+                        <span className="px-2 py-0.5 rounded bg-amber-400 text-black text-[0.62rem] font-mono font-bold">
+                          {tableReq.request_type}
+                        </span>
+                      </div>
+                      <p className="text-xs text-white mb-2.5 font-medium">
+                        "{tableReq.notes}"
+                      </p>
+                      {!isHandled ? (
+                        <button
+                          onClick={() => handleStartHandlingRequest(tableReq.id, selectedTable.code)}
+                          disabled={actionLoadingId === tableReq.id}
+                          style={{ background: '#F1C40F', color: '#070605' }}
+                          className="w-full py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                        >
+                          {actionLoadingId === tableReq.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <User className="w-3.5 h-3.5" />
+                          )}
+                          <span>TANGANI PANGGILAN MEJA INI</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleCompleteRequest(tableReq.id, selectedTable.code)}
+                          disabled={actionLoadingId === tableReq.id}
+                          style={{ background: '#27AE60', color: '#FFFFFF' }}
+                          className="w-full py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                        >
+                          {actionLoadingId === tableReq.id ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : (
+                            <Check className="w-3.5 h-3.5" />
+                          )}
+                          <span>SELESAI DITANGANI</span>
+                        </button>
+                      )}
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
+              {/* Active Orders on this table */}
               {(() => {
                 const tableOrders = orders.filter((o) => isSameTable(o.table_id || o.table_code, selectedTable.code));
                 const readyOrder = tableOrders.find((o) => o.order_status === 'READY');
@@ -1111,7 +1324,7 @@ export default function WaiterFloorPage() {
                         onClick={() => handleStartDelivery(readyOrder.id, selectedTable.code)}
                         disabled={actionLoadingId === readyOrder.id}
                         style={{ background: '#9E1F1F', color: '#FFFFFF' }}
-                        className="w-full py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md"
+                        className="w-full py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
                       >
                         {actionLoadingId === readyOrder.id ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1137,7 +1350,7 @@ export default function WaiterFloorPage() {
                         onClick={() => handleCompleteServed(deliveringOrder.id, selectedTable.code)}
                         disabled={actionLoadingId === deliveringOrder.id}
                         style={{ background: '#27AE60', color: '#FFFFFF' }}
-                        className="w-full py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md"
+                        className="w-full py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
                       >
                         {actionLoadingId === deliveringOrder.id ? (
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
