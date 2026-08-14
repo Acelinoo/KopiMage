@@ -271,23 +271,42 @@ export function EditorialHome() {
           2. ABOUT KOPI MAGE (#about) — INDUSTRIAL PAPER SURFACE
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section id="about" className="py-16 lg:py-24 bg-[#161210] border border-white/10 shadow-xl overflow-hidden">
+                <section
+                    id="about"
+                    style={{
+                        background: isDark ? '#161210' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-16 lg:py-24 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden"
+                >
                     <div className="editorial-container">
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-start mb-12 sm:mb-16">
                             <div className="lg:col-span-5 reveal-slide-left">
-                                <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold block mb-4">
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-sans text-[0.72rem] tracking-[0.25em] uppercase font-bold block mb-4"
+                                >
                                     02 / TENTANG KOPI MAGE
                                 </span>
-                                <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl leading-tight font-light mb-6 text-[#FFFFFF]">
+                                <h2
+                                    style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                    className="font-serif text-3xl sm:text-5xl md:text-6xl leading-tight font-bold mb-6"
+                                >
                                     Ruang teduh untuk jeda, percakapan, dan seduhan jujur.
                                 </h2>
-                                <p className="font-sans text-sm sm:text-base text-[#A89F91] leading-relaxed mb-6 font-light">
-                                    KOPIMAGE hadir menghadirkan ruang bernapas di tengah dinamika Soreang dan Margahayu. Mengusung arsitektur <strong className="text-[#C29B7F] font-normal">Industrial Design</strong> yang hangat, kami menyatukan kopi pilihan, hidangan lezat, dan keramahan tulus dalam satu harmoni.
+                                <p
+                                    style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                    className="font-sans text-sm sm:text-base leading-relaxed mb-6 font-light"
+                                >
+                                    KOPIMAGE hadir menghadirkan ruang bernapas di tengah dinamika Soreang dan Margahayu. Mengusung arsitektur <strong style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="font-semibold">Industrial Design</strong> yang hangat, kami menyatukan kopi pilihan, hidangan lezat, dan keramahan tulus dalam satu harmoni.
                                 </p>
-                                <p className="font-sans text-sm sm:text-base text-[#A89F91] leading-relaxed mb-8 font-light">
-                                    Kini melayani Anda di <strong className="text-[#FFFFFF] font-semibold">2 cabang utama</strong>: Cabang Gading Tutuka (Soreang) dan Cabang Lanud Sulaiman (Margahayu).
+                                <p
+                                    style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                    className="font-sans text-sm sm:text-base leading-relaxed mb-8 font-light"
+                                >
+                                    Kini melayani Anda di <strong style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="font-semibold">2 cabang utama</strong>: Cabang Gading Tutuka (Soreang) dan Cabang Lanud Sulaiman (Margahayu).
                                 </p>
-                                <div style={{ background: '#7A1414', borderColor: 'rgba(255,255,255,0.3)' }} className="p-6 border max-w-md rounded shadow-lg quote-highlight-card">
+                                <div style={{ background: '#7A1414', borderColor: 'rgba(255,255,255,0.3)' }} className="p-6 border max-w-md rounded-xl shadow-lg quote-highlight-card">
                                     <span style={{ color: '#FFE600' }} className="font-serif italic text-lg block mb-2 font-bold quote-title">
                                         "Kopi Enak, Suasana Nyaman, Live Music Asik."
                                     </span>
@@ -298,7 +317,12 @@ export function EditorialHome() {
                             </div>
 
                             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div className="editorial-img-wrapper h-[260px] sm:h-[360px] md:h-[400px] reveal-scale-pop border border-[#FFFFFF]/10 ">
+                                <div
+                                    style={{
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.25)',
+                                    }}
+                                    className="editorial-img-wrapper h-[260px] sm:h-[360px] md:h-[400px] reveal-scale-pop border rounded-2xl overflow-hidden shadow-md"
+                                >
                                     <Image
                                         src="/images/kopimage_space_morning.webp"
                                         alt="Suasana Pagi Kopi Mage"
@@ -309,7 +333,13 @@ export function EditorialHome() {
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
                                     />
                                 </div>
-                                <div className="editorial-img-wrapper h-[260px] sm:h-[360px] md:h-[400px] sm:mt-12 reveal-scale-pop border border-[#FFFFFF]/10 " style={{ transitionDelay: '0.2s' }}>
+                                <div
+                                    style={{
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.25)',
+                                        transitionDelay: '0.2s'
+                                    }}
+                                    className="editorial-img-wrapper h-[260px] sm:h-[360px] md:h-[400px] sm:mt-12 reveal-scale-pop border rounded-2xl overflow-hidden shadow-md"
+                                >
                                     <Image
                                         src="/images/WFC.webp"
                                         alt="Suasana Malam Kopi Mage Lanud Sulaiman"
@@ -330,24 +360,53 @@ export function EditorialHome() {
           2.3. KATALOG MENU BEST SELLER (#menu) — DROPDOWN COLLAPSIBLE SHOWCASE
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section id="menu" className="py-12 lg:py-16 bg-[#0E0B0A] rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden transition-all">
+                <section
+                    id="menu"
+                    style={{
+                        background: isDark ? '#0E0B0A' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-12 lg:py-16 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden transition-all"
+                >
                     <div className="editorial-container">
                         {/* Collapsible Header Block */}
-                        <div className="p-5 sm:p-8 border border-[#B82E2E]/30 bg-[#161210] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-lg reveal-fade-up">
+                        <div
+                            style={{
+                                background: isDark ? '#161210' : '#FAF7F5',
+                                borderColor: isDark ? 'rgba(184, 46, 46, 0.3)' : '#9E1F1F',
+                            }}
+                            className="p-5 sm:p-8 border rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-md reveal-fade-up"
+                        >
                             <div className="flex items-start sm:items-center gap-4">
                                 <div>
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className="font-sans text-[0.68rem] tracking-[0.22em] uppercase text-[#B82E2E] font-semibold">
+                                        <span
+                                            style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                            className="font-sans text-[0.68rem] tracking-[0.22em] uppercase font-bold"
+                                        >
                                             MENU BEST SELLER KOPI MAGE
                                         </span>
-                                        <span className="px-2 py-0.5 bg-[#B82E2E]/20 text-[#C29B7F] text-[0.62rem] font-sans tracking-wider uppercase font-semibold rounded-md border border-[#B82E2E]/30">
+                                        <span
+                                            style={{
+                                                background: isDark ? 'rgba(184, 46, 46, 0.2)' : '#F5EBEB',
+                                                borderColor: isDark ? 'rgba(184, 46, 46, 0.3)' : '#9E1F1F',
+                                                color: isDark ? '#D4A373' : '#9E1F1F',
+                                            }}
+                                            className="px-2 py-0.5 text-[0.62rem] font-sans tracking-wider uppercase font-bold rounded-md border"
+                                        >
                                             FAVORIT PENGUNJUNG
                                         </span>
                                     </div>
-                                    <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#FFFFFF]">
-                                        Pilihan Racikan & Hidangan Terbaik
+                                    <h2
+                                        style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                        className="font-serif text-2xl sm:text-3xl font-bold"
+                                    >
+                                        Pilihan Racikan &amp; Hidangan Terbaik
                                     </h2>
-                                    <p className="font-sans text-xs text-[#A89F91] font-light mt-1 max-w-2xl leading-relaxed">
+                                    <p
+                                        style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                        className="font-sans text-xs font-light mt-1 max-w-2xl leading-relaxed"
+                                    >
                                         {isMenuExpanded
                                             ? 'Koleksi sajian kopi pilihan, minuman segar, dan hidangan signature KOPIMAGE. Silakan jelajahi pilihan favorit dan nikmati kemudahan pemesanan langsung dari meja Anda.'
                                             : 'Buka katalog untuk menjelajahi sajian racikan kopi dan hidangan signature terfavorit.'}
@@ -358,7 +417,8 @@ export function EditorialHome() {
                             {/* Interactive Expand / Collapse Dropdown Button */}
                             <button
                                 onClick={() => setIsMenuExpanded(!isMenuExpanded)}
-                                className="inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-[#B82E2E] text-[#FFFFFF] hover:bg-[#D63434] transition-all text-xs tracking-wider uppercase font-semibold border border-[#B82E2E] shadow-sm shrink-0 group cursor-pointer w-full sm:w-auto"
+                                style={{ background: '#9E1F1F', color: '#FFFFFF', borderColor: '#9E1F1F' }}
+                                className="inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl hover:opacity-90 transition-all text-xs tracking-wider uppercase font-bold border shadow-md shrink-0 group cursor-pointer w-full sm:w-auto"
                             >
                                 <span>{isMenuExpanded ? 'TUTUP KATALOG' : 'JELAJAHI MENU BEST SELLER'}</span>
                                 {isMenuExpanded ? (
@@ -379,17 +439,23 @@ export function EditorialHome() {
                                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                                     className="overflow-hidden"
                                 >
-                                    <div className="mt-8 pt-8 border-t border-[#FFFFFF]/10">
+                                    <div
+                                        style={{
+                                            borderTopColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                                        }}
+                                        className="mt-8 pt-8 border-t"
+                                    >
                                         {/* Category Filter Pills (Read-Only) */}
                                         <div className="flex flex-wrap gap-2.5 mb-8 overflow-x-auto pb-2">
                                             {menuCategories.map(cat => (
                                                 <button
                                                     key={cat.id}
                                                     onClick={() => setActiveMenuCategory(cat.id)}
-                                                    className={`px-5 py-2.5 rounded-full font-sans text-xs tracking-wider uppercase transition-all whitespace-nowrap ${activeMenuCategory === cat.id
-                                                        ? 'bg-[#B82E2E] text-[#FFFFFF] font-semibold shadow-sm'
-                                                        : 'bg-[#161210] text-[#A89F91] hover:text-[#FFFFFF] border border-[#FFFFFF]/10 hover:border-[#B82E2E]/40'
-                                                        }`}
+                                                    style={activeMenuCategory === cat.id
+                                                        ? { background: '#9E1F1F', color: '#FFFFFF', borderColor: '#9E1F1F', fontWeight: 'bold' }
+                                                        : { background: isDark ? '#161210' : '#FAF7F5', borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F', color: isDark ? '#A89F91' : '#1A1A1A' }
+                                                    }
+                                                    className="px-5 py-2.5 rounded-full font-sans text-xs tracking-wider uppercase transition-all whitespace-nowrap border cursor-pointer shadow-sm"
                                                 >
                                                     {cat.name}
                                                 </button>
@@ -402,11 +468,21 @@ export function EditorialHome() {
                                                 <div
                                                     key={item.id}
                                                     onClick={() => setSelectedDetailItem(item)}
-                                                    className="p-5 border border-[#FFFFFF]/10 bg-[#161210] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#B82E2E]/40 transition-all group cursor-pointer"
+                                                    style={{
+                                                        background: isDark ? '#161210' : '#FAF7F5',
+                                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.25)',
+                                                    }}
+                                                    className="p-5 border rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#9E1F1F] transition-all group cursor-pointer shadow-sm"
                                                 >
                                                     <div className="flex items-center gap-4">
                                                         {item.image && (
-                                                            <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-[#0E0B0A] border border-[#FFFFFF]/05 shrink-0">
+                                                            <div
+                                                                style={{
+                                                                    background: isDark ? '#0E0B0A' : '#FFFFFF',
+                                                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                                                }}
+                                                                className="relative w-20 h-20 rounded-xl overflow-hidden border shrink-0"
+                                                            >
                                                                 <Image
                                                                     src={item.image}
                                                                     alt={item.name}
@@ -420,25 +496,51 @@ export function EditorialHome() {
                                                         )}
                                                         <div>
                                                             <div className="flex items-center gap-2 mb-1">
-                                                                <span className="px-2 py-0.5 bg-[#B82E2E] text-[#FFFFFF] text-[0.6rem] font-sans tracking-wider uppercase font-semibold rounded-md shadow-sm">
+                                                                <span className="px-2 py-0.5 bg-[#9E1F1F] text-[#FFFFFF] text-[0.6rem] font-sans tracking-wider uppercase font-bold rounded-md shadow-sm">
                                                                     BEST SELLER
                                                                 </span>
-                                                                <span className="px-2 py-0.5 bg-[#FFFFFF]/05 text-[#C29B7F] text-[0.6rem] font-sans tracking-wider uppercase font-medium rounded-md border border-[#FFFFFF]/10">
+                                                                <span
+                                                                    style={{
+                                                                        color: isDark ? '#D4A373' : '#9E1F1F',
+                                                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.3)',
+                                                                        background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#FFFFFF',
+                                                                    }}
+                                                                    className="px-2 py-0.5 text-[0.6rem] font-sans tracking-wider uppercase font-bold rounded-md border"
+                                                                >
                                                                     KLIK UNTUK DETAIL ↗
                                                                 </span>
                                                             </div>
-                                                            <h3 className="font-serif text-lg font-normal text-[#FFFFFF] group-hover:text-[#C29B7F] transition-colors">
+                                                            <h3
+                                                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                                                className="font-serif text-lg font-bold group-hover:text-[#9E1F1F] transition-colors"
+                                                            >
                                                                 {item.name}
                                                             </h3>
-                                                            <p className="font-sans text-xs text-[#A89F91] font-light leading-relaxed max-w-lg">
+                                                            <p
+                                                                style={{ color: isDark ? '#A89F91' : '#555555' }}
+                                                                className="font-sans text-xs font-light leading-relaxed max-w-lg"
+                                                            >
                                                                 {item.description || 'Racikan khas berkualitas disajikan hangat di Kopi Mage.'}
                                                             </p>
                                                         </div>
                                                     </div>
 
-                                                    <div className="pt-2 sm:pt-0 sm:border-l sm:border-[#FFFFFF]/08 sm:pl-6 flex sm:flex-col items-center sm:items-end justify-between shrink-0">
-                                                        <span className="font-sans text-[0.65rem] tracking-wider uppercase text-[#9E9287]">HARGA</span>
-                                                        <span className="font-serif text-xl font-medium text-[#C29B7F]">
+                                                    <div
+                                                        style={{
+                                                            borderLeftColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                                                        }}
+                                                        className="pt-2 sm:pt-0 sm:border-l sm:pl-6 flex sm:flex-col items-center sm:items-end justify-between shrink-0"
+                                                    >
+                                                        <span
+                                                            style={{ color: isDark ? '#A89F91' : '#777777' }}
+                                                            className="font-sans text-[0.65rem] tracking-wider uppercase font-bold"
+                                                        >
+                                                            HARGA
+                                                        </span>
+                                                        <span
+                                                            style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                                            className="font-serif text-xl font-bold"
+                                                        >
                                                             {item.price.includes('K') || item.price.includes('Rp') ? item.price : `Rp ${item.price}`}
                                                         </span>
                                                     </div>
@@ -452,21 +554,42 @@ export function EditorialHome() {
                                         />
 
                                         {/* Informational QR Barcode Banner */}
-                                        <div className="p-5 sm:p-6 border border-[#B82E2E]/30 bg-[#161210] rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+                                        <div
+                                            style={{
+                                                background: isDark ? '#161210' : '#FAF7F5',
+                                                borderColor: isDark ? 'rgba(184, 46, 46, 0.3)' : '#9E1F1F',
+                                            }}
+                                            className="p-5 sm:p-6 border rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 mb-8 shadow-sm"
+                                        >
                                             <div className="flex items-center gap-4">
-                                                <div className="w-12 h-12 rounded-xl bg-[#B82E2E]/15 border border-[#B82E2E]/30 flex items-center justify-center shrink-0">
-                                                    <QrCode className="w-6 h-6 text-[#B82E2E]" />
+                                                <div
+                                                    style={{
+                                                        background: isDark ? 'rgba(184, 46, 46, 0.15)' : '#F5EBEB',
+                                                        borderColor: isDark ? 'rgba(184, 46, 46, 0.3)' : '#9E1F1F',
+                                                    }}
+                                                    className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0"
+                                                >
+                                                    <QrCode className="w-6 h-6 text-[#9E1F1F]" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-serif text-lg text-[#FFFFFF] font-normal">Pemesanan Langsung Dari Meja</h4>
-                                                    <p className="font-sans text-xs text-[#A89F91] font-light leading-relaxed mt-0.5">
+                                                    <h4
+                                                        style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                                        className="font-serif text-lg font-bold"
+                                                    >
+                                                        Pemesanan Langsung Dari Meja
+                                                    </h4>
+                                                    <p
+                                                        style={{ color: isDark ? '#A89F91' : '#555555' }}
+                                                        className="font-sans text-xs font-light leading-relaxed mt-0.5"
+                                                    >
                                                         Saat berkunjung ke cabang Gading Tutuka atau Lanud Sulaiman, silakan duduk nyaman di meja Anda dan pindai stiker QR yang tersedia untuk melakukan pemesanan instan tanpa perlu mengantre.
                                                     </p>
                                                 </div>
                                             </div>
                                             <a
                                                 href="#experience"
-                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#B82E2E] text-[#FFFFFF] text-xs font-sans tracking-wider uppercase font-semibold hover:bg-[#D63434] transition-colors shrink-0 w-full sm:w-auto text-center justify-center"
+                                                style={{ background: '#9E1F1F', color: '#FFFFFF' }}
+                                                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-sans tracking-wider uppercase font-bold hover:opacity-90 transition-opacity shrink-0 w-full sm:w-auto text-center justify-center shadow-sm"
                                             >
                                                 <span>PANDUAN PESAN MEJA</span>
                                                 <ArrowRight className="w-3.5 h-3.5" />
@@ -477,10 +600,15 @@ export function EditorialHome() {
                                         <div className="flex justify-center pt-2">
                                             <button
                                                 onClick={() => setIsMenuExpanded(false)}
-                                                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#FFFFFF]/20 bg-[#161210] text-[#A89F91] hover:text-[#FFFFFF] hover:border-[#B82E2E] transition-all text-xs font-sans tracking-wider uppercase font-medium cursor-pointer"
+                                                style={{
+                                                    background: isDark ? '#161210' : '#FAF7F5',
+                                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : '#9E1F1F',
+                                                    color: isDark ? '#A89F91' : '#1A1A1A',
+                                                }}
+                                                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border transition-all text-xs font-sans tracking-wider uppercase font-bold cursor-pointer shadow-sm"
                                             >
                                                 <span>TUTUP KATALOG BEST SELLER</span>
-                                                <ChevronUp className="w-4 h-4 text-[#B82E2E]" />
+                                                <ChevronUp className="w-4 h-4 text-[#9E1F1F]" />
                                             </button>
                                         </div>
                                     </div>
@@ -495,11 +623,23 @@ export function EditorialHome() {
           2.5. LIVE MUSIC & EVENT HIGHLIGHT (#livemusic)
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section id="livemusic" className="py-16 lg:py-24 bg-[#0E0B0A]  border border-white/10 shadow-xl overflow-hidden">
+                <section
+                    id="livemusic"
+                    style={{
+                        background: isDark ? '#0E0B0A' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-16 lg:py-24 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden"
+                >
                     <div className="editorial-container">
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                             <div className="lg:col-span-6 reveal-slide-left">
-                                <div className="relative h-[280px] sm:h-[400px] lg:h-[480px] w-full editorial-img-wrapper border border-[#B82E2E]/30 overflow-hidden shadow-lg">
+                                <div
+                                    style={{
+                                        borderColor: isDark ? 'rgba(184, 46, 46, 0.3)' : 'rgba(158, 31, 31, 0.25)',
+                                    }}
+                                    className="relative h-[280px] sm:h-[400px] lg:h-[480px] w-full editorial-img-wrapper border overflow-hidden rounded-2xl shadow-lg"
+                                >
                                     <Image
                                         src="/images/Moments-Live music.webp"
                                         alt="Live Music Acoustic Session di Kopi Mage"
@@ -509,9 +649,18 @@ export function EditorialHome() {
                                         className="object-cover"
                                         sizes="(max-width: 1024px) 100vw, 50vw"
                                     />
-                                    <div className="absolute top-4 left-4 bg-[#0E0B0A]/90 backdrop-blur-md px-3 sm:px-4 py-2 border border-[#B82E2E]/40  flex items-center gap-2 shadow-sm">
-                                        <Music className="w-4 h-4 text-[#B82E2E] animate-pulse" />
-                                        <span className="font-sans text-[0.62rem] sm:text-[0.65rem] tracking-[0.18em] sm:tracking-[0.2em] uppercase text-[#FFFFFF] font-semibold">
+                                    <div
+                                        style={{
+                                            background: isDark ? 'rgba(14, 11, 10, 0.9)' : 'rgba(255, 255, 255, 0.95)',
+                                            borderColor: isDark ? 'rgba(184, 46, 46, 0.4)' : '#9E1F1F',
+                                        }}
+                                        className="absolute top-4 left-4 backdrop-blur-md px-3 sm:px-4 py-2 border rounded-xl flex items-center gap-2 shadow-md"
+                                    >
+                                        <Music className="w-4 h-4 text-[#9E1F1F] animate-pulse" />
+                                        <span
+                                            style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                            className="font-sans text-[0.62rem] sm:text-[0.65rem] tracking-[0.18em] sm:tracking-[0.2em] uppercase font-bold"
+                                        >
                                             LIVE MUSIC EVERY WEEKEND
                                         </span>
                                     </div>
@@ -519,28 +668,63 @@ export function EditorialHome() {
                             </div>
 
                             <div className="lg:col-span-6 reveal-slide-right">
-                                <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold block mb-4">
-                                    03 / LIVE MUSIC & EVENT
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-sans text-[0.72rem] tracking-[0.25em] uppercase font-bold block mb-4"
+                                >
+                                    03 / LIVE MUSIC &amp; EVENT
                                 </span>
-                                <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light leading-tight mb-6 text-[#FFFFFF]">
+                                <h2
+                                    style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                    className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold leading-tight mb-6"
+                                >
                                     Malam mingguan makin seru bareng Live Music.
                                 </h2>
-                                <p className="font-sans text-sm sm:text-base text-[#A89F91] font-light leading-relaxed mb-6">
+                                <p
+                                    style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                    className="font-sans text-sm sm:text-base font-light leading-relaxed mb-6"
+                                >
                                     Tiap akhir pekan, Kopi Mage ngadain sesi live music akustik dari talenta lokal. Nikmatin alunan lagu favorit sambil nyeruput cangkir kopi pilihan dan cemilan kesukaanmu.
                                 </p>
-                                <div className="space-y-4 font-sans text-xs text-[#A89F91] font-light">
-                                    <div className="p-4 border border-[#FFFFFF]/10 bg-[#161210] flex items-center gap-4 shadow-sm">
-                                        <Music className="w-5 h-5 text-[#B82E2E] shrink-0" />
+                                <div className="space-y-4 font-sans text-xs">
+                                    <div
+                                        style={{
+                                            background: isDark ? '#161210' : '#FAF7F5',
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.25)',
+                                        }}
+                                        className="p-4 border rounded-xl flex items-center gap-4 shadow-sm"
+                                    >
+                                        <Music className="w-5 h-5 text-[#9E1F1F] shrink-0" />
                                         <div>
-                                            <span className="font-semibold text-[#FFFFFF] block text-sm">Akustik & Pop Santai</span>
-                                            <span>Playlist asik yang bikin suasana makin hidup dan tetep enak buat ngobrol.</span>
+                                            <span
+                                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                                className="font-bold block text-sm mb-0.5"
+                                            >
+                                                Akustik &amp; Pop Santai
+                                            </span>
+                                            <span style={{ color: isDark ? '#A89F91' : '#555555' }}>
+                                                Playlist asik yang bikin suasana makin hidup dan tetep enak buat ngobrol.
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="p-4 border border-[#FFFFFF]/10 bg-[#161210]  flex items-center gap-4 shadow-sm">
-                                        <Users className="w-5 h-5 text-[#C29B7F] shrink-0" />
+                                    <div
+                                        style={{
+                                            background: isDark ? '#161210' : '#FAF7F5',
+                                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.25)',
+                                        }}
+                                        className="p-4 border rounded-xl flex items-center gap-4 shadow-sm"
+                                    >
+                                        <Users className="w-5 h-5 text-[#9E1F1F] shrink-0" />
                                         <div>
-                                            <span className="font-semibold text-[#FFFFFF] block text-sm">Bebas Ajak Siapa Aja</span>
-                                            <span>Ajak temen satu circle, keluarga, atau pasangan buat nikmatin malam bareng di Kopi Mage.</span>
+                                            <span
+                                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                                className="font-bold block text-sm mb-0.5"
+                                            >
+                                                Bebas Ajak Siapa Aja
+                                            </span>
+                                            <span style={{ color: isDark ? '#A89F91' : '#555555' }}>
+                                                Ajak temen satu circle, keluarga, atau pasangan buat nikmatin malam bareng di Kopi Mage.
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -554,17 +738,38 @@ export function EditorialHome() {
           2.8. CIRCULAR GALLERY 3D (MOMEN SERU COPY)
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section id="moments" style={{ background: '#0E0B0A' }} className="py-16 lg:py-24  border border-white/10 shadow-xl overflow-hidden">
+                <section
+                    id="moments"
+                    style={{
+                        background: isDark ? '#0E0B0A' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-16 lg:py-24 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden"
+                >
                     <div className="editorial-container mb-8 sm:mb-12 reveal-fade-up">
-                        <div className="flex flex-col text-left border-b border-[#FFFFFF]/10 pb-6 max-w-2xl">
-                            <span style={{ color: '#FFE600' }} className="font-sans text-[0.7rem] tracking-[0.25em] uppercase font-bold block mb-2">
-                                GALERI & MOMEN SERU
+                        <div
+                            style={{
+                                borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                            }}
+                            className="flex flex-col text-left border-b pb-6 max-w-2xl"
+                        >
+                            <span
+                                style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                className="font-sans text-[0.72rem] tracking-[0.25em] uppercase font-bold block mb-2"
+                            >
+                                GALERI &amp; MOMEN SERU
                             </span>
-                            <h2 style={{ color: '#FFFFFF' }} className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light mb-3">
+                            <h2
+                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold mb-3"
+                            >
                                 Momen-Momen Seru di KOPIMAGE
                             </h2>
-                            <p style={{ color: '#FFFFFF' }} className="font-sans text-xs sm:text-sm font-light leading-relaxed">
-                                Geser atau putar kartu 3D di bawah ini buat ngintip keseruan nongkrong, live music, bukber, dan kehangatan bareng temen & pasangan di Kopi Mage.
+                            <p
+                                style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                className="font-sans text-xs sm:text-sm font-light leading-relaxed"
+                            >
+                                Geser atau putar kartu 3D di bawah ini buat ngintip keseruan nongkrong, live music, bukber, dan kehangatan bareng temen &amp; pasangan di Kopi Mage.
                             </p>
                         </div>
                     </div>
@@ -573,7 +778,7 @@ export function EditorialHome() {
                     <div className="reveal-blur-focus relative w-full h-[480px] sm:h-[560px] md:h-[640px]">
                         <CircularGallery
                             bend={0}
-                            textColor="#FFFFFF"
+                            textColor={isDark ? '#FFFFFF' : '#1A1A1A'}
                             borderRadius={0.05}
                             scrollEase={0.12}
                             scrollSpeed={2.5}
@@ -589,23 +794,49 @@ export function EditorialHome() {
           3. THE SPACE (#space) - INDUSTRIAL SPACE
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section id="space" className="py-16 lg:py-24 bg-[#0E0B0A] border border-white/10 shadow-xl overflow-hidden">
+                <section
+                    id="space"
+                    style={{
+                        background: isDark ? '#0E0B0A' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-16 lg:py-24 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden"
+                >
                     <div className="editorial-container">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 pb-6 border-b border-[#FFFFFF]/10 reveal-fade-up">
+                        <div
+                            style={{
+                                borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                            }}
+                            className="flex flex-col md:flex-row md:items-end justify-between mb-10 sm:mb-16 pb-6 border-b reveal-fade-up"
+                        >
                             <div>
-                                <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold block mb-2">
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-sans text-[0.72rem] tracking-[0.25em] uppercase font-bold block mb-2"
+                                >
                                     04 / AREA NONGKRONG
                                 </span>
-                                <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[#FFFFFF]">
-                                    Fasilitas & Ruang
+                                <h2
+                                    style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                    className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold"
+                                >
+                                    Fasilitas &amp; Ruang
                                 </h2>
                             </div>
-                            <p className="font-sans text-xs sm:text-sm text-[#A89F91] max-w-md font-light mt-4 md:mt-0">
-                                Konsep industrial kayu & besi raw yang adem bikin kamu betah berlama-lama, mau buat nugas, WFC, atau ngobrol santai.
+                            <p
+                                style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                className="font-sans text-xs sm:text-sm max-w-md font-light mt-4 md:mt-0"
+                            >
+                                Konsep industrial kayu &amp; besi raw yang adem bikin kamu betah berlama-lama, mau buat nugas, WFC, atau ngobrol santai.
                             </p>
                         </div>
 
-                        <div className="editorial-img-wrapper h-[35vh] sm:h-[55vh] lg:h-[75vh] w-full mb-8 sm:mb-12 reveal-blur-focus border border-[#FFFFFF]/10 ">
+                        <div
+                            style={{
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.25)',
+                            }}
+                            className="editorial-img-wrapper h-[35vh] sm:h-[55vh] lg:h-[75vh] w-full mb-8 sm:mb-12 reveal-blur-focus border rounded-2xl overflow-hidden shadow-md"
+                        >
                             <Image
                                 src="/images/kopimage_space_terrace_1786480961312.webp"
                                 alt="Teras Kopi Mage Industrial Design"
@@ -618,22 +849,66 @@ export function EditorialHome() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 pt-4 sm:pt-6">
-                            <div className="p-5 sm:p-6 border border-[#B82E2E]/25 bg-[#161210]  shadow-sm reveal-step-card">
-                                <span className="font-serif text-xl sm:text-2xl text-[#C29B7F] block mb-2 font-medium">Teras & Indoor Lega</span>
-                                <p className="font-sans text-xs text-[#A89F91] leading-relaxed">
+                            <div
+                                style={{
+                                    background: isDark ? '#161210' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(184, 46, 46, 0.25)' : '#9E1F1F',
+                                }}
+                                className="p-5 sm:p-6 border rounded-2xl shadow-sm reveal-step-card"
+                            >
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-serif text-xl sm:text-2xl block mb-2 font-bold"
+                                >
+                                    Teras &amp; Indoor Lega
+                                </span>
+                                <p
+                                    style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                    className="font-sans text-xs leading-relaxed font-light"
+                                >
                                     Bebas pilih meja indoor ber-AC yang nyaman atau area teras outdoor sejuk buat nongkrong santai.
                                 </p>
                             </div>
-                            <div className="p-5 sm:p-6 border border-[#B82E2E]/25 bg-[#161210]  shadow-sm reveal-step-card" style={{ transitionDelay: '0.15s' }}>
-                                <span className="font-serif text-xl sm:text-2xl text-[#C29B7F] block mb-2 font-medium">WiFi Kenceng & Colokan</span>
-                                <p className="font-sans text-xs text-[#A89F91] leading-relaxed">
+                            <div
+                                style={{
+                                    background: isDark ? '#161210' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(184, 46, 46, 0.25)' : '#9E1F1F',
+                                    transitionDelay: '0.15s'
+                                }}
+                                className="p-5 sm:p-6 border rounded-2xl shadow-sm reveal-step-card"
+                            >
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-serif text-xl sm:text-2xl block mb-2 font-bold"
+                                >
+                                    WiFi Kenceng &amp; Colokan
+                                </span>
+                                <p
+                                    style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                    className="font-sans text-xs leading-relaxed font-light"
+                                >
                                     Colokan listrik melimpah di setiap area dan koneksi WiFi stabil buat nugas atau kerja remote seharian.
                                 </p>
                             </div>
-                            <div className="p-5 sm:p-6 border border-[#B82E2E]/25 bg-[#161210]  shadow-sm reveal-step-card" style={{ transitionDelay: '0.3s' }}>
-                                <span className="font-serif text-xl sm:text-2xl text-[#C29B7F] block mb-2 font-medium">Parkir Luas & Aman</span>
-                                <p className="font-sans text-xs text-[#A89F91] leading-relaxed">
-                                    Lahan parkir lega dan aman buat kendaraan motor maupun mobil di cabang Gading Tutuka & Lanud Sulaiman.
+                            <div
+                                style={{
+                                    background: isDark ? '#161210' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(184, 46, 46, 0.25)' : '#9E1F1F',
+                                    transitionDelay: '0.3s'
+                                }}
+                                className="p-5 sm:p-6 border rounded-2xl shadow-sm reveal-step-card"
+                            >
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-serif text-xl sm:text-2xl block mb-2 font-bold"
+                                >
+                                    Parkir Luas &amp; Aman
+                                </span>
+                                <p
+                                    style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                    className="font-sans text-xs leading-relaxed font-light"
+                                >
+                                    Lahan parkir lega dan aman buat kendaraan motor maupun mobil di cabang Gading Tutuka &amp; Lanud Sulaiman.
                                 </p>
                             </div>
                         </div>
@@ -645,88 +920,151 @@ export function EditorialHome() {
           4. THE EXPERIENCE (#experience) - PESAN QR MEJA
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section id="experience" className="py-16 lg:py-24 bg-[#161210] rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden">
+                <section
+                    id="experience"
+                    style={{
+                        background: isDark ? '#161210' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-16 lg:py-24 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden"
+                >
                     <div className="editorial-container">
                         <div className="max-w-2xl mb-12 sm:mb-16 reveal-slide-left">
-                            <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold block mb-4">
+                            <span
+                                style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                className="font-sans text-[0.72rem] tracking-[0.25em] uppercase font-bold block mb-4"
+                            >
                                 05 / LAYANAN MEJA
                             </span>
-                            <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light mb-4 text-[#FFFFFF]">
+                            <h2
+                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold mb-4"
+                            >
                                 Pesan Dari Meja Tanpa Perlu Antre
                             </h2>
-                            <p className="font-sans text-xs sm:text-sm text-[#A89F91] font-light leading-relaxed">
+                            <p
+                                style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                className="font-sans text-xs sm:text-sm font-light leading-relaxed"
+                            >
                                 Tinggal cari meja favoritmu, scan stiker QR di meja lewat HP, terus pilih menu kesukaanmu secara praktis.
                             </p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-                            <div className={`p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-xl shadow-sm reveal-step-card transition-colors ${
-                                isDark 
-                                    ? 'bg-[#0E0B0A] border border-white/10' 
-                                    : 'bg-white border border-[#9E1F1F]'
-                            }`}>
-                                <span className={`font-serif text-3xl sm:text-4xl font-light ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`}>
+                            <div
+                                style={{
+                                    background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                }}
+                                className="p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-2xl border shadow-sm reveal-step-card transition-colors"
+                            >
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-serif text-3xl sm:text-4xl font-bold"
+                                >
                                     01
                                 </span>
                                 <div>
-                                    <h3 className={`font-serif text-xl sm:text-2xl mb-2 font-medium ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                    <h3
+                                        style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                        className="font-serif text-xl sm:text-2xl mb-2 font-bold"
+                                    >
                                         DUDUK
                                     </h3>
-                                    <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
+                                    <p
+                                        style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                        className="font-sans text-xs font-light"
+                                    >
                                         Silakan pilih area duduk favorit Anda di ruang indoor ber-AC maupun teras luar.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className={`p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-xl shadow-sm reveal-step-card transition-colors ${
-                                isDark 
-                                    ? 'bg-[#0E0B0A] border border-white/10' 
-                                    : 'bg-white border border-[#9E1F1F]'
-                            }`} style={{ transitionDelay: '0.15s' }}>
-                                <span className={`font-serif text-3xl sm:text-4xl font-light ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`}>
+                            <div
+                                style={{
+                                    background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                    transitionDelay: '0.15s'
+                                }}
+                                className="p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-2xl border shadow-sm reveal-step-card transition-colors"
+                            >
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-serif text-3xl sm:text-4xl font-bold"
+                                >
                                     02
                                 </span>
                                 <div>
-                                    <h3 className={`font-serif text-xl sm:text-2xl mb-2 font-medium ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                    <h3
+                                        style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                        className="font-serif text-xl sm:text-2xl mb-2 font-bold"
+                                    >
                                         SCAN QR
                                     </h3>
-                                    <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
+                                    <p
+                                        style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                        className="font-sans text-xs font-light"
+                                    >
                                         Buka kamera ponsel dan pindai stiker kode QR yang tertera pada meja Anda.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className={`p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-xl shadow-sm reveal-step-card transition-colors ${
-                                isDark 
-                                    ? 'bg-[#0E0B0A] border border-white/10' 
-                                    : 'bg-white border border-[#9E1F1F]'
-                            }`} style={{ transitionDelay: '0.3s' }}>
-                                <span className={`font-serif text-3xl sm:text-4xl font-light ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`}>
+                            <div
+                                style={{
+                                    background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                    transitionDelay: '0.3s'
+                                }}
+                                className="p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-2xl border shadow-sm reveal-step-card transition-colors"
+                            >
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-serif text-3xl sm:text-4xl font-bold"
+                                >
                                     03
                                 </span>
                                 <div>
-                                    <h3 className={`font-serif text-xl sm:text-2xl mb-2 font-medium ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                    <h3
+                                        style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                        className="font-serif text-xl sm:text-2xl mb-2 font-bold"
+                                    >
                                         PILIH MENU
                                     </h3>
-                                    <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
+                                    <p
+                                        style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                        className="font-sans text-xs font-light"
+                                    >
                                         Tentukan racikan kopi, minuman segar, cemilan, atau hidangan utama pilihan.
                                     </p>
                                 </div>
                             </div>
 
-                            <div className={`p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-xl shadow-sm reveal-step-card transition-colors ${
-                                isDark 
-                                    ? 'bg-[#0E0B0A] border border-white/10' 
-                                    : 'bg-white border border-[#9E1F1F]'
-                            }`} style={{ transitionDelay: '0.45s' }}>
-                                <span className={`font-serif text-3xl sm:text-4xl font-light ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`}>
+                            <div
+                                style={{
+                                    background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                    transitionDelay: '0.45s'
+                                }}
+                                className="p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-2xl border shadow-sm reveal-step-card transition-colors"
+                            >
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-serif text-3xl sm:text-4xl font-bold"
+                                >
                                     04
                                 </span>
                                 <div>
-                                    <h3 className={`font-serif text-xl sm:text-2xl mb-2 font-medium ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                    <h3
+                                        style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                        className="font-serif text-xl sm:text-2xl mb-2 font-bold"
+                                    >
                                         NIKMATI
                                     </h3>
-                                    <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
+                                    <p
+                                        style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                        className="font-sans text-xs font-light"
+                                    >
                                         Pesanan Anda segera diracik segar dan diantarkan langsung ke meja Anda.
                                     </p>
                                 </div>
@@ -740,25 +1078,53 @@ export function EditorialHome() {
           5. DUAL-ROW UNLIMITED MOVING RATINGS MARQUEE (#ratings)
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section className="py-16 lg:py-24 bg-[#0E0B0A] border border-white/10 shadow-xl overflow-hidden marquee-container">
+                <section
+                    id="ratings"
+                    style={{
+                        background: isDark ? '#0E0B0A' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-16 lg:py-24 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden marquee-container"
+                >
                     <div className="editorial-container mb-8 sm:mb-12 reveal-fade-up">
-                        <div className="flex flex-col sm:flex-row sm:items-end justify-between border-b border-[#FFFFFF]/10 pb-6">
+                        <div
+                            style={{
+                                borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                            }}
+                            className="flex flex-col sm:flex-row sm:items-end justify-between border-b pb-6"
+                        >
                             <div>
-                                <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold block mb-2">
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-sans text-[0.72rem] tracking-[0.25em] uppercase font-bold block mb-2"
+                                >
                                     06 / KATA PENGUNJUNG
                                 </span>
-                                <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[#FFFFFF]">
+                                <h2
+                                    style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                    className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold"
+                                >
                                     Kata Mereka Tentang Kopi Mage
                                 </h2>
                             </div>
                             <div className="flex items-center gap-2 mt-4 sm:mt-0">
-                                <div className="flex text-[#B82E2E]">
+                                <div className="flex text-[#9E1F1F]">
                                     {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className="w-4 h-4 fill-[#B82E2E]" />
+                                        <Star key={i} className="w-4 h-4 fill-[#9E1F1F] text-[#9E1F1F]" />
                                     ))}
                                 </div>
-                                <span className="font-sans text-sm text-[#FFFFFF] font-semibold ml-1">4.9 / 5.0</span>
-                                <span className="font-sans text-xs text-[#A89F91] font-light">(Google Reviews)</span>
+                                <span
+                                    style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                    className="font-sans text-sm font-bold ml-1"
+                                >
+                                    4.9 / 5.0
+                                </span>
+                                <span
+                                    style={{ color: isDark ? '#A89F91' : '#666666' }}
+                                    className="font-sans text-xs font-light"
+                                >
+                                    (Google Reviews)
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -769,29 +1135,57 @@ export function EditorialHome() {
                             {[...ratingsRow1, ...ratingsRow1, ...ratingsRow1, ...ratingsRow1].map((item, idx) => (
                                 <div
                                     key={`row1-${idx}`}
-                                    className="w-[280px] sm:w-[360px] md:w-[400px] shrink-0 p-5 sm:p-6 border border-[#FFFFFF]/10 bg-[#161210] rounded-2xl shadow-sm hover:shadow-md hover:border-[#B82E2E]/60 transition-all flex flex-col justify-between"
+                                    style={{
+                                        background: isDark ? '#161210' : '#FAF7F5',
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                    }}
+                                    className="w-[280px] sm:w-[360px] md:w-[400px] shrink-0 p-5 sm:p-6 border rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
                                 >
                                     <div>
                                         <div className="flex items-center justify-between mb-4">
-                                            <div className="flex text-[#B82E2E]">
+                                            <div className="flex text-[#9E1F1F]">
                                                 {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} className="w-3.5 h-3.5 fill-[#B82E2E]" />
+                                                    <Star key={i} className="w-3.5 h-3.5 fill-[#9E1F1F] text-[#9E1F1F]" />
                                                 ))}
                                             </div>
-                                            <span className="font-sans text-[0.65rem] text-[#A89F91] uppercase tracking-wider font-medium">
+                                            <span
+                                                style={{ color: isDark ? '#A89F91' : '#777777' }}
+                                                className="font-sans text-[0.65rem] uppercase tracking-wider font-semibold"
+                                            >
                                                 {item.date}
                                             </span>
                                         </div>
-                                        <p className="font-serif italic text-sm sm:text-base text-[#FFFFFF] leading-relaxed mb-6 font-light">
+                                        <p
+                                            style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                            className="font-serif italic text-sm sm:text-base leading-relaxed mb-6 font-medium"
+                                        >
                                             "{item.comment}"
                                         </p>
                                     </div>
-                                    <div className="border-t border-[#FFFFFF]/10 pt-4 flex items-center justify-between">
+                                    <div
+                                        style={{
+                                            borderTopColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                                        }}
+                                        className="border-t pt-4 flex items-center justify-between"
+                                    >
                                         <div>
-                                            <h4 className="font-sans text-xs font-semibold text-[#FFFFFF]">{item.name}</h4>
-                                            <span className="font-sans text-[0.7rem] text-[#A89F91]">{item.role}</span>
+                                            <h4
+                                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                                className="font-sans text-xs font-bold"
+                                            >
+                                                {item.name}
+                                            </h4>
+                                            <span
+                                                style={{ color: isDark ? '#A89F91' : '#666666' }}
+                                                className="font-sans text-[0.7rem]"
+                                            >
+                                                {item.role}
+                                            </span>
                                         </div>
-                                        <span className="font-sans text-[0.65rem] tracking-widest text-[#B82E2E] uppercase font-semibold">
+                                        <span
+                                            style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                            className="font-sans text-[0.65rem] tracking-widest uppercase font-bold"
+                                        >
                                             ULASAN TERVERIFIKASI
                                         </span>
                                     </div>
@@ -806,29 +1200,57 @@ export function EditorialHome() {
                             {[...ratingsRow2, ...ratingsRow2, ...ratingsRow2, ...ratingsRow2].map((item, idx) => (
                                 <div
                                     key={`row2-${idx}`}
-                                    className="w-[280px] sm:w-[360px] md:w-[400px] shrink-0 p-5 sm:p-6 border border-[#FFFFFF]/10 bg-[#161210] shadow-sm hover:shadow-md hover:border-[#B82E2E]/60 transition-all flex flex-col justify-between"
+                                    style={{
+                                        background: isDark ? '#161210' : '#FAF7F5',
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                    }}
+                                    className="w-[280px] sm:w-[360px] md:w-[400px] shrink-0 p-5 sm:p-6 border rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
                                 >
                                     <div>
                                         <div className="flex items-center justify-between mb-4">
-                                            <div className="flex text-[#B82E2E]">
+                                            <div className="flex text-[#9E1F1F]">
                                                 {[...Array(5)].map((_, i) => (
-                                                    <Star key={i} className="w-3.5 h-3.5 fill-[#B82E2E]" />
+                                                    <Star key={i} className="w-3.5 h-3.5 fill-[#9E1F1F] text-[#9E1F1F]" />
                                                 ))}
                                             </div>
-                                            <span className="font-sans text-[0.65rem] text-[#A89F91] uppercase tracking-wider font-medium">
+                                            <span
+                                                style={{ color: isDark ? '#A89F91' : '#777777' }}
+                                                className="font-sans text-[0.65rem] uppercase tracking-wider font-semibold"
+                                            >
                                                 {item.date}
                                             </span>
                                         </div>
-                                        <p className="font-serif italic text-sm sm:text-base text-[#FFFFFF] leading-relaxed mb-6 font-light">
+                                        <p
+                                            style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                            className="font-serif italic text-sm sm:text-base leading-relaxed mb-6 font-medium"
+                                        >
                                             "{item.comment}"
                                         </p>
                                     </div>
-                                    <div className="border-t border-[#FFFFFF]/10 pt-4 flex items-center justify-between">
+                                    <div
+                                        style={{
+                                            borderTopColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                                        }}
+                                        className="border-t pt-4 flex items-center justify-between"
+                                    >
                                         <div>
-                                            <h4 className="font-sans text-xs font-semibold text-[#FFFFFF]">{item.name}</h4>
-                                            <span className="font-sans text-[0.7rem] text-[#A89F91]">{item.role}</span>
+                                            <h4
+                                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                                className="font-sans text-xs font-bold"
+                                            >
+                                                {item.name}
+                                            </h4>
+                                            <span
+                                                style={{ color: isDark ? '#A89F91' : '#666666' }}
+                                                className="font-sans text-[0.7rem]"
+                                            >
+                                                {item.role}
+                                            </span>
                                         </div>
-                                        <span className="font-sans text-[0.65rem] tracking-widest text-[#B82E2E] uppercase font-semibold">
+                                        <span
+                                            style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                            className="font-sans text-[0.65rem] tracking-widest uppercase font-bold"
+                                        >
                                             ULASAN TERVERIFIKASI
                                         </span>
                                     </div>
@@ -843,11 +1265,23 @@ export function EditorialHome() {
           6. BARISTA & RACIKAN KOPI (#barista)
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section id="barista" className="py-16 lg:py-24 bg-[#161210] border border-white/10 shadow-xl overflow-hidden">
+                <section
+                    id="barista"
+                    style={{
+                        background: isDark ? '#161210' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-16 lg:py-24 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden"
+                >
                     <div className="editorial-container">
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                             <div className="lg:col-span-6 order-2 lg:order-1 reveal-slide-left">
-                                <div className="editorial-img-wrapper h-[300px] sm:h-[450px] lg:h-[600px] border border-[#FFFFFF]/10  overflow-hidden shadow-md">
+                                <div
+                                    style={{
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.25)',
+                                    }}
+                                    className="editorial-img-wrapper h-[300px] sm:h-[450px] lg:h-[600px] border rounded-2xl overflow-hidden shadow-md"
+                                >
                                     <Image
                                         src="/images/kopimage_barista_pouring_1786480929425.webp"
                                         alt="Barista Kopi Mage menyeduh kopi manual brew"
@@ -861,16 +1295,31 @@ export function EditorialHome() {
                             </div>
 
                             <div className="lg:col-span-6 order-1 lg:order-2 reveal-slide-right">
-                                <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold block mb-4">
+                                <span
+                                    style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                    className="font-sans text-[0.72rem] tracking-[0.25em] uppercase font-bold block mb-4"
+                                >
                                     07 / RACIKAN KOPI
                                 </span>
-                                <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light leading-tight mb-6 text-[#FFFFFF]">
+                                <h2
+                                    style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                    className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold leading-tight mb-6"
+                                >
                                     Dedikasi dan presisi dalam setiap seduhan.
                                 </h2>
-                                <p className="font-sans text-sm sm:text-base text-[#A89F91] font-light leading-relaxed mb-6">
+                                <p
+                                    style={{ color: isDark ? '#A89F91' : '#444444' }}
+                                    className="font-sans text-sm sm:text-base font-light leading-relaxed mb-6"
+                                >
                                     Setiap cangkir kopi diseduh dengan ketelitian tinggi oleh barista kami. Dari racikan Es Kopi Susu Signature yang lembut seimbang, hingga seduhan manual brew single origin pilihan dengan profil rasa yang kaya.
                                 </p>
-                                <blockquote className="border-l-2 border-[#B82E2E] pl-6 py-2 my-6 font-serif italic text-lg sm:text-xl text-[#C29B7F] font-medium">
+                                <blockquote
+                                    style={{
+                                        color: isDark ? '#D4A373' : '#9E1F1F',
+                                        borderLeftColor: '#9E1F1F',
+                                    }}
+                                    className="border-l-2 pl-6 py-2 my-6 font-serif italic text-lg sm:text-xl font-medium"
+                                >
                                     "Kopi berkualitas, racikan jujur, dan kehangatan tulus untuk menemani setiap perbincangan Anda."
                                 </blockquote>
                             </div>
