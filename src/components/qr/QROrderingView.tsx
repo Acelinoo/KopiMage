@@ -72,6 +72,32 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
     });
   }, [activeCategory, searchQuery, liveMenuItems]);
 
+  // Automatic Multi-Variant Scroll Reveal Observer like Landing Page
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+
+    const revealElements = document.querySelectorAll(
+      '.reveal-fade-up, .reveal-slide-left, .reveal-slide-right, .reveal-scale-pop, .reveal-blur-focus, .reveal-step-card'
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -30px 0px' }
+    );
+
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      revealElements.forEach((el) => observer.unobserve(el));
+    };
+  }, [filteredItems, activeCategory]);
+
   return (
     <div style={{ background: 'var(--bg-main)', color: 'var(--text-primary)', minHeight: '100vh', display: 'flex', flexDirection: 'column', transition: 'background-color 0.25s ease, color 0.25s ease' }}>
       <Header />
@@ -79,7 +105,7 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
       {/* Hero Table Section */}
       <section style={{ paddingTop: '7.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid var(--border-color)' }}>
         <div className="container" style={{ maxWidth: '840px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'left', padding: '0 1rem' }}>
+          <div className="reveal-fade-up is-visible" style={{ textAlign: 'left', padding: '0 1rem' }}>
             
             <div
               style={{
@@ -99,7 +125,7 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
               <span>MEJA {cleanTableDisplay} • SOREANG</span>
             </div>
 
-            <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, fontFamily: 'serif', color: '#F7F4EF', lineHeight: 1.25, marginBottom: '0.75rem' }}>
+            <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 800, fontFamily: 'serif', color: 'inherit', lineHeight: 1.25, marginBottom: '0.75rem' }}>
               Katalog Racikan Meja {cleanTableDisplay}
             </h1>
 
@@ -116,7 +142,7 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
         <div className="container" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 1rem' }}>
           
           {/* Search & Category Navigation Bar */}
-          <div style={{ marginBottom: '2rem' }}>
+          <div className="reveal-fade-up is-visible" style={{ marginBottom: '2rem' }}>
             
             {/* Search Input */}
             <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
@@ -210,11 +236,20 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-                gap: '1rem'
+                gap: '1.25rem'
               }}
             >
-              {filteredItems.map((item) => (
-                <MenuItemCard key={item.id} item={item} />
+              {filteredItems.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className="reveal-step-card is-visible hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+                  style={{
+                    transitionDelay: `${Math.min(idx * 0.05, 0.4)}s`,
+                    height: '100%'
+                  }}
+                >
+                  <MenuItemCard item={item} />
+                </div>
               ))}
             </div>
           ) : (

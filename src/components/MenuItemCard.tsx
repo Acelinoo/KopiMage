@@ -15,7 +15,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
   return (
     <>
       <div
-        className="glass-panel"
+        className="glass-panel group"
         style={{
           borderRadius: 'var(--radius-lg)',
           padding: '1.4rem',
@@ -34,6 +34,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
             <img
               src={item.image || '/images/kopimage_hero_atmosphere_1786480906850.webp'}
               alt={item.name}
+              className="group-hover:scale-105 transition-transform duration-500"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/images/kopimage_hero_atmosphere_1786480906850.webp';

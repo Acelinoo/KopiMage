@@ -572,6 +572,32 @@ export default function AdminDashboardPage() {
   const cancellationRequestedCount = ordersList.filter((o) => o.order_status === 'CANCELLATION_REQUESTED').length;
   const totalOrdersCount = ordersList.length;
 
+  // Automatic Multi-Variant Scroll Reveal Observer like Landing Page
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+
+    const revealElements = document.querySelectorAll(
+      '.reveal-fade-up, .reveal-slide-left, .reveal-slide-right, .reveal-scale-pop, .reveal-blur-focus, .reveal-step-card'
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
+    );
+
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      revealElements.forEach((el) => observer.unobserve(el));
+    };
+  }, [activeTab, filteredOrders, menuItemsState, tablesState]);
+
   return (
     <main
       style={{
@@ -589,7 +615,7 @@ export default function AdminDashboardPage() {
           borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
           boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 30px rgba(0, 0, 0, 0.12)',
         }}
-        className="sticky top-0 z-40 backdrop-blur-md px-4 sm:px-8 py-4"
+        className="sticky top-0 z-40 backdrop-blur-md px-4 sm:px-8 py-4 reveal-fade-up is-visible"
       >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
@@ -715,7 +741,7 @@ export default function AdminDashboardPage() {
               border: isDark ? '1px solid rgba(184, 46, 46, 0.4)' : '1.5px solid #9E1F1F',
               boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
             }}
-            className="p-4 rounded-2xl flex items-center justify-between"
+            className="p-4 rounded-2xl flex items-center justify-between reveal-step-card is-visible hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
           >
             <div>
               <span
@@ -743,8 +769,9 @@ export default function AdminDashboardPage() {
                 background: isDark ? '#161210' : '#FFFFFF',
                 border: '1.5px solid #E67E22',
                 boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+                transitionDelay: '0.05s',
               }}
-              className="p-4 rounded-2xl flex items-center justify-between"
+              className="p-4 rounded-2xl flex items-center justify-between reveal-step-card is-visible hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
             >
               <div>
                 <span
@@ -768,8 +795,9 @@ export default function AdminDashboardPage() {
               background: isDark ? '#161210' : '#FFFFFF',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
               boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+              transitionDelay: '0.1s',
             }}
-            className="p-4 rounded-2xl flex items-center justify-between"
+            className="p-4 rounded-2xl flex items-center justify-between reveal-step-card is-visible hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
           >
             <div>
               <span
@@ -792,8 +820,9 @@ export default function AdminDashboardPage() {
               background: isDark ? '#161210' : '#FFFFFF',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
               boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+              transitionDelay: '0.15s',
             }}
-            className="p-4 rounded-2xl flex items-center justify-between"
+            className="p-4 rounded-2xl flex items-center justify-between reveal-step-card is-visible hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
           >
             <div>
               <span
@@ -819,8 +848,9 @@ export default function AdminDashboardPage() {
               background: isDark ? '#161210' : '#FFFFFF',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
               boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+              transitionDelay: '0.2s',
             }}
-            className="p-4 rounded-2xl flex items-center justify-between"
+            className="p-4 rounded-2xl flex items-center justify-between reveal-step-card is-visible hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
           >
             <div>
               <span
@@ -844,7 +874,7 @@ export default function AdminDashboardPage() {
 
         {/* TAB 1: VERIFICATION OPERATIONS CONSOLE */}
         {activeTab === 'verification' && (
-          <section>
+          <section className="reveal-fade-up is-visible">
             {/* Filter & Search Bar */}
             <div
               style={{
@@ -933,7 +963,7 @@ export default function AdminDashboardPage() {
                   background: isDark ? '#161210' : '#FFFFFF',
                   border: isDark ? '1px solid rgba(39, 174, 96, 0.3)' : '1.5px solid #27AE60',
                 }}
-                className="p-12 rounded-3xl text-center max-w-md mx-auto my-12 shadow-2xl"
+                className="p-12 rounded-3xl text-center max-w-md mx-auto my-12 shadow-2xl reveal-scale-pop is-visible"
               >
                 <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
                   <CheckCircle2 className="w-8 h-8 text-emerald-500" />
@@ -953,7 +983,7 @@ export default function AdminDashboardPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredOrders.map((order) => {
+                {filteredOrders.map((order, idx) => {
                   const isVerifying = order.payment_status === 'VERIFYING';
                   const isPaid = order.payment_status === 'PAID';
                   const isRejected = order.payment_status === 'REJECTED';
@@ -972,8 +1002,9 @@ export default function AdminDashboardPage() {
                           ? (isDark ? '1px solid rgba(39, 174, 96, 0.3)' : '1.5px solid #27AE60')
                           : (isDark ? '1px solid rgba(231, 76, 60, 0.3)' : '1.5px solid #E74C3C'),
                         boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+                        transitionDelay: `${Math.min(idx * 0.05, 0.35)}s`,
                       }}
-                      className="p-6 rounded-2xl transition-all flex flex-col justify-between relative overflow-hidden"
+                      className="p-6 rounded-2xl transition-all duration-300 flex flex-col justify-between relative overflow-hidden reveal-step-card is-visible hover:-translate-y-1 hover:shadow-2xl"
                     >
                       <div>
                         {/* Order Header Card */}
@@ -1210,7 +1241,7 @@ export default function AdminDashboardPage() {
 
         {/* TAB 2: MENU CATALOG CRUD */}
         {activeTab === 'menu' && (
-          <section>
+          <section className="reveal-fade-up is-visible">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
                 <h2 className="text-xl font-serif text-white font-bold">Katalog Menu QR Order</h2>
@@ -1251,15 +1282,16 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {menuItemsState.map((item) => (
+              {menuItemsState.map((item, idx) => (
                 <div
                   key={item.id}
                   style={{
                     background: isDark ? '#161210' : '#FFFFFF',
                     border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
                     boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+                    transitionDelay: `${Math.min(idx * 0.04, 0.3)}s`,
                   }}
-                  className="p-5 rounded-2xl flex flex-col justify-between"
+                  className="p-5 rounded-2xl flex flex-col justify-between reveal-step-card is-visible hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
                 >
                   <div>
                     <div className="flex items-start justify-between gap-3 mb-3">
@@ -1357,7 +1389,7 @@ export default function AdminDashboardPage() {
 
         {/* TAB 3: TABLE REGISTRY & QR STICKER */}
         {activeTab === 'tables' && (
-          <section>
+          <section className="reveal-fade-up is-visible">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
                 <h2 className="text-xl font-serif text-white font-bold">Registry Meja &amp; Generator Stiker QR</h2>
@@ -1397,15 +1429,16 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {tablesState.map((t) => (
+              {tablesState.map((t, idx) => (
                 <div
                   key={t.id}
                   style={{
                     background: isDark ? '#161210' : '#FFFFFF',
                     border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
                     boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+                    transitionDelay: `${Math.min(idx * 0.04, 0.3)}s`,
                   }}
-                  className="p-5 rounded-2xl flex flex-col justify-between"
+                  className="p-5 rounded-2xl flex flex-col justify-between reveal-step-card is-visible hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
                 >
                   <div>
                     <h3

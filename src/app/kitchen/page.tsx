@@ -254,6 +254,32 @@ export default function KitchenDisplayPage() {
   const preparingCount = orders.filter((o) => o.order_status === 'PREPARING').length;
   const readyCount = orders.filter((o) => o.order_status === 'READY').length;
 
+  // Automatic Multi-Variant Scroll Reveal Observer like Landing Page
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+
+    const revealElements = document.querySelectorAll(
+      '.reveal-fade-up, .reveal-slide-left, .reveal-slide-right, .reveal-scale-pop, .reveal-blur-focus, .reveal-step-card'
+    );
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+          }
+        });
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
+    );
+
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => {
+      revealElements.forEach((el) => observer.unobserve(el));
+    };
+  }, [filteredOrders, stationFilter, statusTab]);
+
   return (
     <div
       style={{
@@ -272,7 +298,7 @@ export default function KitchenDisplayPage() {
           borderRadius: '24px',
           boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 30px rgba(0, 0, 0, 0.12)',
         }}
-        className="max-w-7xl mx-auto mb-8 p-5 flex flex-wrap items-center justify-between gap-4"
+        className="max-w-7xl mx-auto mb-8 p-5 flex flex-wrap items-center justify-between gap-4 reveal-fade-up is-visible"
       >
         <div className="flex items-center gap-4">
           <div
@@ -396,7 +422,7 @@ export default function KitchenDisplayPage() {
       </header>
 
       {/* Filter & Station Tabs */}
-      <div className="max-w-7xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4 reveal-fade-up is-visible">
         {/* Status Tabs (Pesanan Aktif vs Selesai) */}
         <div
           style={{
@@ -482,7 +508,7 @@ export default function KitchenDisplayPage() {
               background: isDark ? 'rgba(22, 18, 16, 0.5)' : '#FFFFFF',
               border: isDark ? '1px dashed rgba(255, 255, 255, 0.15)' : '1.5px dashed #9E1F1F',
             }}
-            className="py-24 text-center rounded-3xl p-6 shadow-sm"
+            className="py-24 text-center rounded-3xl p-6 shadow-sm reveal-scale-pop is-visible"
           >
             <UtensilsCrossed
               style={{ color: isDark ? '#A89F91' : '#9E1F1F' }}
@@ -506,7 +532,7 @@ export default function KitchenDisplayPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             <AnimatePresence>
-              {filteredOrders.map((order) => {
+              {filteredOrders.map((order, idx) => {
                 const elapsedMin = getElapsedMinutes(order.created_at);
                 const isUrgent = elapsedMin >= 12;
                 const isWarning = elapsedMin >= 6 && elapsedMin < 12;
@@ -521,9 +547,10 @@ export default function KitchenDisplayPage() {
                   <motion.div
                     key={order.id}
                     layout
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
+                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
                     style={{
                       background: isDark
                         ? (isUrgent ? '#140807' : currentStatus === 'READY' ? '#06120B' : '#161210')
@@ -537,7 +564,7 @@ export default function KitchenDisplayPage() {
                         ? '0 10px 30px rgba(0, 0, 0, 0.6)'
                         : '0 10px 30px rgba(0, 0, 0, 0.15)',
                     }}
-                    className="rounded-3xl p-5 flex flex-col justify-between transition-all relative overflow-hidden"
+                    className="rounded-3xl p-5 flex flex-col justify-between transition-all duration-300 relative overflow-hidden reveal-step-card is-visible hover:-translate-y-1 hover:shadow-2xl"
                   >
                     {/* Header Top Badge & Timer */}
                     <div>
