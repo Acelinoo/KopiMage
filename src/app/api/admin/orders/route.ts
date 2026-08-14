@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
-import { getOrdersFromStore, updateOrderInStore, clearOrdersStore, OrderRecord } from '@/lib/ordersStore';
+import {
+  getOrdersFromStore,
+  updateOrderInStore,
+  updateOrderInStoreConditional,
+  clearOrdersStore,
+  OrderRecord,
+} from '@/lib/ordersStore';
 
 export async function GET(request: Request) {
   try {
@@ -128,7 +134,14 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json();
-    const { order_id, payment_status, order_status, rejection_reason, cancellation_reason } = body;
+    const {
+      order_id,
+      payment_status,
+      order_status,
+      expected_current_status,
+      rejection_reason,
+      cancellation_reason,
+    } = body;
 
     if (!order_id) {
       return NextResponse.json(
@@ -154,6 +167,19 @@ export async function PATCH(request: Request) {
           { status: 400 }
         );
       }
+
+      // Rule 2: Concurrency Lock Check if expected_current_status is provided
+      if (expected_current_status && currentOrder.order_status !== expected_current_status) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Pesanan ini sudah diambil oleh waiter lain atau status telah berubah.',
+            code: 'CONCURRENCY_CONFLICT',
+            current_status: currentOrder.order_status,
+          },
+          { status: 409 }
+        );
+      }
     }
 
     // Update payload
@@ -168,7 +194,7 @@ export async function PATCH(request: Request) {
     if (order_status) {
       updatePayload.order_status = order_status;
 
-      // Rule 2: If a PAID order is cancelled, set payment_status to REFUND_REQUIRED
+      // Rule 3: If a PAID order is cancelled, set payment_status to REFUND_REQUIRED
       if (order_status === 'CANCELLED' && (currentOrder?.payment_status === 'PAID' || payment_status === 'PAID')) {
         updatePayload.payment_status = 'REFUND_REQUIRED';
       }
@@ -182,14 +208,32 @@ export async function PATCH(request: Request) {
       updatePayload.cancellation_reason = cancellation_reason;
     }
 
-    const { data: updatedDb, error } = await supabase
-      .from('orders')
-      .update(updatePayload)
-      .eq('id', order_id)
-      .select('*, order_items(*)');
+    // 2. Atomic Database Query execution
+    let dbQuery = supabase.from('orders').update(updatePayload).eq('id', order_id);
+    if (expected_current_status) {
+      dbQuery = dbQuery.eq('order_status', expected_current_status);
+    }
+    const { data: updatedDb, error } = await dbQuery.select('*, order_items(*)');
 
-    // Synchronize status update to memory store
-    const updatedInMemory = updateOrderInStore(order_id, updatePayload);
+    // 3. Synchronize status update to memory store with atomic conditional check
+    let updatedInMemory: any = null;
+    if (expected_current_status) {
+      const memoryResult = updateOrderInStoreConditional(order_id, updatePayload, expected_current_status);
+      if (!memoryResult.success && (!updatedDb || updatedDb.length === 0)) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Pesanan ini sudah diambil oleh waiter lain atau status telah berubah.',
+            code: 'CONCURRENCY_CONFLICT',
+            current_status: memoryResult.currentStatus || currentOrder?.order_status,
+          },
+          { status: 409 }
+        );
+      }
+      updatedInMemory = memoryResult.order;
+    } else {
+      updatedInMemory = updateOrderInStore(order_id, updatePayload);
+    }
 
     if (error) {
       console.warn('Supabase DB update warning:', error.message);

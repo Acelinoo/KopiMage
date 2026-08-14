@@ -23,7 +23,9 @@ import {
   User,
   ShoppingBag,
   Flame,
-  CheckCheck
+  CheckCheck,
+  Send,
+  Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -39,6 +41,18 @@ export default function WaiterFloorPage() {
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [areaFilter, setAreaFilter] = useState<'ALL' | 'Indoor' | 'Terrace' | 'VIP'>('ALL');
+  
+  // Phase 3 Mutation States
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [alertMessage, setAlertMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Auto-dismiss alert notification after 4 seconds
+  useEffect(() => {
+    if (alertMessage) {
+      const timer = setTimeout(() => setAlertMessage(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [alertMessage]);
 
   // Fetch Live Orders and Tables from Server API
   const fetchFloorData = async (showLoader = false) => {
@@ -109,6 +123,11 @@ export default function WaiterFloorPage() {
     return orders.filter((o) => o.order_status === 'READY');
   }, [orders]);
 
+  // Filter In-Transit Delivering Orders (being delivered to table by waiter)
+  const deliveringOrders = useMemo(() => {
+    return orders.filter((o) => o.order_status === 'DELIVERING');
+  }, [orders]);
+
   // Filter Active Waiter Requests (OPEN or HANDLED)
   const activeRequests = useMemo(() => {
     return requestsList.filter((r) => r.status !== 'COMPLETED');
@@ -169,9 +188,104 @@ export default function WaiterFloorPage() {
 
   // Floor KPI Counts
   const readyOrdersCount = readyOrders.length;
+  const deliveringOrdersCount = deliveringOrders.length;
   const activeRequestsCount = activeRequests.length;
   const needsCleaningCount = floorTables.filter((t) => t.status === 'PERLU_DIBERSIHKAN').length;
-  const inProgressCount = floorTables.filter((t) => t.status === 'PESANAN_DIPROSES').length;
+
+  // ----------------------------------------------------
+  // Phase 3 Delivery Mutation Handlers (With Concurrency Lock)
+  // ----------------------------------------------------
+
+  // 1. Claim & Start Delivery: READY -> DELIVERING (Conditional Atomic Lock)
+  const handleStartDelivery = async (orderId: string, tableCode: string) => {
+    setActionLoadingId(orderId);
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          order_status: 'DELIVERING',
+          expected_current_status: 'READY',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 409) {
+        setAlertMessage({
+          type: 'error',
+          text: data.error || `Pesanan Meja ${tableCode} sudah diambil oleh rekan waiter lain.`,
+        });
+        fetchFloorData(false);
+      } else if (res.ok) {
+        setAlertMessage({
+          type: 'success',
+          text: `Pesanan Meja ${tableCode} diambil. Sedang diantar ke meja customer.`,
+        });
+        // Optimistic local update
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, order_status: 'DELIVERING' } : o))
+        );
+        fetchFloorData(false);
+      } else {
+        setAlertMessage({
+          type: 'error',
+          text: data.error || 'Gagal memulai pengantaran.',
+        });
+      }
+    } catch (err: any) {
+      setAlertMessage({ type: 'error', text: 'Koneksi bermasalah: ' + err.message });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  // 2. Complete Delivery at Customer Table: DELIVERING -> COMPLETED
+  const handleCompleteServed = async (orderId: string, tableCode: string) => {
+    setActionLoadingId(orderId);
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          order_status: 'COMPLETED',
+          expected_current_status: 'DELIVERING',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 409) {
+        setAlertMessage({
+          type: 'error',
+          text: data.error || `Status pesanan Meja ${tableCode} telah diperbarui sebelumnya.`,
+        });
+        fetchFloorData(false);
+      } else if (res.ok) {
+        setAlertMessage({
+          type: 'success',
+          text: `Pesanan Meja ${tableCode} telah disajikan! Status meja: SEDANG MAKAN.`,
+        });
+        // Optimistic local update
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, order_status: 'COMPLETED' } : o))
+        );
+        if (selectedTable) setSelectedTable(null);
+        fetchFloorData(false);
+      } else {
+        setAlertMessage({
+          type: 'error',
+          text: data.error || 'Gagal mengonfirmasi penyajian.',
+        });
+      }
+    } catch (err: any) {
+      setAlertMessage({ type: 'error', text: 'Koneksi bermasalah: ' + err.message });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
 
   // Visual Styling Helper per Table Status
   const getStatusBadgeStyle = (status: TableStatusType) => {
@@ -250,6 +364,33 @@ export default function WaiterFloorPage() {
       }}
       className="font-sans pb-24 selection:bg-[#B82E2E] selection:text-white"
     >
+      {/* Toast Alert Notification */}
+      <AnimatePresence>
+        {alertMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            style={{
+              background: alertMessage.type === 'success' ? '#27AE60' : '#E74C3C',
+              color: '#FFFFFF',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+            }}
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl text-xs font-mono font-bold flex items-center gap-2 max-w-md w-[90%]"
+          >
+            {alertMessage.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 shrink-0" />
+            )}
+            <span className="flex-1">{alertMessage.text}</span>
+            <button onClick={() => setAlertMessage(null)} className="opacity-75 hover:opacity-100">
+              <X className="w-4 h-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* 1. COMPACT WAITER HEADER (Mobile-First) */}
       <header
         style={{
@@ -308,17 +449,17 @@ export default function WaiterFloorPage() {
       {/* 2. OPERATIONAL SUMMARY KPI BAR (One-Hand Priority Counters) */}
       <div className="max-w-6xl mx-auto px-4 pt-4 sm:px-6">
         <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
-          {/* KPI 1: Ready Orders */}
+          {/* KPI 1: Ready & Delivering Orders */}
           <button
             onClick={() => setActiveTab('READY')}
             style={{
               background: activeTab === 'READY'
                 ? (isDark ? '#2C1D11' : '#FFFFFF')
                 : (isDark ? '#161210' : '#FFFFFF'),
-              border: readyOrdersCount > 0
+              border: (readyOrdersCount > 0 || deliveringOrdersCount > 0)
                 ? '2px solid #E67E22'
                 : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F'),
-              boxShadow: readyOrdersCount > 0 ? '0 0 15px rgba(230, 126, 34, 0.25)' : 'none',
+              boxShadow: (readyOrdersCount > 0 || deliveringOrdersCount > 0) ? '0 0 15px rgba(230, 126, 34, 0.25)' : 'none',
             }}
             className="p-3 rounded-2xl text-left transition-all cursor-pointer relative overflow-hidden"
           >
@@ -332,9 +473,11 @@ export default function WaiterFloorPage() {
               <span className="text-xl sm:text-2xl font-serif font-black text-orange-500">
                 {readyOrdersCount}
               </span>
-              <span style={{ color: isDark ? '#A89F91' : '#666666' }} className="text-[0.65rem] font-mono">
-                Order
-              </span>
+              {deliveringOrdersCount > 0 && (
+                <span className="text-[0.68rem] font-mono font-bold text-amber-500">
+                  (+{deliveringOrdersCount} Jalan)
+                </span>
+              )}
             </div>
           </button>
 
@@ -427,7 +570,7 @@ export default function WaiterFloorPage() {
             className="flex-1 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-1.5"
           >
             <ShoppingBag className="w-3.5 h-3.5" />
-            <span>SIAP DIANTAR ({readyOrdersCount})</span>
+            <span>SIAP DIANTAR ({readyOrdersCount + deliveringOrdersCount})</span>
           </button>
 
           <button
@@ -564,122 +707,241 @@ export default function WaiterFloorPage() {
           </section>
         )}
 
-        {/* VIEW 2: READY ORDERS (Siap Diantar dari Counter) */}
+        {/* VIEW 2: READY & DELIVERING ORDERS (Siap Diantar & Sedang Diantar) */}
         {activeTab === 'READY' && (
-          <section>
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <h2 style={{ color: isDark ? '#FFFFFF' : '#FFFFFF' }} className="text-sm font-serif font-bold">
-                  Daftar Pesanan Siap Diantar (Ready to Serve)
-                </h2>
+          <section className="space-y-6">
+            {/* SUBSECTION 1: READY ORDERS (Di Pickup Counter) */}
+            <div>
+              <div className="mb-3">
+                <div className="flex items-center gap-2">
+                  <h2 style={{ color: '#FFFFFF' }} className="text-sm font-serif font-bold">
+                    1. Siap Diambil di Counter ({readyOrders.length})
+                  </h2>
+                  <span className="w-2 h-2 rounded-full bg-orange-500" />
+                </div>
                 <p style={{ color: isDark ? '#A89F91' : '#F3EFEA' }} className="text-[0.7rem] font-mono">
-                  Pesanan yang sudah selesai dibuat Barista/Dapur di pickup counter.
+                  Barista telah membunyikan bel. Ambil nampan lalu tekan "Ambil &amp; Antar".
                 </p>
               </div>
-            </div>
 
-            {readyOrders.length === 0 ? (
-              <div
-                style={{
-                  background: isDark ? '#161210' : '#FFFFFF',
-                  border: isDark ? '1px dashed rgba(255, 255, 255, 0.15)' : '1.5px dashed #9E1F1F',
-                }}
-                className="py-16 text-center rounded-2xl p-6"
-              >
-                <CheckCircle2 style={{ color: isDark ? '#A89F91' : '#9E1F1F' }} className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                <h3 style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="text-sm font-serif font-bold mb-0.5">
-                  Tidak Ada Pesanan yang Siap Diantar
-                </h3>
-                <p style={{ color: isDark ? '#A89F91' : '#555555' }} className="text-xs font-mono">
-                  Semua pesanan yang matang telah disajikan ke meja customer.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {readyOrders.map((order) => {
-                  const itemsList = order.items || order.order_items || [];
-                  const cleanTable =
-                    order.table_code ||
-                    (order.tables?.code && !order.tables.code.includes('-') ? order.tables.code : null) ||
-                    (order.table_id && !String(order.table_id).includes('-') ? order.table_id : '01');
+              {readyOrders.length === 0 ? (
+                <div
+                  style={{
+                    background: isDark ? '#161210' : '#FFFFFF',
+                    border: isDark ? '1px dashed rgba(255, 255, 255, 0.15)' : '1.5px dashed #9E1F1F',
+                  }}
+                  className="py-10 text-center rounded-2xl p-6 mb-4"
+                >
+                  <CheckCircle2 style={{ color: isDark ? '#A89F91' : '#9E1F1F' }} className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <h3 style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="text-sm font-serif font-bold mb-0.5">
+                    Tidak Ada Pesanan Baru di Counter
+                  </h3>
+                  <p style={{ color: isDark ? '#A89F91' : '#555555' }} className="text-xs font-mono">
+                    Semua pesanan yang matang telah diambil oleh tim floor.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {readyOrders.map((order) => {
+                    const itemsList = order.items || order.order_items || [];
+                    const cleanTable =
+                      order.table_code ||
+                      (order.tables?.code && !order.tables.code.includes('-') ? order.tables.code : null) ||
+                      (order.table_id && !String(order.table_id).includes('-') ? order.table_id : '01');
 
-                  return (
-                    <div
-                      key={order.id}
-                      style={{
-                        background: isDark ? '#161210' : '#FFFFFF',
-                        border: '2px solid #E67E22',
-                        boxShadow: isDark ? '0 8px 25px rgba(0,0,0,0.6)' : '0 6px 20px rgba(0,0,0,0.1)',
-                      }}
-                      className="p-4 rounded-2xl transition-all relative overflow-hidden"
-                    >
-                      <div className="flex items-start justify-between gap-3 mb-2.5">
-                        <div>
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span className="text-lg font-serif font-black text-orange-500">
-                              MEJA {cleanTable}
-                            </span>
-                            <span
-                              style={{ color: isDark ? '#A89F91' : '#666666' }}
-                              className="text-[0.65rem] font-mono font-bold"
-                            >
-                              {order.order_display_number || order.order_number}
+                    const isLoading = actionLoadingId === order.id;
+
+                    return (
+                      <div
+                        key={order.id}
+                        style={{
+                          background: isDark ? '#161210' : '#FFFFFF',
+                          border: '2px solid #E67E22',
+                          boxShadow: isDark ? '0 8px 25px rgba(0,0,0,0.6)' : '0 6px 20px rgba(0,0,0,0.1)',
+                        }}
+                        className="p-4 rounded-2xl transition-all relative overflow-hidden"
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-2.5">
+                          <div>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="text-xl font-serif font-black text-orange-500">
+                                MEJA {cleanTable}
+                              </span>
+                              <span
+                                style={{ color: isDark ? '#A89F91' : '#666666' }}
+                                className="text-[0.68rem] font-mono font-bold"
+                              >
+                                {order.order_display_number || order.order_number}
+                              </span>
+                            </div>
+                            <span style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} className="text-xs font-mono font-bold block">
+                              Customer: {order.customer_name}
                             </span>
                           </div>
-                          <span style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} className="text-xs font-mono font-bold block">
-                            Atas Nama: {order.customer_name}
+
+                          <span className="px-2.5 py-1 rounded-lg bg-orange-500/15 border border-orange-500/30 text-orange-400 text-[0.65rem] font-mono font-bold uppercase">
+                            🔔 READY DI COUNTER
                           </span>
                         </div>
 
-                        <span className="px-2 py-0.5 rounded-md bg-orange-500/15 border border-orange-500/30 text-orange-400 text-[0.65rem] font-mono font-bold uppercase">
-                          READY DI COUNTER
-                        </span>
-                      </div>
-
-                      {/* Items Preview */}
-                      <div
-                        style={{
-                          background: isDark ? '#0E0B0A' : '#FAF7F5',
-                          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(158, 31, 31, 0.12)',
-                        }}
-                        className="p-2.5 rounded-xl mb-3 space-y-1 text-xs"
-                      >
-                        {itemsList.map((it: any, idx: number) => (
-                          <div key={idx} className="flex justify-between items-center">
-                            <span style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="font-medium">
-                              {it.quantity}x {it.item_name || it.name}
-                            </span>
-                            {it.notes && (
-                              <span style={{ color: isDark ? '#A89F91' : '#777777' }} className="text-[0.68rem] italic truncate max-w-[140px]">
-                                "{it.notes}"
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Action Button Preview (Phase 2 UI Placeholder - Phase 3 will activate mutation) */}
-                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
-                        <span style={{ color: isDark ? '#A89F91' : '#666666' }} className="text-[0.68rem] font-mono">
-                          Total: {itemsList.length} Item
-                        </span>
-                        <button
-                          disabled
+                        {/* Items Preview */}
+                        <div
                           style={{
-                            background: '#9E1F1F',
-                            color: '#FFFFFF',
-                            opacity: 0.9,
+                            background: isDark ? '#0E0B0A' : '#FAF7F5',
+                            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(158, 31, 31, 0.12)',
                           }}
-                          className="px-4 py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-not-allowed shadow-md"
-                          title="Aksi pengantaran aktif di Fase 3"
+                          className="p-2.5 rounded-xl mb-3 space-y-1 text-xs"
                         >
-                          <ShoppingBag className="w-3.5 h-3.5" />
-                          <span>AMBIL &amp; ANTAR KE MEJA (FASE 3)</span>
-                        </button>
+                          {itemsList.map((it: any, idx: number) => (
+                            <div key={idx} className="flex justify-between items-center">
+                              <span style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="font-medium">
+                                {it.quantity}x {it.item_name || it.name}
+                              </span>
+                              {it.notes && (
+                                <span style={{ color: isDark ? '#A89F91' : '#777777' }} className="text-[0.68rem] italic truncate max-w-[140px]">
+                                  "{it.notes}"
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Active Action Button (Phase 3 Atomic Mutation) */}
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
+                          <span style={{ color: isDark ? '#A89F91' : '#666666' }} className="text-[0.68rem] font-mono">
+                            Total: {itemsList.length} Item
+                          </span>
+                          <button
+                            onClick={() => handleStartDelivery(order.id, cleanTable)}
+                            disabled={isLoading}
+                            style={{
+                              background: '#9E1F1F',
+                              color: '#FFFFFF',
+                            }}
+                            className="px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-md hover:bg-[#B82E2E] active:scale-95 transition-all disabled:opacity-50"
+                          >
+                            {isLoading ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <ShoppingBag className="w-3.5 h-3.5" />
+                            )}
+                            <span>AMBIL &amp; ANTAR KE MEJA</span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* SUBSECTION 2: DELIVERING ORDERS (Sedang Diantar ke Meja) */}
+            {deliveringOrders.length > 0 && (
+              <div className="pt-4 border-t border-white/10">
+                <div className="mb-3">
+                  <div className="flex items-center gap-2">
+                    <h2 style={{ color: '#FFFFFF' }} className="text-sm font-serif font-bold">
+                      2. Sedang Diantar ke Meja ({deliveringOrders.length})
+                    </h2>
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                  </div>
+                  <p style={{ color: isDark ? '#A89F91' : '#F3EFEA' }} className="text-[0.7rem] font-mono">
+                    Pesanan sedang dibawa menuju meja. Tekan "Sudah Disajikan" setelah ditaruh di meja customer.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  {deliveringOrders.map((order) => {
+                    const itemsList = order.items || order.order_items || [];
+                    const cleanTable =
+                      order.table_code ||
+                      (order.tables?.code && !order.tables.code.includes('-') ? order.tables.code : null) ||
+                      (order.table_id && !String(order.table_id).includes('-') ? order.table_id : '01');
+
+                    const isLoading = actionLoadingId === order.id;
+
+                    return (
+                      <div
+                        key={order.id}
+                        style={{
+                          background: isDark ? '#161210' : '#FFFFFF',
+                          border: '2px solid #F39C12',
+                          boxShadow: isDark ? '0 8px 25px rgba(0,0,0,0.6)' : '0 6px 20px rgba(0,0,0,0.1)',
+                        }}
+                        className="p-4 rounded-2xl transition-all relative overflow-hidden"
+                      >
+                        <div className="flex items-start justify-between gap-3 mb-2.5">
+                          <div>
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="text-xl font-serif font-black text-amber-500">
+                                MEJA {cleanTable}
+                              </span>
+                              <span
+                                style={{ color: isDark ? '#A89F91' : '#666666' }}
+                                className="text-[0.68rem] font-mono font-bold"
+                              >
+                                {order.order_display_number || order.order_number}
+                              </span>
+                            </div>
+                            <span style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} className="text-xs font-mono font-bold block">
+                              Customer: {order.customer_name}
+                            </span>
+                          </div>
+
+                          <span className="px-2.5 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 text-[0.65rem] font-mono font-bold uppercase flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                            SEDANG DIANTAR
+                          </span>
+                        </div>
+
+                        {/* Items Preview */}
+                        <div
+                          style={{
+                            background: isDark ? '#0E0B0A' : '#FAF7F5',
+                            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(158, 31, 31, 0.12)',
+                          }}
+                          className="p-2.5 rounded-xl mb-3 space-y-1 text-xs"
+                        >
+                          {itemsList.map((it: any, idx: number) => (
+                            <div key={idx} className="flex justify-between items-center">
+                              <span style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="font-medium">
+                                {it.quantity}x {it.item_name || it.name}
+                              </span>
+                              {it.notes && (
+                                <span style={{ color: isDark ? '#A89F91' : '#777777' }} className="text-[0.68rem] italic truncate max-w-[140px]">
+                                  "{it.notes}"
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Complete Delivery Action */}
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
+                          <span style={{ color: isDark ? '#A89F91' : '#666666' }} className="text-[0.68rem] font-mono">
+                            Total: {itemsList.length} Item
+                          </span>
+                          <button
+                            onClick={() => handleCompleteServed(order.id, cleanTable)}
+                            disabled={isLoading}
+                            style={{
+                              background: '#27AE60',
+                              color: '#FFFFFF',
+                            }}
+                            className="px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-md hover:bg-[#2ECC71] active:scale-95 transition-all disabled:opacity-50"
+                          >
+                            {isLoading ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            )}
+                            <span>SUDAH DISAJIKAN DI MEJA</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </section>
@@ -690,7 +952,7 @@ export default function WaiterFloorPage() {
           <section>
             <div className="mb-3 flex items-center justify-between">
               <div>
-                <h2 style={{ color: isDark ? '#FFFFFF' : '#FFFFFF' }} className="text-sm font-serif font-bold">
+                <h2 style={{ color: '#FFFFFF' }} className="text-sm font-serif font-bold">
                   Panggilan &amp; Permintaan Bantuan Meja
                 </h2>
                 <p style={{ color: isDark ? '#A89F91' : '#F3EFEA' }} className="text-[0.7rem] font-mono">
@@ -830,43 +1092,77 @@ export default function WaiterFloorPage() {
                 );
               })()}
 
-              {/* Table Action Controls Placeholder (Phase 3 & 4 Preview) */}
-              <div className="space-y-2 pt-2">
-                <span style={{ color: isDark ? '#A89F91' : '#666666' }} className="text-[0.68rem] font-mono uppercase font-bold block">
-                  AKSI OPERASIONAL WAITER (PREVIEW FASE 3/4):
-                </span>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    disabled
-                    style={{
-                      background: isDark ? '#0E0B0A' : '#FAF7F5',
-                      border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F',
-                      color: isDark ? '#A89F91' : '#666666',
-                    }}
-                    className="p-2.5 rounded-xl text-xs font-mono font-bold uppercase cursor-not-allowed opacity-75"
-                  >
-                    TANDAI BERSIH / KOSONG
-                  </button>
-                  <button
-                    disabled
-                    style={{
-                      background: isDark ? '#0E0B0A' : '#FAF7F5',
-                      border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F',
-                      color: isDark ? '#A89F91' : '#666666',
-                    }}
-                    className="p-2.5 rounded-xl text-xs font-mono font-bold uppercase cursor-not-allowed opacity-75"
-                  >
-                    PERLU DIBERSIHKAN
-                  </button>
-                </div>
-              </div>
+              {/* Active Orders on this table (if any) */}
+              {(() => {
+                const tableOrders = orders.filter((o) => isSameTable(o.table_id || o.table_code, selectedTable.code));
+                const readyOrder = tableOrders.find((o) => o.order_status === 'READY');
+                const deliveringOrder = tableOrders.find((o) => o.order_status === 'DELIVERING');
+
+                if (readyOrder) {
+                  return (
+                    <div className="mb-4 p-3 rounded-xl bg-orange-500/10 border border-orange-500/30">
+                      <span className="text-[0.68rem] font-mono font-bold text-orange-400 block mb-1">
+                        PESANAN MEJA INI SIAP DIANTAR:
+                      </span>
+                      <p className="text-xs text-white mb-2">
+                        {readyOrder.order_display_number || readyOrder.order_number} • {readyOrder.customer_name}
+                      </p>
+                      <button
+                        onClick={() => handleStartDelivery(readyOrder.id, selectedTable.code)}
+                        disabled={actionLoadingId === readyOrder.id}
+                        style={{ background: '#9E1F1F', color: '#FFFFFF' }}
+                        className="w-full py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md"
+                      >
+                        {actionLoadingId === readyOrder.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <ShoppingBag className="w-3.5 h-3.5" />
+                        )}
+                        <span>AMBIL &amp; ANTAR PESANAN INI</span>
+                      </button>
+                    </div>
+                  );
+                }
+
+                if (deliveringOrder) {
+                  return (
+                    <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                      <span className="text-[0.68rem] font-mono font-bold text-amber-400 block mb-1">
+                        PESANAN SEDANG MENUJU MEJA INI:
+                      </span>
+                      <p className="text-xs text-white mb-2">
+                        {deliveringOrder.order_display_number || deliveringOrder.order_number} • {deliveringOrder.customer_name}
+                      </p>
+                      <button
+                        onClick={() => handleCompleteServed(deliveringOrder.id, selectedTable.code)}
+                        disabled={actionLoadingId === deliveringOrder.id}
+                        style={{ background: '#27AE60', color: '#FFFFFF' }}
+                        className="w-full py-2 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md"
+                      >
+                        {actionLoadingId === deliveringOrder.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                        )}
+                        <span>KONFIRMASI SUDAH DISAJIKAN</span>
+                      </button>
+                    </div>
+                  );
+                }
+
+                return null;
+              })()}
 
               {/* Close CTA */}
-              <div className="pt-4 mt-4 border-t border-white/10">
+              <div className="pt-2">
                 <button
                   onClick={() => setSelectedTable(null)}
-                  style={{ background: '#9E1F1F', color: '#FFFFFF' }}
-                  className="w-full py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider cursor-pointer shadow-md"
+                  style={{
+                    background: isDark ? '#0E0B0A' : '#FAF7F5',
+                    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F',
+                    color: isDark ? '#FFFFFF' : '#1A1A1A',
+                  }}
+                  className="w-full py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider cursor-pointer"
                 >
                   TUTUP DETAIL MEJA
                 </button>

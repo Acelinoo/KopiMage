@@ -140,8 +140,9 @@ export default function OrderTrackerPage() {
   const currentOrderStatus = order?.order_status || 'NEW_ORDER';
   const currentPaymentStatus = order?.payment_status || 'UNPAID';
 
-  const isPreparing = currentOrderStatus === 'PREPARING' || currentOrderStatus === 'READY' || currentOrderStatus === 'COMPLETED';
-  const isReady = currentOrderStatus === 'READY' || currentOrderStatus === 'COMPLETED';
+  const isPreparing = currentOrderStatus === 'PREPARING' || currentOrderStatus === 'READY' || currentOrderStatus === 'DELIVERING' || currentOrderStatus === 'COMPLETED';
+  const isReady = currentOrderStatus === 'READY' || currentOrderStatus === 'DELIVERING' || currentOrderStatus === 'COMPLETED';
+  const isDelivering = currentOrderStatus === 'DELIVERING';
   const isCompleted = currentOrderStatus === 'COMPLETED';
 
   return (
@@ -153,6 +154,36 @@ export default function OrderTrackerPage() {
           <ArrowLeft size={16} />
           <span>Kembali ke Katalog Menu</span>
         </Link>
+
+        {/* DELIVERING / SEDANG DIANTAR WAITER BANNER ALERT */}
+        {isDelivering && (
+          <div
+            style={{
+              background: 'rgba(230, 126, 34, 0.15)',
+              border: '1.5px solid #E67E22',
+              padding: '1.25rem 1.5rem',
+              borderRadius: '16px',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              boxShadow: '0 0 20px rgba(230, 126, 34, 0.25)',
+            }}
+          >
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#E67E22', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Coffee size={24} color="#FFFFFF" />
+            </div>
+            <div>
+              <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#E67E22', fontWeight: 800 }}>PRAMUSAJI / FLOOR RUNNER</span>
+              <h3 style={{ fontSize: '1.15rem', color: '#FFFFFF', fontWeight: 800, margin: '0.1rem 0 0.2rem 0' }}>
+                PESANAN SEDANG DIANTAR KE MEJA
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: '#F3EFEA', margin: 0 }}>
+                Waiter KOPIMAGE sedang membawa pesananmu menuju meja. Harap bersiap!
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* READY / SIAP DISAJIKAN GLOWING BANNER ALERT */}
         {currentOrderStatus === 'READY' && (
@@ -174,10 +205,10 @@ export default function OrderTrackerPage() {
             <div>
               <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#27AE60', fontWeight: 800 }}>STASIUN KITCHEN NOTIFIKASI</span>
               <h3 style={{ fontSize: '1.15rem', color: '#FFFFFF', fontWeight: 800, margin: '0.1rem 0 0.2rem 0' }}>
-                PESANAN SIAP DISAJIKAN
+                PESANAN SIAP DI PICKUP COUNTER
               </h3>
               <p style={{ fontSize: '0.85rem', color: '#C4BBB4', margin: 0 }}>
-                Pesananmu sudah selesai diracik dan lagi meluncur ke mejamu.
+                Pesananmu sudah selesai diracik dan segera diambil oleh waiter.
               </p>
             </div>
           </div>

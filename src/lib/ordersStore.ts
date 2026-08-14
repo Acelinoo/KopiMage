@@ -95,6 +95,33 @@ export function updateOrderInStore(
 }
 
 /**
+ * Atomic conditional update for concurrency safety (e.g. READY -> DELIVERING)
+ * Returns { success: true, order } if current status matches expectedStatus, otherwise { success: false, currentStatus }
+ */
+export function updateOrderInStoreConditional(
+  orderId: string,
+  updates: Partial<OrderRecord>,
+  expectedStatus: string
+): { success: boolean; order?: OrderRecord; currentStatus?: string } {
+  const idx = sharedOrdersStore.findIndex((o) => o.id === orderId);
+  if (idx === -1) {
+    return { success: false, currentStatus: undefined };
+  }
+  const current = sharedOrdersStore[idx];
+  if (current.order_status !== expectedStatus) {
+    return { success: false, currentStatus: current.order_status };
+  }
+
+  sharedOrdersStore[idx] = {
+    ...current,
+    ...updates,
+    updated_at: new Date().toISOString(),
+  };
+  return { success: true, order: sharedOrdersStore[idx] };
+}
+
+
+/**
  * Clear all stored orders from memory store
  */
 export function clearOrdersStore() {
