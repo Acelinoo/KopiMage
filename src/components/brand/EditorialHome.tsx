@@ -257,7 +257,6 @@ export function EditorialHome() {
                                         style={{ background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.3)', fontWeight: 600 }}
                                         className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl border transition-all text-xs tracking-wider uppercase text-center w-full sm:w-auto cursor-pointer"
                                     >
-                                        <Coffee className="w-4 h-4" style={{ color: '#FFFFFF' }} />
                                         <span>Cara Pesan</span>
                                     </a>
                                 </div>

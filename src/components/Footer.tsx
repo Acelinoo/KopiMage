@@ -9,20 +9,7 @@ export const Footer: React.FC = () => {
           
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <div
-              style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '10px',
-                background: 'linear-gradient(135deg, #D4A373 0%, #C67D5A 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <Coffee size={18} color="#0F0D0C" strokeWidth={2.5} />
-            </div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#F7F4EF', letterSpacing: '-0.02em' }}>
+            <span style={{ fontSize: '1.35rem', fontWeight: 900, color: '#F7F4EF', letterSpacing: '-0.02em', fontFamily: 'serif' }}>
               KOPIMAGE
             </span>
           </div>
