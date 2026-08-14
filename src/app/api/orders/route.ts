@@ -2,9 +2,31 @@ import { NextResponse } from 'next/server';
 import { createAdminSupabaseClient } from '@/lib/supabase/server';
 import { MENU_ITEMS } from '@/data/menuData';
 import { addOrderToStore, OrderRecord } from '@/lib/ordersStore';
+import { checkRateLimit, getClientIp } from '@/lib/rateLimiter';
+
+// Helper to strip HTML tags and trim length to prevent stored XSS and payload bloating
+function sanitizeText(input: any, maxLength: number = 100): string {
+  if (typeof input !== 'string') return '';
+  return input
+    .replace(/[<>]/g, '') // Strip HTML tags
+    .trim()
+    .slice(0, maxLength);
+}
 
 export async function POST(request: Request) {
   try {
+    // 0. Rate Limiting Protection (Max 15 order creations per minute per IP)
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(clientIp, 15, 60 * 1000);
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        {
+          error: 'Terlalu banyak permintaan pemesanan dari perangkat Anda. Harap tunggu beberapa saat sebelum memesan kembali.',
+        },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil(rateLimit.resetInMs / 1000)) } }
+      );
+    }
+
     const body = await request.json();
     const { client_order_id, mode, table_id, customer_name, customer_phone, payment_method, payment_proof_url, items } = body;
 
@@ -21,6 +43,20 @@ export async function POST(request: Request) {
         { error: 'Pemesanan Dine-In wajib menyertakan nomor meja.' },
         { status: 400 }
       );
+    }
+
+    // Sanitize user-provided fields
+    const cleanCustomerName = sanitizeText(customer_name, 60);
+    const cleanCustomerPhone = sanitizeText(customer_phone, 20).replace(/[^0-9+]/g, '');
+    let cleanProofUrl = payment_proof_url;
+    if (cleanProofUrl && typeof cleanProofUrl === 'string') {
+      // Validate payment proof URL or data URI format
+      if (!cleanProofUrl.startsWith('data:image/') && !cleanProofUrl.startsWith('https://') && !cleanProofUrl.startsWith('http://')) {
+        cleanProofUrl = null;
+      } else if (cleanProofUrl.length > 8 * 1024 * 1024) {
+        // Block oversized payload > 8MB
+        return NextResponse.json({ error: 'Ukuran foto bukti transfer terlalu besar (Maksimal 5MB).' }, { status: 400 });
+      }
     }
 
     const supabase = createAdminSupabaseClient();
@@ -167,10 +203,10 @@ export async function POST(request: Request) {
       tracking_secret: trackingSecret,
       mode,
       table_id: mode === 'dine-in' ? cleanTableCode : null,
-      customer_name,
-      customer_phone,
+      customer_name: cleanCustomerName,
+      customer_phone: cleanCustomerPhone,
       payment_method,
-      payment_proof_url,
+      payment_proof_url: cleanProofUrl,
       subtotal: calculatedSubtotal,
       total_amount: calculatedSubtotal,
       order_status: initialOrderStatus,

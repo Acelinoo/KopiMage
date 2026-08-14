@@ -1217,7 +1217,28 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                onChange={(e) => setProofFile(e.target.files ? e.target.files[0] : null)}
+                onChange={(e) => {
+                  const file = e.target.files ? e.target.files[0] : null;
+                  if (file) {
+                    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+                    if (!validTypes.includes(file.type)) {
+                      setErrorMessage('Format file tidak didukung. Harap pilih foto bertipe JPG, PNG, atau WebP.');
+                      e.target.value = '';
+                      setProofFile(null);
+                      return;
+                    }
+                    if (file.size > 5 * 1024 * 1024) {
+                      setErrorMessage('Ukuran foto terlalu besar. Maksimal ukuran file adalah 5 MB.');
+                      e.target.value = '';
+                      setProofFile(null);
+                      return;
+                    }
+                    setErrorMessage('');
+                    setProofFile(file);
+                  } else {
+                    setProofFile(null);
+                  }
+                }}
                 style={{ fontSize: '0.82rem', color: isDark ? '#FFFFFF' : '#1A1A1A' }}
               />
             </div>

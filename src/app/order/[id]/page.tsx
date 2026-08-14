@@ -95,6 +95,18 @@ export default function OrderTrackerPage() {
   const handleSimulatedUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+      if (!validTypes.includes(file.type)) {
+        alert('Format file tidak didukung. Harap pilih foto bertipe JPG, PNG, atau WebP.');
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Ukuran foto terlalu besar. Maksimal ukuran file adalah 5 MB.');
+        e.target.value = '';
+        return;
+      }
+
       setUploading(true);
       try {
         // Upload proof to server if available
