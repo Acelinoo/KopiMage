@@ -1,5 +1,5 @@
 export type OrderMode = 'dine-in' | 'takeaway';
-export type PaymentMethod = 'qris_static' | 'bank_transfer' | 'cashier';
+export type PaymentMethod = 'midtrans_online' | 'qris' | 'qris_static' | 'bank_transfer' | 'cashier';
 export type OrderStatus =
   | 'verifying_payment' // QRIS / Transfer waiting for admin approval
   | 'new'               // Approved/Cashier order ready for Barista kitchen production

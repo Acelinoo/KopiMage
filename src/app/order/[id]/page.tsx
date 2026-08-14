@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { Coffee, Clock, CheckCircle, Upload, QrCode, ShieldCheck, AlertCircle, ArrowLeft, Sparkles, Flame } from 'lucide-react';
+import { Coffee, Clock, CheckCircle, Upload, QrCode, ShieldCheck, AlertCircle, ArrowLeft, Sparkles, Flame, Zap, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
+import { loadSnapScript } from '@/lib/payment/snapLoader';
 
 export default function OrderTrackerPage() {
   const params = useParams();
@@ -15,6 +16,57 @@ export default function OrderTrackerPage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [isOpeningSnap, setIsOpeningSnap] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
+
+  const handlePayWithMidtrans = async () => {
+    if (!order?.id) return;
+    setIsOpeningSnap(true);
+    setPaymentError('');
+
+    try {
+      await loadSnapScript();
+      const res = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: order.id,
+          payment_method: 'qris',
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.snap_token) {
+        throw new Error(data.error || 'Gagal membuat sesi pembayaran Midtrans.');
+      }
+
+      if (window.snap && typeof window.snap.pay === 'function') {
+        window.snap.pay(data.snap_token, {
+          onSuccess: (result: any) => {
+            console.log('Payment success:', result);
+            fetchLiveOrder();
+          },
+          onPending: (result: any) => {
+            console.log('Payment pending:', result);
+            fetchLiveOrder();
+          },
+          onError: (result: any) => {
+            console.error('Payment error:', result);
+            setPaymentError('Pembayaran gagal atau dibatalkan.');
+          },
+          onClose: () => {
+            console.log('Payment popup closed.');
+            fetchLiveOrder();
+          },
+        });
+      }
+    } catch (err: any) {
+      console.error('Midtrans trigger error:', err);
+      setPaymentError(err.message || 'Gagal membuka pembayaran Midtrans.');
+    } finally {
+      setIsOpeningSnap(false);
+    }
+  };
 
   // Live order fetcher from real-time API with cache buster
   const fetchLiveOrder = async () => {
@@ -345,12 +397,86 @@ export default function OrderTrackerPage() {
           </div>
         )}
 
-        {/* QRIS / Transfer Payment Section */}
-        {currentPaymentStatus !== 'PAID' && order.payment_method !== 'cashier' && (
+        {/* 1. MIDTRANS ONLINE PAYMENT CARD (QRIS / E-WALLET / VA) */}
+        {currentPaymentStatus !== 'PAID' && (order.payment_method === 'midtrans_online' || order.payment_method === 'qris') && (
+          <div style={{ borderRadius: '24px', padding: '1.75rem', marginBottom: '1.5rem', background: 'linear-gradient(135deg, #1A1412 0%, #0E0C0A 100%)', border: '1.5px solid rgba(46, 204, 113, 0.4)', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(46, 204, 113, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Zap size={22} color="#2ECC71" />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.15rem', color: '#F7F4EF', fontWeight: 800, margin: 0 }}>
+                    Pembayaran Online Instan
+                  </h3>
+                  <span style={{ fontSize: '0.75rem', color: '#2ECC71', fontWeight: 700, fontFamily: 'monospace' }}>
+                    MIDTRANS SNAP (QRIS / GOPAY / VA)
+                  </span>
+                </div>
+              </div>
+              <span style={{ fontSize: '0.7rem', fontWeight: 800, padding: '0.2rem 0.5rem', borderRadius: '6px', background: 'rgba(46, 204, 113, 0.2)', color: '#2ECC71', border: '1px solid #2ECC71' }}>
+                OTOMATIS
+              </span>
+            </div>
+
+            <p style={{ fontSize: '0.88rem', color: '#A89F91', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+              Total tagihan pesanan Anda: <strong style={{ color: '#2ECC71', fontSize: '1.05rem', fontFamily: 'monospace' }}>Rp {(order.subtotal || order.total_amount || 47000)?.toLocaleString('id-ID')}</strong>. Klik tombol di bawah untuk membuka popup pembayaran.
+            </p>
+
+            {paymentError && (
+              <div style={{ background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.4)', padding: '0.65rem 1rem', borderRadius: '10px', color: '#E74C3C', fontSize: '0.82rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <AlertCircle size={16} />
+                <span>{paymentError}</span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={handlePayWithMidtrans}
+              disabled={isOpeningSnap}
+              style={{
+                width: '100%',
+                padding: '0.9rem',
+                borderRadius: '12px',
+                background: 'linear-gradient(135deg, #27AE60 0%, #2ECC71 100%)',
+                color: '#FFFFFF',
+                fontWeight: 800,
+                fontSize: '0.95rem',
+                border: 'none',
+                cursor: isOpeningSnap ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem',
+                boxShadow: '0 6px 20px rgba(39, 174, 96, 0.4)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Zap size={18} />
+              <span>{isOpeningSnap ? 'Menghubungkan ke Midtrans...' : 'Buka QRIS / Bayar Sekarang'}</span>
+            </button>
+          </div>
+        )}
+
+        {/* 2. CASHIER INSTRUCTION CARD */}
+        {currentPaymentStatus !== 'PAID' && order.payment_method === 'cashier' && (
+          <div style={{ borderRadius: '24px', padding: '1.5rem', marginBottom: '1.5rem', background: '#161210', border: '1.5px solid rgba(212, 163, 115, 0.4)' }}>
+            <h3 style={{ fontSize: '1.1rem', color: '#F7F4EF', fontWeight: 800, marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Coffee size={18} color="#D4A373" />
+              <span>Instruksi Bayar di Kasir</span>
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#A89F91', margin: 0, lineHeight: 1.5 }}>
+              Pesanan Anda telah masuk antrean dapur. Silakan lakukan pembayaran sebesar <strong style={{ color: '#D4A373' }}>Rp {(order.subtotal || order.total_amount || 47000)?.toLocaleString('id-ID')}</strong> secara tunai atau EDC di kasir saat pesanan disajikan.
+            </p>
+          </div>
+        )}
+
+        {/* 3. MANUAL QRIS / BANK TRANSFER UPLOAD (Jika Menggunakan Manual Flow) */}
+        {currentPaymentStatus !== 'PAID' && (order.payment_method === 'qris_static' || order.payment_method === 'bank_transfer') && (
           <div style={{ borderRadius: '24px', padding: '1.75rem', marginBottom: '1.5rem', background: '#0E0C0A', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
             <h3 style={{ fontSize: '1.15rem', color: '#F7F4EF', fontWeight: 700, marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <QrCode size={20} color="#C29B7F" />
-              <span>Instruksi Pembayaran QRIS / Bank</span>
+              <span>Instruksi Pembayaran QRIS / Bank Manual</span>
             </h3>
             <p style={{ fontSize: '0.88rem', color: '#A89F91', marginBottom: '1.25rem' }}>
               Silakan melakukan pembayaran sebesar <strong style={{ color: '#C29B7F' }}>Rp {(order.subtotal || order.total_amount || 47000)?.toLocaleString('id-ID')}</strong> ke QRIS atau rekening resmi KOPIMAGE.

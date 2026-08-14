@@ -6,7 +6,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { OrderMode, PaymentMethod } from '@/types/order';
 import { compressImageFile } from '@/lib/imageCompressor';
 import { isSameTable, isActiveCustomerOrder, isCompletedOrCancelledOrder } from '@/lib/tableUtils';
-import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee, Clock, ShieldCheck, RefreshCw, XCircle, Heart, Sparkles } from 'lucide-react';
+import { loadSnapScript } from '@/lib/payment/snapLoader';
+import { X, CheckCircle, Upload, QrCode, CreditCard, Store, UtensilsCrossed, ShoppingBag, AlertCircle, Loader2, Coffee, Clock, ShieldCheck, RefreshCw, XCircle, Heart, Sparkles, Zap, ExternalLink } from 'lucide-react';
 
 interface CheckoutModalProps {
   onClose: () => void;
@@ -24,11 +25,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
   const [liveTables, setLiveTables] = useState<any[]>([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cashier');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('midtrans_online');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionStep, setSubmissionStep] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState('');
+  const [snapToken, setSnapToken] = useState<string | null>(null);
+  const [isOpeningSnap, setIsOpeningSnap] = useState<boolean>(false);
+
+  // Pre-load Snap.js client script on mount
+  useEffect(() => {
+    loadSnapScript().catch((err) => console.warn('Midtrans Snap script pre-load warning:', err));
+  }, []);
 
   // Single Popup Unified State: Track created order right inside this popup
   const [createdOrder, setCreatedOrder] = useState<any>(null);
@@ -225,11 +233,59 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
       setSubmissionStep(4); // Step 4: Selesai -> Tampilkan Live Popup Status
       clearCart();
       onSuccess();
+
+      // Trigger Midtrans Snap Popup if online payment chosen
+      if (paymentMethod === 'midtrans_online' || paymentMethod === 'qris') {
+        triggerMidtransPayment(data.order.id);
+      }
     } catch (err: any) {
       console.error('Checkout error:', err);
       setErrorMessage(err.message || 'Terjadi kesalahan sistem saat checkout.');
       setSubmissionStep(0);
       setIsSubmitting(false);
+    }
+  };
+
+  const triggerMidtransPayment = async (orderId: string) => {
+    setIsOpeningSnap(true);
+    try {
+      await loadSnapScript();
+      const resPay = await fetch('/api/payments/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderId,
+          payment_method: 'qris',
+        }),
+      });
+
+      const payData = await resPay.json();
+      if (!resPay.ok || !payData.snap_token) {
+        throw new Error(payData.error || 'Gagal membuat sesi pembayaran Midtrans.');
+      }
+
+      setSnapToken(payData.snap_token);
+
+      if (window.snap && typeof window.snap.pay === 'function') {
+        window.snap.pay(payData.snap_token, {
+          onSuccess: (result: any) => {
+            console.log('Midtrans payment success callback:', result);
+          },
+          onPending: (result: any) => {
+            console.log('Midtrans payment pending callback:', result);
+          },
+          onError: (result: any) => {
+            console.error('Midtrans payment error callback:', result);
+          },
+          onClose: () => {
+            console.log('Customer closed Midtrans Snap popup.');
+          },
+        });
+      }
+    } catch (payErr: any) {
+      console.warn('Payment initiation warning:', payErr);
+    } finally {
+      setIsOpeningSnap(false);
     }
   };
 
@@ -593,7 +649,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     TERIMA KASIH ATAS PESANAN ANDA
                   </h4>
                   <p style={{ fontSize: '0.85rem', color: isDark ? '#FFFFFF' : '#1A1A1A', lineHeight: 1.5 }}>
-                    Pesanan Anda telah selesai disajikan oleh Dapur & Barista KOPIMAGE. Selamat menikmati!
+                    Pesanan Anda telah selesai disajikan oleh Dapur &amp; Barista KOPIMAGE. Selamat menikmati!
                   </p>
                 </div>
               ) : isReady ? (
@@ -605,14 +661,48 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     Pesanan Anda telah selesai diracik dan siap diantarkan ke meja Anda.
                   </p>
                 </div>
-              ) : isApproved ? (
+              ) : createdOrder.payment_status === 'PAID' ? (
                 <div>
                   <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#27AE60', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                    PEMBAYARAN TERVERIFIKASI
+                    PEMBAYARAN TERVERIFIKASI (LUNAS)
                   </h4>
                   <p style={{ fontSize: '0.82rem', color: isDark ? '#FFFFFF' : '#1A1A1A' }}>
-                    Pesanan Anda telah disetujui Admin dan sedang diracik oleh Dapur & Barista KopiMage.
+                    Pembayaran telah diterima sistem. Pesanan sedang diproses oleh Dapur &amp; Barista KopiMage.
                   </p>
+                </div>
+              ) : (createdOrder.payment_method === 'midtrans_online' || createdOrder.payment_method === 'qris') && createdOrder.payment_status !== 'PAID' ? (
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
+                    <Zap size={20} color="#F39C12" />
+                    <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#F39C12', margin: 0, fontFamily: 'serif' }}>
+                      MENUNGGU PEMBAYARAN ONLINE
+                    </h4>
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: isDark ? '#FFFFFF' : '#1A1A1A', marginBottom: '0.8rem' }}>
+                    Selesaikan pembayaran via QRIS / E-Wallet untuk mempercepat racikan pesanan.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => triggerMidtransPayment(createdOrder.id)}
+                    disabled={isOpeningSnap}
+                    style={{
+                      padding: '0.65rem 1.25rem',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, #27AE60 0%, #2ECC71 100%)',
+                      color: '#FFFFFF',
+                      fontWeight: 800,
+                      fontSize: '0.85rem',
+                      border: 'none',
+                      cursor: isOpeningSnap ? 'not-allowed' : 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      boxShadow: '0 4px 15px rgba(39, 174, 96, 0.4)',
+                    }}
+                  >
+                    <Zap size={16} />
+                    <span>{isOpeningSnap ? 'Membuka Midtrans...' : 'Buka QRIS / Bayar Sekarang'}</span>
+                  </button>
                 </div>
               ) : (
                 <div>
@@ -620,7 +710,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     PESANAN SEDANG DIRACIK
                   </h4>
                   <p style={{ fontSize: '0.82rem', color: isDark ? '#FFFFFF' : '#1A1A1A' }}>
-                    Pesanan Anda telah diteruskan ke Dapur & Barista KopiMage.
+                    {createdOrder.payment_method === 'cashier' ? 'Silakan lakukan pembayaran tunai di kasir saat pesanan tiba.' : 'Pesanan Anda telah diteruskan ke Dapur & Barista KopiMage.'}
                   </p>
                 </div>
               )}
@@ -1109,6 +1199,52 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               METODE PEMBAYARAN:
             </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              {/* 1. MIDTRANS ONLINE (REKOMENDASI) */}
+              <label
+                style={{
+                  padding: '0.9rem 1rem',
+                  borderRadius: '12px',
+                  border: paymentMethod === 'midtrans_online'
+                    ? (isDark ? '1.5px solid #2ECC71' : '2px solid #27AE60')
+                    : (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F'),
+                  background: paymentMethod === 'midtrans_online'
+                    ? (isDark ? 'rgba(46, 204, 113, 0.15)' : '#F2FAF5')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  transition: 'all 0.2s ease',
+                  position: 'relative',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="payment"
+                  value="midtrans_online"
+                  checked={paymentMethod === 'midtrans_online'}
+                  onChange={() => setPaymentMethod('midtrans_online')}
+                  style={{ accentColor: '#2ECC71' }}
+                />
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: isDark ? 'rgba(46, 204, 113, 0.2)' : 'rgba(39, 174, 96, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Zap size={20} color={isDark ? '#2ECC71' : '#27AE60'} />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'midtrans_online' ? '#27AE60' : '#1A1A1A'), fontWeight: 800 }}>
+                      QRIS &amp; E-Wallet Otomatis (Midtrans)
+                    </span>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 800, padding: '0.15rem 0.45rem', borderRadius: '6px', background: '#27AE60', color: '#FFF', letterSpacing: '0.05em' }}>
+                      INSTAN
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>
+                    QRIS Dinamis, GoPay, ShopeePay, VA BCA / Mandiri / BNI (Verifikasi Otomatis)
+                  </div>
+                </div>
+              </label>
+
+              {/* 2. BAYAR DI KASIR */}
               <label
                 style={{
                   padding: '0.85rem 1rem',
@@ -1136,11 +1272,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 />
                 <Store size={20} color={isDark ? '#D4A373' : '#9E1F1F'} />
                 <div>
-                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'cashier' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>Bayar di Kasir / Tempat</div>
-                  <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>Bayar tunai/EDC saat mengambil/di meja</div>
+                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'cashier' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>Bayar di Kasir / Tunai</div>
+                  <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>Bayar tunai atau EDC saat pesanan selesai</div>
                 </div>
               </label>
 
+              {/* 3. QRIS STATIS */}
               <label
                 style={{
                   padding: '0.85rem 1rem',
@@ -1168,11 +1305,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 />
                 <QrCode size={20} color={isDark ? '#D4A373' : '#9E1F1F'} />
                 <div>
-                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'qris_static' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>QRIS Statis KOPIMAGE</div>
-                  <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>Scan via GoPay/OVO/Dana/BCA Mobile</div>
+                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'qris_static' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>QRIS Manual (Unggah Bukti)</div>
+                  <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>Scan QRIS statis di meja lalu unggah foto struk</div>
                 </div>
               </label>
 
+              {/* 4. TRANSFER BANK */}
               <label
                 style={{
                   padding: '0.85rem 1rem',
@@ -1200,7 +1338,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 />
                 <CreditCard size={20} color={isDark ? '#D4A373' : '#9E1F1F'} />
                 <div>
-                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'bank_transfer' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>Transfer Bank BCA</div>
+                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'bank_transfer' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>Transfer Bank BCA Manual</div>
                   <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>Rekening 1234567890 a.n KOPIMAGE</div>
                 </div>
               </label>
