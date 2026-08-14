@@ -469,7 +469,7 @@ export function EditorialHome() {
                                                 href="#experience"
                                                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#B82E2E] text-[#FFFFFF] text-xs font-sans tracking-wider uppercase font-semibold hover:bg-[#D63434] transition-colors shrink-0 w-full sm:w-auto text-center justify-center"
                                             >
-                                                <span>SIMULASI SCAN QR MEJA</span>
+                                                <span>CARA PESAN DI MEJA</span>
                                                 <ArrowRight className="w-3.5 h-3.5" />
                                             </a>
                                         </div>
