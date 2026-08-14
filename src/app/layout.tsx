@@ -6,13 +6,31 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { CartDrawer } from '@/components/CartDrawer';
 
 export const metadata: Metadata = {
-  title: 'KOPIMAGE Soreang - Coffee, Drinks & Eats | Gading Tutuka',
-  description: 'Kedai Kopi & Kuliner Favorit di Gading Tutuka, Soreang. Menyediakan Es Kopi Susu Signature, Manual Brew, Cemilan Asin/Manis, dan Makanan Berat Lezat.',
-  keywords: ['KopiMage', 'KOPIMAGE Soreang', 'Coffee Shop Soreang', 'Gading Tutuka Kopi', 'Es Kopi Susu Soreang'],
+  metadataBase: new URL('https://kopimage.vercel.app'),
+  title: 'KOPIMAGE — Industrial Coffee Space & Roastery | Soreang & Sulaiman',
+  description: 'Kedai Kopi & Kuliner Favorit di Gading Tutuka (Soreang) dan Lanud Sulaiman (Margahayu). Menyediakan Kopi Racikan Signature, Manual Brew, Cemilan, dan Makanan Lezat.',
+  keywords: ['KopiMage', 'KOPIMAGE Soreang', 'Coffee Shop Soreang', 'Gading Tutuka Kopi', 'Lanud Sulaiman Kopi', 'Kopi Mage Bandung'],
   openGraph: {
-    title: 'KOPIMAGE Soreang - Coffee, Drinks & Eats',
-    description: 'Nikmati sajian kopi pilihan, cemilan, dan makanan khas di Gading Tutuka, Soreang. Buka setiap hari 07.00 - 23.00 WIB.',
+    title: 'KOPIMAGE — Industrial Coffee Space & Roastery',
+    description: 'A place to slow down, converse, and appreciate the honest art of hospitality. 2 Cabang: Gading Tutuka & Lanud Sulaiman.',
+    url: 'https://kopimage.vercel.app',
+    siteName: 'KOPIMAGE',
+    images: [
+      {
+        url: '/images/Banner.webp',
+        width: 1200,
+        height: 630,
+        alt: 'KOPIMAGE Industrial Coffee Space & Roastery',
+      },
+    ],
+    locale: 'id_ID',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'KOPIMAGE — Industrial Coffee Space & Roastery',
+    description: 'Nikmati sajian kopi pilihan dan suasana industrial hangat di Gading Tutuka & Lanud Sulaiman.',
+    images: ['/images/Banner.webp'],
   },
 };
 

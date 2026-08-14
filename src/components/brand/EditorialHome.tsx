@@ -280,20 +280,20 @@ export function EditorialHome() {
                                     02 / TENTANG KOPI MAGE
                                 </span>
                                 <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl leading-tight font-light mb-6 text-[#FFFFFF]">
-                                    Tempat pas buat cerita dan ngopi santai.
+                                    Ruang teduh untuk jeda, percakapan, dan seduhan jujur.
                                 </h2>
                                 <p className="font-sans text-sm sm:text-base text-[#A89F91] leading-relaxed mb-6 font-light">
-                                    Kopi Mage hadir dengan konsep <strong className="text-[#C29B7F] font-normal">Industrial Design</strong> yang hangat dan ramah buat siapa aja. Mau ngopi pagi sebelum aktivitas, nugas siang hari, atau nongkrong malam mingguan sambil dengerin musik.
+                                    KOPIMAGE hadir menghadirkan ruang bernapas di tengah dinamika Soreang dan Margahayu. Mengusung arsitektur <strong className="text-[#C29B7F] font-normal">Industrial Design</strong> yang hangat, kami menyatukan kopi pilihan, hidangan lezat, dan keramahan tulus dalam satu harmoni.
                                 </p>
                                 <p className="font-sans text-sm sm:text-base text-[#A89F91] leading-relaxed mb-8 font-light">
-                                    Kini Kopi Mage makin deket sama kamu di <strong className="text-[#FFFFFF] font-semibold">2 cabang utama</strong>: cabang Gading Tutuka (Soreang) dan cabang Lanud Sulaiman (Margahayu).
+                                    Kini melayani Anda di <strong className="text-[#FFFFFF] font-semibold">2 cabang utama</strong>: Cabang Gading Tutuka (Soreang) dan Cabang Lanud Sulaiman (Margahayu).
                                 </p>
                                 <div style={{ background: '#7A1414', borderColor: 'rgba(255,255,255,0.3)' }} className="p-6 border max-w-md rounded shadow-lg quote-highlight-card">
                                     <span style={{ color: '#FFE600' }} className="font-serif italic text-lg block mb-2 font-bold quote-title">
                                         "Kopi Enak, Suasana Nyaman, Live Music Asik."
                                     </span>
                                     <p style={{ color: '#FFFFFF' }} className="font-sans text-xs font-light quote-desc">
-                                        Tempat nongkrong jujur buat nikmatin setiap harimu di Kopi Mage.
+                                        Dedikasi rasa dan kenyamanan untuk menyempurnakan setiap momen kunjungan Anda di Kopi Mage.
                                     </p>
                                 </div>
                             </div>
@@ -346,12 +346,12 @@ export function EditorialHome() {
                                         </span>
                                     </div>
                                     <h2 className="font-serif text-2xl sm:text-3xl font-light text-[#FFFFFF]">
-                                        Pilihan Menu Best Seller
+                                        Pilihan Racikan & Hidangan Terbaik
                                     </h2>
                                     <p className="font-sans text-xs text-[#A89F91] font-light mt-1 max-w-2xl leading-relaxed">
                                         {isMenuExpanded
-                                            ? 'Deretan menu Best Seller favorit di Kopi Mage. Mau liat menu lengkap & langsung pesen? Tinggal scan QR di meja pas kamu mampir ya!'
-                                            : 'Klik "LIHAT MENU BEST SELLER" buat ngintip menu-menu favorit yang paling sering dipesen!'}
+                                            ? 'Koleksi sajian kopi pilihan, minuman segar, dan hidangan signature KOPIMAGE. Silakan jelajahi pilihan favorit dan nikmati kemudahan pemesanan langsung dari meja Anda.'
+                                            : 'Buka katalog untuk menjelajahi sajian racikan kopi dan hidangan signature terfavorit.'}
                                     </p>
                                 </div>
                             </div>
@@ -361,7 +361,7 @@ export function EditorialHome() {
                                 onClick={() => setIsMenuExpanded(!isMenuExpanded)}
                                 className="inline-flex items-center justify-center gap-3 px-6 py-3.5 rounded-xl bg-[#B82E2E] text-[#FFFFFF] hover:bg-[#D63434] transition-all text-xs tracking-wider uppercase font-semibold border border-[#B82E2E] shadow-sm shrink-0 group cursor-pointer w-full sm:w-auto"
                             >
-                                <span>{isMenuExpanded ? 'TUTUP KATALOG BEST SELLER' : 'LIHAT MENU BEST SELLER'}</span>
+                                <span>{isMenuExpanded ? 'TUTUP KATALOG' : 'JELAJAHI MENU BEST SELLER'}</span>
                                 {isMenuExpanded ? (
                                     <ChevronUp className="w-4 h-4 text-[#FFFFFF] transition-transform" />
                                 ) : (
@@ -459,9 +459,9 @@ export function EditorialHome() {
                                                     <QrCode className="w-6 h-6 text-[#B82E2E]" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-serif text-lg text-[#FFFFFF] font-normal">Mau Liat Semua Menu & Langsung Pesen?</h4>
+                                                    <h4 className="font-serif text-lg text-[#FFFFFF] font-normal">Pemesanan Langsung Dari Meja</h4>
                                                     <p className="font-sans text-xs text-[#A89F91] font-light leading-relaxed mt-0.5">
-                                                        Pas kamu mampir ke cabang Gading Tutuka atau Lanud Sulaiman, tinggal duduk santai di meja terus **scan stiker QR di mejanya**. Semua pilihan kopi, non-kopi, makanan, & cemilan bisa langsung kamu pesen dari HP tanpa antre!
+                                                        Saat berkunjung ke cabang Gading Tutuka atau Lanud Sulaiman, silakan duduk nyaman di meja Anda dan pindai stiker QR yang tersedia untuk melakukan pemesanan instan tanpa perlu mengantre.
                                                     </p>
                                                 </div>
                                             </div>
@@ -469,7 +469,7 @@ export function EditorialHome() {
                                                 href="#experience"
                                                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#B82E2E] text-[#FFFFFF] text-xs font-sans tracking-wider uppercase font-semibold hover:bg-[#D63434] transition-colors shrink-0 w-full sm:w-auto text-center justify-center"
                                             >
-                                                <span>CARA PESAN DI MEJA</span>
+                                                <span>PANDUAN PESAN MEJA</span>
                                                 <ArrowRight className="w-3.5 h-3.5" />
                                             </a>
                                         </div>
@@ -674,7 +674,7 @@ export function EditorialHome() {
                                         DUDUK
                                     </h3>
                                     <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
-                                        Pilih spot duduk favoritmu di indoor maupun teras outdoor.
+                                        Silakan pilih area duduk favorit Anda di ruang indoor ber-AC maupun teras luar.
                                     </p>
                                 </div>
                             </div>
@@ -692,7 +692,7 @@ export function EditorialHome() {
                                         SCAN QR
                                     </h3>
                                     <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
-                                        Buka kamera HP terus scan stiker QR yang terpasang di mejamu.
+                                        Buka kamera ponsel dan pindai stiker kode QR yang tertera pada meja Anda.
                                     </p>
                                 </div>
                             </div>
@@ -710,7 +710,7 @@ export function EditorialHome() {
                                         PILIH MENU
                                     </h3>
                                     <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
-                                        Pilih kopi racikan, minuman segar, cemilan, atau makanan utama.
+                                        Tentukan racikan kopi, minuman segar, cemilan, atau hidangan utama pilihan.
                                     </p>
                                 </div>
                             </div>
@@ -728,7 +728,7 @@ export function EditorialHome() {
                                         NIKMATI
                                     </h3>
                                     <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
-                                        Tinggal santai, pesananmu bakal langsung dianterin hangat ke meja.
+                                        Pesanan Anda segera diracik segar dan diantarkan langsung ke meja Anda.
                                     </p>
                                 </div>
                             </div>
@@ -866,13 +866,13 @@ export function EditorialHome() {
                                     07 / RACIKAN KOPI
                                 </span>
                                 <h2 className="font-serif text-3xl sm:text-5xl md:text-6xl font-light leading-tight mb-6 text-[#FFFFFF]">
-                                    Racikan kopi pilihan dari barista berpengalaman.
+                                    Dedikasi dan presisi dalam setiap seduhan.
                                 </h2>
                                 <p className="font-sans text-sm sm:text-base text-[#A89F91] font-light leading-relaxed mb-6">
-                                    Tiap cangkir diseduh presisi oleh barista kami. Dari Es Kopi Susu Signature yang legit creamy seimbang, sampe aneka manual brew single origin buat kamu pecinta kopi sejati.
+                                    Setiap cangkir kopi diseduh dengan ketelitian tinggi oleh barista kami. Dari racikan Es Kopi Susu Signature yang lembut seimbang, hingga seduhan manual brew single origin pilihan dengan profil rasa yang kaya.
                                 </p>
                                 <blockquote className="border-l-2 border-[#B82E2E] pl-6 py-2 my-6 font-serif italic text-lg sm:text-xl text-[#C29B7F] font-medium">
-                                    "Kopi enak, racikan jujur, disajiin hangat buat nemenin setiap obrolan serumu."
+                                    "Kopi berkualitas, racikan jujur, dan kehangatan tulus untuk menemani setiap perbincangan Anda."
                                 </blockquote>
                             </div>
                         </div>
