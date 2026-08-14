@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTheme } from '@/context/ThemeContext';
 import {
   Coffee,
   Clock,
@@ -45,6 +46,8 @@ const playNewOrderChime = () => {
 import { createClient } from '@/lib/supabase/client';
 
 export default function KitchenDisplayPage() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -252,19 +255,46 @@ export default function KitchenDisplayPage() {
   const readyCount = orders.filter((o) => o.order_status === 'READY').length;
 
   return (
-    <div style={{ background: 'var(--bg-main)', color: 'var(--text-primary)', transition: 'background-color 0.25s ease, color 0.25s ease' }} className="min-h-screen font-sans p-4 md:p-8 selection:bg-[#B82E2E] selection:text-white">
+    <div
+      style={{
+        background: isDark ? '#0E0B0A' : '#9E1F1F',
+        color: isDark ? '#F7F4EF' : '#FFFFFF',
+        minHeight: '100vh',
+        transition: 'background-color 0.25s ease, color 0.25s ease',
+      }}
+      className="p-4 md:p-8 selection:bg-[#B82E2E] selection:text-white"
+    >
       {/* Top Bar Navigation */}
-      <header className="max-w-7xl mx-auto mb-8 bg-[#0E0C0A] border border-[#FFFFFF]/10 rounded-3xl p-5 shadow-2xl backdrop-blur-xl flex flex-wrap items-center justify-between gap-4">
+      <header
+        style={{
+          background: isDark ? '#161210' : '#FFFFFF',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+          borderRadius: '24px',
+          boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 30px rgba(0, 0, 0, 0.12)',
+        }}
+        className="max-w-7xl mx-auto mb-8 p-5 flex flex-wrap items-center justify-between gap-4"
+      >
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#B82E2E] to-[#6E1A1A] flex items-center justify-center shadow-lg shadow-[#B82E2E]/20">
+          <div
+            style={{ background: '#9E1F1F' }}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-md shrink-0"
+          >
             <Flame className="w-6 h-6 text-white animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[0.65rem] font-mono uppercase tracking-widest text-[#B82E2E] font-bold">KOPIMAGE KITCHEN SYSTEM</span>
+              <span
+                style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                className="text-[0.68rem] font-mono uppercase tracking-widest font-bold"
+              >
+                KOPIMAGE KITCHEN SYSTEM
+              </span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
             </div>
-            <h1 className="text-xl md:text-2xl font-black font-serif tracking-tight text-white">
+            <h1
+              style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+              className="text-xl md:text-2xl font-black font-serif tracking-tight"
+            >
               Kitchen & Barista Display (KDS)
             </h1>
           </div>
@@ -276,61 +306,91 @@ export default function KitchenDisplayPage() {
           <ThemeToggle />
 
           {/* Connection Status Indicator */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
-            <span className={`w-2 h-2 rounded-full ${connectionStatus === 'LIVE' ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-            <span className={connectionStatus === 'LIVE' ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
-              {connectionStatus === 'LIVE' ? '🟢 LIVE' : '🔴 RECONNECTING'}
+          <div
+            style={{
+              background: isDark ? '#0E0B0A' : '#FAF7F5',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono"
+          >
+            <span className={`w-2 h-2 rounded-full ${connectionStatus === 'LIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
+            <span className={connectionStatus === 'LIVE' ? 'text-emerald-500 font-bold' : 'text-amber-500 font-bold'}>
+              {connectionStatus === 'LIVE' ? 'LIVE' : 'RECONNECTING'}
             </span>
           </div>
 
           {/* Sound Toggle Button */}
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`p-2 rounded-xl border text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
-              soundEnabled
-                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
-                : 'bg-red-500/15 border-red-500/30 text-red-400'
-            }`}
-            title={soundEnabled ? 'Suara Beep Aktif' : 'Suara Beep Mati'}
+            style={{
+              background: soundEnabled
+                ? (isDark ? 'rgba(39, 174, 96, 0.15)' : '#F2FAF5')
+                : (isDark ? 'rgba(231, 76, 60, 0.15)' : '#FDEDEC'),
+              borderColor: soundEnabled ? '#27AE60' : '#E74C3C',
+              color: soundEnabled ? '#27AE60' : '#E74C3C',
+            }}
+            className="p-2 rounded-xl border text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 font-bold"
+            title={soundEnabled ? 'Suara Alert Aktif' : 'Suara Alert Mati'}
           >
             {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
             <span>{soundEnabled ? 'SOUND ON' : 'SOUND OFF'}</span>
           </button>
 
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
-            <span className="text-[#A89F91]">Aktif:</span>
-            <span className="font-bold text-white bg-[#B82E2E] px-2 py-0.5 rounded-md">{activeOrdersCount}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
-            <span className="text-[#A89F91]">Disiapkan:</span>
-            <span className="font-bold text-[#C29B7F]">{preparingCount}</span>
-          </div>
-
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 text-xs font-mono">
-            <span className="text-[#A89F91]">Siap Antar:</span>
-            <span className="font-bold text-emerald-400">{readyCount}</span>
-          </div>
-
-          <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-              soundEnabled
-                ? 'bg-[#B82E2E]/20 border-[#B82E2E] text-white hover:bg-[#B82E2E]/30'
-                : 'bg-[#161210] border-[#FFFFFF]/10 text-[#A89F91] hover:text-white'
-            }`}
-            title={soundEnabled ? 'Suara Alert Aktif' : 'Suara Alert Di-Mute'}
+          {/* Stat: Aktif */}
+          <div
+            style={{
+              background: isDark ? '#0E0B0A' : '#FAF7F5',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono"
           >
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-[#B82E2E]" /> : <VolumeX className="w-4 h-4" />}
-          </button>
+            <span style={{ color: isDark ? '#A89F91' : '#555555' }}>Aktif:</span>
+            <span style={{ background: '#9E1F1F', color: '#FFFFFF' }} className="font-bold px-2 py-0.5 rounded-md">
+              {activeOrdersCount}
+            </span>
+          </div>
 
+          {/* Stat: Disiapkan */}
+          <div
+            style={{
+              background: isDark ? '#0E0B0A' : '#FAF7F5',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono"
+          >
+            <span style={{ color: isDark ? '#A89F91' : '#555555' }}>Disiapkan:</span>
+            <span style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} className="font-bold">
+              {preparingCount}
+            </span>
+          </div>
+
+          {/* Stat: Siap Antar */}
+          <div
+            style={{
+              background: isDark ? '#0E0B0A' : '#FAF7F5',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono"
+          >
+            <span style={{ color: isDark ? '#A89F91' : '#555555' }}>Siap Antar:</span>
+            <span className="font-bold text-emerald-500">
+              {readyCount}
+            </span>
+          </div>
+
+          {/* Refresh Button */}
           <button
             onClick={() => fetchKitchenOrders(false)}
             disabled={isRefreshing}
-            className="p-2.5 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 hover:border-[#B82E2E] text-white transition-all cursor-pointer disabled:opacity-50"
+            style={{
+              background: isDark ? '#0E0B0A' : '#FAF7F5',
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+              color: isDark ? '#FFFFFF' : '#9E1F1F',
+            }}
+            className="p-2.5 rounded-xl border hover:opacity-80 transition-all cursor-pointer disabled:opacity-50"
             title="Refresh Tiket Pesanan"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#B82E2E]' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#9E1F1F]' : ''}`} />
           </button>
         </div>
       </header>
@@ -338,24 +398,30 @@ export default function KitchenDisplayPage() {
       {/* Filter & Station Tabs */}
       <div className="max-w-7xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-4">
         {/* Status Tabs (Pesanan Aktif vs Selesai) */}
-        <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-[#0E0C0A] border border-[#FFFFFF]/10">
+        <div
+          style={{
+            background: isDark ? '#161210' : '#FFFFFF',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+          }}
+          className="flex items-center gap-2 p-1.5 rounded-2xl shadow-sm"
+        >
           <button
             onClick={() => setStatusTab('ACTIVE')}
-            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
-              statusTab === 'ACTIVE'
-                ? 'bg-[#B82E2E] text-white shadow-md shadow-[#B82E2E]/20'
-                : 'text-[#A89F91] hover:text-white'
-            }`}
+            style={{
+              background: statusTab === 'ACTIVE' ? (isDark ? '#B82E2E' : '#9E1F1F') : 'transparent',
+              color: statusTab === 'ACTIVE' ? '#FFFFFF' : (isDark ? '#A89F91' : '#555555'),
+            }}
+            className="px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer"
           >
             TIKET AKTIF ({activeOrdersCount})
           </button>
           <button
             onClick={() => setStatusTab('COMPLETED')}
-            className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
-              statusTab === 'COMPLETED'
-                ? 'bg-[#B82E2E] text-white shadow-md shadow-[#B82E2E]/20'
-                : 'text-[#A89F91] hover:text-white'
-            }`}
+            style={{
+              background: statusTab === 'COMPLETED' ? (isDark ? '#B82E2E' : '#9E1F1F') : 'transparent',
+              color: statusTab === 'COMPLETED' ? '#FFFFFF' : (isDark ? '#A89F91' : '#555555'),
+            }}
+            className="px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer"
           >
             SELESAI DISAJIKAN
           </button>
@@ -363,25 +429,41 @@ export default function KitchenDisplayPage() {
 
         {/* Station Filter (Semua, Barista, Dapur) */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[0.65rem] font-mono text-[#A89F91] uppercase">Stasiun:</span>
+          <span
+            style={{ color: isDark ? '#A89F91' : '#FFFFFF' }}
+            className="text-[0.7rem] font-mono font-bold uppercase tracking-wider"
+          >
+            STASIUN:
+          </span>
           {[
             { id: 'ALL', label: 'Semua Tiket', icon: UtensilsCrossed },
-            { id: 'BARISTA', label: 'Barista (Kopi/Minuman)', icon: Coffee },
-            { id: 'KITCHEN', label: 'Dapur Utama (Makanan)', icon: Flame },
-          ].map((st) => (
-            <button
-              key={st.id}
-              onClick={() => setStationFilter(st.id as any)}
-              className={`px-3 py-1.5 rounded-xl border text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
-                stationFilter === st.id
-                  ? 'bg-[#C29B7F]/20 border-[#C29B7F] text-white'
-                  : 'bg-[#0E0C0A] border-[#FFFFFF]/10 text-[#A89F91] hover:border-[#C29B7F]'
-              }`}
-            >
-              <st.icon className="w-3.5 h-3.5" />
-              <span>{st.label}</span>
-            </button>
-          ))}
+            { id: 'BARISTA', label: 'Barista (Minuman)', icon: Coffee },
+            { id: 'KITCHEN', label: 'Dapur (Makanan)', icon: Flame },
+          ].map((st) => {
+            const isActive = stationFilter === st.id;
+            return (
+              <button
+                key={st.id}
+                onClick={() => setStationFilter(st.id as any)}
+                style={{
+                  background: isActive
+                    ? (isDark ? '#B82E2E' : '#FFFFFF')
+                    : (isDark ? '#161210' : 'rgba(255, 255, 255, 0.15)'),
+                  border: isActive
+                    ? (isDark ? '1px solid #B82E2E' : '2px solid #FFFFFF')
+                    : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.35)'),
+                  color: isActive
+                    ? (isDark ? '#FFFFFF' : '#9E1F1F')
+                    : (isDark ? '#A89F91' : '#FFFFFF'),
+                  fontWeight: isActive ? 800 : 600,
+                }}
+                className="px-3.5 py-2 rounded-xl text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
+              >
+                <st.icon className="w-3.5 h-3.5" />
+                <span>{st.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -389,16 +471,33 @@ export default function KitchenDisplayPage() {
       <main className="max-w-7xl mx-auto">
         {loading ? (
           <div className="py-20 text-center flex flex-col items-center justify-center">
-            <RefreshCw className="w-8 h-8 text-[#B82E2E] animate-spin mb-3" />
-            <p className="text-sm font-mono text-[#A89F91]">Menghubungkan ke Stasiun Dapur KOPIMAGE...</p>
+            <RefreshCw className="w-8 h-8 text-white animate-spin mb-3" />
+            <p style={{ color: isDark ? '#A89F91' : '#FFFFFF' }} className="text-sm font-mono font-bold">
+              Menghubungkan ke Stasiun Dapur KOPIMAGE...
+            </p>
           </div>
         ) : filteredOrders.length === 0 ? (
-          <div className="py-24 text-center border border-dashed border-[#FFFFFF]/10 rounded-3xl bg-[#0E0C0A]/50">
-            <UtensilsCrossed className="w-12 h-12 text-[#A89F91]/40 mx-auto mb-3" />
-            <h3 className="text-base font-serif text-white font-bold mb-1">
+          <div
+            style={{
+              background: isDark ? 'rgba(22, 18, 16, 0.5)' : '#FFFFFF',
+              border: isDark ? '1px dashed rgba(255, 255, 255, 0.15)' : '1.5px dashed #9E1F1F',
+            }}
+            className="py-24 text-center rounded-3xl p-6 shadow-sm"
+          >
+            <UtensilsCrossed
+              style={{ color: isDark ? '#A89F91' : '#9E1F1F' }}
+              className="w-12 h-12 mx-auto mb-3 opacity-60"
+            />
+            <h3
+              style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+              className="text-lg font-serif font-bold mb-1"
+            >
               {statusTab === 'ACTIVE' ? 'Tidak Ada Tiket Pesanan Aktif Saat Ini' : 'Belum Ada Riwayat Tiket Selesai'}
             </h3>
-            <p className="text-xs text-[#A89F91] font-mono">
+            <p
+              style={{ color: isDark ? '#A89F91' : '#555555' }}
+              className="text-xs font-mono"
+            >
               {statusTab === 'ACTIVE'
                 ? 'Semua pesanan telah selesai disajikan atau belum ada pesanan baru.'
                 : 'Tiket pesanan yang selesai disajikan akan muncul di sini.'}
@@ -425,40 +524,68 @@ export default function KitchenDisplayPage() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className={`rounded-3xl border p-5 flex flex-col justify-between transition-all shadow-xl relative overflow-hidden ${
-                      isUrgent
-                        ? 'bg-[#140807] border-[#B82E2E] shadow-[#B82E2E]/20 ring-1 ring-[#B82E2E]/40'
+                    style={{
+                      background: isDark
+                        ? (isUrgent ? '#140807' : currentStatus === 'READY' ? '#06120B' : '#161210')
+                        : '#FFFFFF',
+                      border: isUrgent
+                        ? '2px solid #E74C3C'
                         : currentStatus === 'READY'
-                        ? 'bg-[#06120B] border-emerald-500/50 shadow-emerald-500/10'
-                        : currentStatus === 'PREPARING'
-                        ? 'bg-[#120E09] border-[#C29B7F]/50 shadow-[#C29B7F]/10'
-                        : 'bg-[#0E0C0A] border-[#FFFFFF]/10'
-                    }`}
+                        ? '2px solid #27AE60'
+                        : (isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1.5px solid #9E1F1F'),
+                      boxShadow: isDark
+                        ? '0 10px 30px rgba(0, 0, 0, 0.6)'
+                        : '0 10px 30px rgba(0, 0, 0, 0.15)',
+                    }}
+                    className="rounded-3xl p-5 flex flex-col justify-between transition-all relative overflow-hidden"
                   >
                     {/* Header Top Badge & Timer */}
                     <div>
-                      <div className="flex items-center justify-between gap-2 border-b border-[#FFFFFF]/10 pb-3 mb-4">
+                      <div
+                        style={{
+                          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(158, 31, 31, 0.15)',
+                        }}
+                        className="flex items-center justify-between gap-2 pb-3 mb-4"
+                      >
                         <div>
-                          <span className="text-[0.7rem] font-mono font-bold text-[#D4A373] block">
+                          <span
+                            style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                            className="text-[0.72rem] font-mono font-bold block tracking-wider"
+                          >
                             {order.order_display_number || `#${order.order_number}`}
                           </span>
-                          <h2 className="text-lg font-black font-serif text-white flex items-center gap-2">
+                          <h2
+                            style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                            className="text-lg font-black font-serif flex items-center gap-2"
+                          >
                             <span>MEJA {cleanTableCode}</span>
-                            <span className="text-xs font-normal text-[#C29B7F] font-mono">
+                            <span
+                              style={{ color: isDark ? '#D4A373' : '#777777' }}
+                              className="text-xs font-normal font-mono"
+                            >
                               ({order.mode === 'takeaway' ? 'TAKEAWAY' : 'DINE-IN'})
                             </span>
                           </h2>
                         </div>
 
-                        {/* Elapsed Timer Badge */}
+                        {/* Elapsed Timer Badge (No AI slop) */}
                         <div
-                          className={`px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 text-xs font-mono font-bold ${
+                          style={
                             isUrgent
-                              ? 'bg-[#B82E2E] text-white border-red-400 animate-pulse'
+                              ? { background: '#E74C3C', color: '#FFFFFF', border: '1px solid #C0392B' }
                               : isWarning
-                              ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                          }`}
+                              ? {
+                                  background: isDark ? 'rgba(230, 126, 34, 0.15)' : '#FFF9F4',
+                                  color: '#E67E22',
+                                  border: '1px solid #E67E22',
+                                }
+                              : {
+                                  background: isDark ? 'rgba(39, 174, 96, 0.15)' : '#F2FAF5',
+                                  color: '#27AE60',
+                                  border: '1px solid #27AE60',
+                                }
+                          }
+                          className="px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-mono font-bold"
                         >
                           <Clock className="w-3.5 h-3.5" />
                           <span>{elapsedMin} mnt</span>
@@ -467,20 +594,40 @@ export default function KitchenDisplayPage() {
 
                       {/* Customer Name & Notes */}
                       <div className="mb-4">
-                        <span className="text-[0.7rem] text-[#A89F91] block font-mono">
-                          Pemesan: <strong className="text-white font-serif">{order.customer_name || 'Pelanggan'}</strong> ({order.customer_phone || '-'})
+                        <span
+                          style={{ color: isDark ? '#A89F91' : '#555555' }}
+                          className="text-[0.75rem] block font-mono"
+                        >
+                          Pemesan:{' '}
+                          <strong
+                            style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                            className="font-serif font-bold"
+                          >
+                            {order.customer_name || 'Pelanggan'}
+                          </strong>{' '}
+                          ({order.customer_phone || '-'})
                         </span>
                         {currentStatus === 'CANCELLATION_REQUESTED' && (
-                          <div className="mt-2 p-2.5 rounded-xl bg-orange-500/20 border border-orange-500/50 text-orange-400 text-xs font-mono font-bold flex items-center gap-1.5 animate-pulse">
+                          <div
+                            style={{
+                              background: isDark ? 'rgba(230, 126, 34, 0.15)' : '#FFF9F4',
+                              borderColor: '#E67E22',
+                              color: '#E67E22',
+                            }}
+                            className="mt-2 p-2.5 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 animate-pulse"
+                          >
                             <XCircle className="w-4 h-4 shrink-0" />
-                            <span>⚠️ CUSTOMER MENGAJUKAN PEMBATALAN (Cek Admin)</span>
+                            <span>CUSTOMER MENGAJUKAN PEMBATALAN</span>
                           </div>
                         )}
                       </div>
 
                       {/* Items Checklist */}
                       <div className="space-y-3 mb-6">
-                        <span className="text-[0.65rem] font-mono uppercase text-[#A89F91] tracking-wider block mb-1">
+                        <span
+                          style={{ color: isDark ? '#A89F91' : '#555555' }}
+                          className="text-[0.68rem] font-mono uppercase tracking-wider block mb-1 font-bold"
+                        >
                           ITEM PESANAN DIBUAT:
                         </span>
                         {(order.order_items || order.items || []).map((item: any, idx: number) => {
@@ -488,42 +635,66 @@ export default function KitchenDisplayPage() {
                           return (
                             <div
                               key={item.id || idx}
-                              className="p-3 rounded-2xl bg-[#161210] border border-[#FFFFFF]/5 flex items-start justify-between gap-2"
+                              style={{
+                                background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(158, 31, 31, 0.25)',
+                              }}
+                              className="p-3 rounded-2xl flex items-start justify-between gap-2"
                             >
                               <div className="flex items-start gap-2.5">
-                                <span className="w-6 h-6 rounded-lg bg-[#B82E2E]/20 text-[#B82E2E] font-mono font-black text-xs flex items-center justify-center shrink-0 mt-0.5">
+                                <span
+                                  style={{
+                                    background: isDark ? 'rgba(184, 46, 46, 0.2)' : '#F5EBEB',
+                                    color: isDark ? '#D4A373' : '#9E1F1F',
+                                  }}
+                                  className="w-6 h-6 rounded-lg font-mono font-black text-xs flex items-center justify-center shrink-0 mt-0.5"
+                                >
                                   {item.quantity}x
                                 </span>
                                 <div>
-                                  <h4 className="text-sm font-bold text-white leading-tight">
+                                  <h4
+                                    style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                    className="text-sm font-bold leading-tight"
+                                  >
                                     {item.item_name}
                                   </h4>
 
-                                  {/* Modifiers / Temperature */}
+                                  {/* Modifiers / Options */}
                                   {item.order_item_modifiers && item.order_item_modifiers.length > 0 && (
-                                    <div className="text-[0.7rem] text-[#C29B7F] font-mono mt-0.5">
+                                    <div
+                                      style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                      className="text-[0.7rem] font-mono mt-0.5 font-semibold"
+                                    >
                                       {item.order_item_modifiers.map((m: any) => `${m.modifier_name}: ${m.option_label}`).join(', ')}
                                     </div>
                                   )}
 
                                   {/* Item Special Catatan */}
                                   {item.notes && (
-                                    <div className="mt-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-[0.65rem] font-mono text-amber-300">
+                                    <div
+                                      style={{
+                                        background: isDark ? 'rgba(230, 126, 34, 0.1)' : '#FFF9F4',
+                                        borderColor: 'rgba(230, 126, 34, 0.3)',
+                                        color: isDark ? '#F39C12' : '#C0392B',
+                                      }}
+                                      className="mt-1 px-2 py-0.5 rounded border text-[0.68rem] font-mono"
+                                    >
                                       Catatan: "{item.notes}"
                                     </div>
                                   )}
                                 </div>
                               </div>
 
-                              {/* Station Badge */}
+                              {/* Station Badge (Under + Top Line, No Pill Slop) */}
                               <span
-                                className={`px-2 py-0.5 rounded text-[0.6rem] font-mono font-semibold uppercase ${
-                                  station === 'BARISTA'
-                                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20'
-                                    : 'bg-[#B82E2E]/15 text-[#B82E2E] border border-[#B82E2E]/20'
-                                }`}
+                                style={{
+                                  borderTop: '1px solid currentColor',
+                                  borderBottom: '1px solid currentColor',
+                                  color: isDark ? '#D4A373' : '#9E1F1F',
+                                }}
+                                className="px-1.5 py-0.5 text-[0.62rem] font-mono font-bold uppercase tracking-wider whitespace-nowrap"
                               >
-                                {station === 'BARISTA' ? '☕ Bar' : '🍝 Dapur'}
+                                {station === 'BARISTA' ? 'BARISTA' : 'DAPUR'}
                               </span>
                             </div>
                           );
@@ -532,17 +703,34 @@ export default function KitchenDisplayPage() {
                     </div>
 
                     {/* Bottom Action Controls — 1-TAP BUMP SYSTEM */}
-                    <div className="pt-3 border-t border-[#FFFFFF]/10 space-y-2">
+                    <div
+                      style={{
+                        borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(158, 31, 31, 0.15)',
+                      }}
+                      className="pt-3 space-y-2"
+                    >
                       {currentStatus !== 'COMPLETED' ? (
                         <button
                           onClick={() => handleUpdateOrderStatus(order.id, 'COMPLETED')}
-                          className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-mono text-sm font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 active:scale-95"
+                          style={{
+                            background: '#27AE60',
+                            color: '#FFFFFF',
+                            borderRadius: '14px',
+                          }}
+                          className="w-full p-3.5 hover:opacity-90 font-mono text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md active:scale-95"
                         >
-                          <CheckCircle2 className="w-5 h-5" />
+                          <CheckCircle2 className="w-4 h-4" />
                           <span>SELESAI DISAJIKAN (1-TAP)</span>
                         </button>
                       ) : (
-                        <div className="text-center py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-xs font-mono text-emerald-400 flex items-center justify-center gap-1.5">
+                        <div
+                          style={{
+                            background: isDark ? 'rgba(39, 174, 96, 0.15)' : '#F2FAF5',
+                            borderColor: 'rgba(39, 174, 96, 0.3)',
+                            color: '#27AE60',
+                          }}
+                          className="text-center py-2.5 border rounded-2xl text-xs font-mono font-bold flex items-center justify-center gap-1.5"
+                        >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>PESANAN SUDAH DISAJIKAN 100%</span>
                         </div>
