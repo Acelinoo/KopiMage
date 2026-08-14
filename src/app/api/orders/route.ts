@@ -194,24 +194,20 @@ export async function POST(request: Request) {
     const initialOrderStatus: 'NEW_ORDER' = 'NEW_ORDER';
     const initialPaymentStatus: 'UNPAID' | 'VERIFYING' = payment_method === 'cashier' ? 'UNPAID' : 'UNPAID';
 
-    // 6. Insert into database
+    // 6. Insert into Supabase database (strictly matching PostgreSQL orders schema columns)
     const insertPayload: any = {
       id: orderId,
-      client_order_id: client_order_id || null,
       order_number: orderNumber,
-      order_display_number: orderDisplayNumber,
       tracking_secret: trackingSecret,
       mode,
-      table_id: mode === 'dine-in' ? cleanTableCode : null,
+      table_id: mode === 'dine-in' ? resolvedTableUuid : null,
       customer_name: cleanCustomerName,
-      customer_phone: cleanCustomerPhone,
-      payment_method,
-      payment_proof_url: cleanProofUrl,
+      customer_phone: cleanCustomerPhone || null,
       subtotal: calculatedSubtotal,
-      total_amount: calculatedSubtotal,
-      order_status: initialOrderStatus,
+      payment_method,
       payment_status: initialPaymentStatus,
-      items: processedItems,
+      order_status: initialOrderStatus,
+      payment_proof_url: cleanProofUrl || null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -219,25 +215,23 @@ export async function POST(request: Request) {
     const { data: orderData, error: orderError } = await supabase
       .from('orders')
       .insert(insertPayload)
-      .select()
+      .select('*, tables(*)')
       .maybeSingle();
 
     if (orderError) {
       console.warn('Supabase DB order insert warning:', orderError.message);
     }
 
-    // 6. Insert order items into order_items table in Supabase
+    // 7. Insert order items into order_items table in Supabase
     if (processedItems.length > 0) {
       const itemsToInsert = processedItems.map((item) => ({
         id: crypto.randomUUID(),
         order_id: orderData ? orderData.id : orderId,
-        menu_item_id: item.menu_item_id || null,
         item_name: item.item_name,
         unit_price: item.unit_price,
         quantity: item.quantity,
         subtotal: item.subtotal,
         notes: item.notes || '',
-        modifiers: item.modifiers || [],
       }));
 
       const { error: itemsError } = await supabase.from('order_items').insert(itemsToInsert);
@@ -252,12 +246,12 @@ export async function POST(request: Request) {
       order_number: orderNumber,
       order_display_number: orderDisplayNumber,
       tracking_secret: trackingSecret,
-      mode: mode === 'takeaway' ? 'takeaway' : 'dine-in',
+      mode,
       table_id: mode === 'dine-in' ? cleanTableCode : null,
-      customer_name,
-      customer_phone,
+      customer_name: cleanCustomerName,
+      customer_phone: cleanCustomerPhone,
       payment_method,
-      payment_proof_url,
+      payment_proof_url: cleanProofUrl,
       subtotal: calculatedSubtotal,
       total_amount: calculatedSubtotal,
       order_status: initialOrderStatus,

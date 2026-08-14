@@ -68,8 +68,7 @@ export async function POST(request: Request) {
     const cleanTableCode = String(table_code).padStart(2, '0');
     const supabase = createAdminSupabaseClient();
 
-    // 1. Prevent duplicate active request for the same table & type
-    // Check if an active request already exists in Supabase DB
+    // 1. Prevent duplicate active request for the same table & type (Authoritative DB check)
     const { data: existingDbRequest } = await supabase
       .from('waiter_requests')
       .select('*')
@@ -87,22 +86,8 @@ export async function POST(request: Request) {
       });
     }
 
-    // Check in-memory store as well
-    const memoryActive = getWaiterRequestsFromStore('ALL', cleanTableCode).find(
-      (r) => r.request_type === normalizedType && (r.status === 'OPEN' || r.status === 'HANDLED')
-    );
-
-    if (memoryActive) {
-      return NextResponse.json({
-        success: true,
-        request: memoryActive,
-        isDuplicate: true,
-        message: 'Permintaan bantuan Anda sedang dalam antrean staf waiter.',
-      });
-    }
-
-    // 2. Resolve table UUID from tables table if exists
-    let resolvedTableId = crypto.randomUUID();
+    // 2. Resolve table UUID from tables table with fallback auto-create for valid foreign key
+    let resolvedTableId: string = '';
     const { data: tableData } = await supabase
       .from('tables')
       .select('id')
@@ -111,6 +96,22 @@ export async function POST(request: Request) {
 
     if (tableData?.id) {
       resolvedTableId = tableData.id;
+    } else {
+      const newTableId = crypto.randomUUID();
+      const { data: createdTable } = await supabase
+        .from('tables')
+        .insert({
+          id: newTableId,
+          code: cleanTableCode,
+          name: `MEJA ${cleanTableCode}`,
+          area: 'Indoor AC',
+          is_active: true,
+          status: 'KOSONG',
+        })
+        .select('id')
+        .maybeSingle();
+
+      resolvedTableId = createdTable ? createdTable.id : newTableId;
     }
 
     const newRequest: WaiterRequest = {
@@ -225,28 +226,29 @@ export async function PATCH(request: Request) {
       updatePayload.completed_at = new Date().toISOString();
     }
 
-    // 3. Atomic conditional update in Supabase DB
+    // 3. Atomic conditional update in Supabase PostgreSQL (Single Source of Truth)
     let dbQuery = supabase.from('waiter_requests').update(updatePayload).eq('id', request_id);
     if (expectedStatus) {
       dbQuery = dbQuery.eq('status', expectedStatus);
     }
     const { data: updatedDb, error } = await dbQuery.select().maybeSingle();
 
-    // 4. Atomic conditional update in Memory store
-    let memoryResult: any = { success: true };
+    // If expectedStatus was required and 0 rows updated in PostgreSQL -> 409 CONFLICT
+    if (expectedStatus && !updatedDb) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Panggilan ini telah diperbarui oleh staf waiter lain.',
+          code: 'CONCURRENCY_CONFLICT',
+          current_status: currentDbRequest?.status,
+        },
+        { status: 409 }
+      );
+    }
+
+    // 4. Synchronize memory store mirror
     if (expectedStatus) {
-      memoryResult = updateWaiterRequestInStoreConditional(request_id, updatePayload, expectedStatus);
-      if (!memoryResult.success && !updatedDb) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Panggilan ini telah diperbarui oleh staf waiter lain.',
-            code: 'CONCURRENCY_CONFLICT',
-            current_status: memoryResult.currentStatus || currentDbRequest?.status,
-          },
-          { status: 409 }
-        );
-      }
+      updateWaiterRequestInStoreConditional(request_id, updatePayload, expectedStatus);
     }
 
     if (error) {
@@ -255,7 +257,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json({
       success: true,
-      request: updatedDb || memoryResult.request || { id: request_id, ...updatePayload },
+      request: updatedDb || { id: request_id, ...updatePayload },
     });
   } catch (err: any) {
     console.error('Error updating waiter request:', err);

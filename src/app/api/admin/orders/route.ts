@@ -208,28 +208,30 @@ export async function PATCH(request: Request) {
       updatePayload.cancellation_reason = cancellation_reason;
     }
 
-    // 2. Atomic Database Query execution
+    // 2. Atomic Database Query execution (Single Source of Truth)
     let dbQuery = supabase.from('orders').update(updatePayload).eq('id', order_id);
     if (expected_current_status) {
       dbQuery = dbQuery.eq('order_status', expected_current_status);
     }
     const { data: updatedDb, error } = await dbQuery.select('*, order_items(*)');
 
-    // 3. Synchronize status update to memory store with atomic conditional check
+    // If expected_current_status was required and PostgreSQL updated 0 rows -> 409 CONFLICT
+    if (expected_current_status && (!updatedDb || updatedDb.length === 0)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Pesanan ini sudah diambil oleh waiter lain atau status telah berubah.',
+          code: 'CONCURRENCY_CONFLICT',
+          current_status: currentOrder?.order_status,
+        },
+        { status: 409 }
+      );
+    }
+
+    // 3. Synchronize status update to memory store mirror
     let updatedInMemory: any = null;
     if (expected_current_status) {
       const memoryResult = updateOrderInStoreConditional(order_id, updatePayload, expected_current_status);
-      if (!memoryResult.success && (!updatedDb || updatedDb.length === 0)) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'Pesanan ini sudah diambil oleh waiter lain atau status telah berubah.',
-            code: 'CONCURRENCY_CONFLICT',
-            current_status: memoryResult.currentStatus || currentOrder?.order_status,
-          },
-          { status: 409 }
-        );
-      }
       updatedInMemory = memoryResult.order;
     } else {
       updatedInMemory = updateOrderInStore(order_id, updatePayload);
