@@ -883,22 +883,43 @@ export function EditorialHome() {
           7. 2 OUTLETS LIVE LOCATION MAPS TRACKER (#visit)
          ---------------------------------------------------- */}
             <div className="w-full px-3 sm:px-6 lg:px-8 py-3 sm:py-5 max-w-[1440px] mx-auto">
-                <section id="visit" className="py-16 lg:py-24 bg-[#0E0B0A] rounded-2xl sm:rounded-3xl border border-white/10 shadow-xl overflow-hidden">
+                <section
+                    id="visit"
+                    style={{
+                        background: isDark ? '#0E0B0A' : '#FFFFFF',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                    }}
+                    className="py-16 lg:py-24 rounded-2xl sm:rounded-3xl border shadow-xl overflow-hidden"
+                >
                     <div className="editorial-container">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b border-[#FFFFFF]/10 reveal-fade-up">
+                        <div
+                            style={{
+                                borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                            }}
+                            className="flex flex-col md:flex-row md:items-end justify-between mb-8 pb-6 border-b reveal-fade-up"
+                        >
                             <div>
                                 <div className="flex items-center gap-3 mb-2">
-                                    <span className="font-sans text-[0.7rem] tracking-[0.25em] uppercase text-[#B82E2E] font-semibold">
+                                    <span
+                                        style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                        className="font-sans text-[0.72rem] tracking-[0.25em] uppercase font-bold"
+                                    >
                                         08 / LOKASI 2 CABANG KOPI MAGE
                                     </span>
                                 </div>
-                                <h2 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[#FFFFFF]">
+                                <h2
+                                    style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                    className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold"
+                                >
                                     Kunjungi Cabang Terdekat
                                 </h2>
                             </div>
-                            <div className="mt-4 md:mt-0 flex flex-wrap gap-4 text-xs font-sans text-[#A89F91]">
+                            <div
+                                style={{ color: isDark ? '#A89F91' : '#555555' }}
+                                className="mt-4 md:mt-0 flex flex-wrap gap-4 text-xs font-sans font-medium"
+                            >
                                 <div className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-[#B82E2E]" />
+                                    <Clock className="w-4 h-4" style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} />
                                     <span>Buka Setiap Hari • 07.00 - 23.00 WIB</span>
                                 </div>
                             </div>
@@ -909,8 +930,8 @@ export function EditorialHome() {
                             <button
                                 onClick={() => setActiveOutlet('gading')}
                                 style={activeOutlet === 'gading'
-                                    ? { background: isDark ? '#FFFFFF' : '#9E1F1F', color: isDark ? '#8C1C1C' : '#FFFFFF', borderColor: isDark ? '#FFFFFF' : '#9E1F1F', fontWeight: 'bold' }
-                                    : { background: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.05)', color: isDark ? '#FFFFFF' : '#1A1A1A', borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.15)' }
+                                    ? { background: '#9E1F1F', color: '#FFFFFF', borderColor: '#9E1F1F', fontWeight: 'bold' }
+                                    : { background: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FAF7F5', color: isDark ? '#FFFFFF' : '#1A1A1A', borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : '#9E1F1F', fontWeight: '600' }
                                 }
                                 className="py-3.5 px-5 sm:px-6 w-full sm:w-auto font-sans text-xs tracking-[0.18em] uppercase transition-all border rounded-xl shadow-sm cursor-pointer"
                             >
@@ -919,8 +940,8 @@ export function EditorialHome() {
                             <button
                                 onClick={() => setActiveOutlet('lanud')}
                                 style={activeOutlet === 'lanud'
-                                    ? { background: isDark ? '#FFFFFF' : '#9E1F1F', color: isDark ? '#8C1C1C' : '#FFFFFF', borderColor: isDark ? '#FFFFFF' : '#9E1F1F', fontWeight: 'bold' }
-                                    : { background: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.05)', color: isDark ? '#FFFFFF' : '#1A1A1A', borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.15)' }
+                                    ? { background: '#9E1F1F', color: '#FFFFFF', borderColor: '#9E1F1F', fontWeight: 'bold' }
+                                    : { background: isDark ? 'rgba(255, 255, 255, 0.1)' : '#FAF7F5', color: isDark ? '#FFFFFF' : '#1A1A1A', borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : '#9E1F1F', fontWeight: '600' }
                                 }
                                 className="py-3.5 px-5 sm:px-6 w-full sm:w-auto font-sans text-xs tracking-[0.18em] uppercase transition-all border rounded-xl shadow-sm cursor-pointer"
                             >
@@ -931,7 +952,13 @@ export function EditorialHome() {
                         {/* Interactive Live Radar Map Frame */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
                             {/* Live Map Tracker Embed Frame */}
-                            <div className="lg:col-span-8 relative border border-[#FFFFFF]/15 overflow-hidden min-h-[300px] sm:min-h-[380px] lg:min-h-[440px] bg-[#161210] rounded-2xl reveal-scale-pop shadow-sm">
+                            <div
+                                style={{
+                                    background: isDark ? '#161210' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(158, 31, 31, 0.3)',
+                                }}
+                                className="lg:col-span-8 relative border overflow-hidden min-h-[300px] sm:min-h-[380px] lg:min-h-[440px] rounded-2xl reveal-scale-pop shadow-sm"
+                            >
                                 <iframe
                                     title={activeOutlet === 'gading' ? 'KOPIMAGE Cabang Soreang Google Maps' : 'Kopi Mage Lanud Sulaiman Google Maps'}
                                     src={
@@ -950,59 +977,103 @@ export function EditorialHome() {
                             </div>
 
                             {/* Practical Tracker Sidebar */}
-                            <div className="lg:col-span-4 p-5 sm:p-8 border border-[#FFFFFF]/15 bg-[#161210] rounded-2xl shadow-sm flex flex-col justify-between space-y-6 reveal-slide-right">
+                            <div
+                                style={{
+                                    background: isDark ? '#161210' : '#FAF7F5',
+                                    borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#9E1F1F',
+                                }}
+                                className="lg:col-span-4 p-5 sm:p-8 border rounded-2xl shadow-sm flex flex-col justify-between space-y-6 reveal-slide-right"
+                            >
                                 <div>
-                                    <span className="font-sans text-[0.7rem] tracking-[0.2em] uppercase text-[#B82E2E] font-semibold block mb-4">
+                                    <span
+                                        style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                        className="font-sans text-[0.72rem] tracking-[0.2em] uppercase font-bold block mb-4"
+                                    >
                                         {activeOutlet === 'gading' ? 'INFORMASI CABANG GADING TUTUKA' : 'INFORMASI CABANG LANUD SULAIMAN'}
                                     </span>
 
-                                    <div className="space-y-3 font-sans text-xs font-light mb-6">
-                                        <div className={`p-3.5 border rounded-xl shadow-sm transition-colors ${
-                                            isDark 
-                                                ? 'bg-[#0E0B0A] border-white/10 text-[#F3EFEA]' 
-                                                : 'bg-white border-[#9E1F1F] text-[#1A1A1A]'
-                                        }`}>
-                                            <span className={`font-bold block mb-1 ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                    <div className="space-y-3 font-sans text-xs mb-6">
+                                        <div
+                                            style={{
+                                                background: isDark ? '#0E0B0A' : '#FFFFFF',
+                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                            }}
+                                            className="p-3.5 border rounded-xl shadow-sm transition-colors"
+                                        >
+                                            <span
+                                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                                className="font-bold block mb-1"
+                                            >
                                                 Alamat Cabang
                                             </span>
-                                            <span className={isDark ? 'text-[#A89F91]' : 'text-[#1A1A1A]'}>
+                                            <span
+                                                style={{ color: isDark ? '#A89F91' : '#333333' }}
+                                                className="leading-relaxed block"
+                                            >
                                                 {activeOutlet === 'gading'
                                                     ? 'Jl. Gading Tutuka No. 88, Soreang, Kab. Bandung (Dekat Tol Seroja)'
                                                     : 'Kawasan Lanud Sulaiman, Margahayu, Kab. Bandung'}
                                             </span>
                                         </div>
-                                        <div className={`p-3.5 border rounded-xl shadow-sm transition-colors ${
-                                            isDark 
-                                                ? 'bg-[#0E0B0A] border-white/10 text-[#F3EFEA]' 
-                                                : 'bg-white border-[#9E1F1F] text-[#1A1A1A]'
-                                        }`}>
-                                            <span className={`font-bold block mb-1 ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                        <div
+                                            style={{
+                                                background: isDark ? '#0E0B0A' : '#FFFFFF',
+                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F',
+                                            }}
+                                            className="p-3.5 border rounded-xl shadow-sm transition-colors"
+                                        >
+                                            <span
+                                                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                                                className="font-bold block mb-1"
+                                            >
                                                 Jam Operasional
                                             </span>
-                                            <span className={isDark ? 'text-[#A89F91]' : 'text-[#1A1A1A]'}>
+                                            <span
+                                                style={{ color: isDark ? '#A89F91' : '#333333' }}
+                                                className="leading-relaxed block font-medium"
+                                            >
                                                 Buka Setiap Hari: 07.00 - 23.00 WIB
                                             </span>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3 pt-4 border-t border-[#FFFFFF]/10">
-                                        <div className={`flex items-center gap-3 text-xs ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
-                                            <Music className={`w-4 h-4 shrink-0 ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`} />
+                                    <div
+                                        style={{
+                                            borderTopColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                                        }}
+                                        className="space-y-3 pt-4 border-t"
+                                    >
+                                        <div
+                                            style={{ color: isDark ? '#A89F91' : '#333333' }}
+                                            className="flex items-center gap-3 text-xs font-medium"
+                                        >
+                                            <Music className="w-4 h-4 shrink-0" style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} />
                                             <span>Live Music Akustik Setiap Weekend</span>
                                         </div>
-                                        <div className={`flex items-center gap-3 text-xs ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
-                                            <Car className={`w-4 h-4 shrink-0 ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`} />
+                                        <div
+                                            style={{ color: isDark ? '#A89F91' : '#333333' }}
+                                            className="flex items-center gap-3 text-xs font-medium"
+                                        >
+                                            <Car className="w-4 h-4 shrink-0" style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} />
                                             <span>Area Parkir Luas (Mobil & Motor)</span>
                                         </div>
-                                        <div className={`flex items-center gap-3 text-xs ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
-                                            <Wifi className={`w-4 h-4 shrink-0 ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`} />
+                                        <div
+                                            style={{ color: isDark ? '#A89F91' : '#333333' }}
+                                            className="flex items-center gap-3 text-xs font-medium"
+                                        >
+                                            <Wifi className="w-4 h-4 shrink-0" style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} />
                                             <span>Koneksi WiFi Cepat & Banyak Colokan</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Direct Google Maps Action Buttons */}
-                                <div className="pt-4 border-t border-[#FFFFFF]/10 mt-auto space-y-3">
+                                <div
+                                    style={{
+                                        borderTopColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(158, 31, 31, 0.15)',
+                                    }}
+                                    className="pt-4 border-t mt-auto space-y-3"
+                                >
                                     <a
                                         href={
                                             activeOutlet === 'gading'
@@ -1011,7 +1082,12 @@ export function EditorialHome() {
                                         }
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="w-full block text-center py-4 px-4 text-xs tracking-[0.18em] uppercase font-semibold bg-[#B82E2E] text-[#FFFFFF] hover:bg-[#D63434] transition-colors border border-[#B82E2E] rounded-xl shadow-sm relative z-10"
+                                        style={{
+                                            background: '#9E1F1F',
+                                            color: '#FFFFFF',
+                                            borderColor: '#9E1F1F',
+                                        }}
+                                        className="w-full block text-center py-4 px-4 text-xs tracking-[0.18em] uppercase font-bold hover:opacity-90 transition-opacity border rounded-xl shadow-md relative z-10"
                                     >
                                         <span className="inline-flex items-center justify-center gap-2">
                                             <span>
