@@ -69,24 +69,21 @@ export const Header: React.FC = () => {
         {/* In Table Order Mode: Clean Under + Top Line Indicator */}
         {isTableMode && (
           <div
-            className="desktop-nav"
+            className="desktop-nav header-table-indicator"
             style={{
               display: 'none',
               alignItems: 'center',
               gap: '0.5rem',
               background: 'transparent',
-              borderTop: '1px solid rgba(158, 31, 31, 0.4)',
-              borderBottom: '1px solid rgba(158, 31, 31, 0.4)',
               padding: '0.25rem 0.6rem',
               borderRadius: '0',
               fontSize: '0.72rem',
               fontWeight: 700,
               fontFamily: 'monospace',
-              color: '#9E1F1F',
               letterSpacing: '0.14em'
             }}
           >
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2ECC71' }} />
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2ECC71', flexShrink: 0 }} />
             <span>ORDERING AKTIF MEJA {activeTableId}</span>
           </div>
         )}

@@ -577,6 +577,39 @@ h1, h2, h3, h4 {
   color: #888888 !important;
 }
 
+/* Header Table Indicator (Under + Top Line) */
+.header-table-indicator {
+  border-top: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4) !important;
+  border-left: none !important;
+  border-right: none !important;
+  color: #FFFFFF !important;
+}
+
+.header-table-indicator span {
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] .header-table-indicator {
+  border-top: 1px solid rgba(255, 255, 255, 0.6) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] .header-table-indicator span {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .header-table-indicator {
+  border-top: 1px solid rgba(212, 163, 115, 0.4) !important;
+  border-bottom: 1px solid rgba(212, 163, 115, 0.4) !important;
+  color: #F7F4EF !important;
+}
+
+[data-theme="dark"] .header-table-indicator span {
+  color: #F7F4EF !important;
+}
+
 /* ----------------------------------------------------
    INFINITE MARQUEE ANIMATIONS (FIXED DUAL-ROW UNLIMITED SCROLL)
    ---------------------------------------------------- */
