@@ -95,42 +95,66 @@ export default function WaiterFloorPage() {
   useEffect(() => {
     fetchFloorData(true);
 
-    // Live fast polling interval (3.5 seconds)
-    const interval = setInterval(() => fetchFloorData(false), 3500);
+    // 1. Supabase Realtime Single Managed Hub (orders, waiter_requests, tables)
+    let channel: any = null;
+    let isSubscribed = false;
 
-    // Supabase Realtime Listener
-    let channelOrders: any = null;
-    let channelRequests: any = null;
     try {
       import('@/lib/supabase/client').then(({ createClient }) => {
         const supabase = createClient();
-        channelOrders = supabase
-          .channel('waiter-realtime-orders')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-            fetchFloorData(false);
-          })
-          .subscribe();
-
-        channelRequests = supabase
-          .channel('waiter-realtime-requests')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'waiter_requests' }, () => {
-            fetchFloorData(false);
-          })
-          .subscribe();
+        
+        channel = supabase
+          .channel('waiter-realtime-hub')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'orders' },
+            () => {
+              fetchFloorData(false);
+            }
+          )
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'waiter_requests' },
+            () => {
+              fetchFloorData(false);
+            }
+          )
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'tables' },
+            () => {
+              fetchFloorData(false);
+            }
+          )
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              isSubscribed = true;
+              // Authoritative catch-up refetch upon connect/reconnect
+              fetchFloorData(false);
+            } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+              isSubscribed = false;
+            }
+          });
       });
     } catch (e) {
-      console.warn('Realtime channel fallback:', e);
+      console.warn('Realtime channel fallback error:', e);
     }
 
+    // 2. Slow Heartbeat Polling Fallback (15 seconds) as safety net for mobile network drops
+    const heartbeatInterval = setInterval(() => {
+      fetchFloorData(false);
+    }, 15000);
+
     return () => {
-      clearInterval(interval);
-      try {
-        import('@/lib/supabase/client').then(({ createClient }) => {
-          const supabase = createClient();
-          if (channelOrders) supabase.removeChannel(channelOrders);
-          if (channelRequests) supabase.removeChannel(channelRequests);
-        });
-      } catch (e) {}
+      clearInterval(heartbeatInterval);
+      if (channel) {
+        try {
+          import('@/lib/supabase/client').then(({ createClient }) => {
+            const supabase = createClient();
+            supabase.removeChannel(channel);
+          });
+        } catch (e) {}
+      }
     };
   }, []);
 

@@ -54,16 +54,13 @@ export default function OrderTrackerPage() {
   useEffect(() => {
     fetchLiveOrder();
 
-    // Fast 1.5-second polling interval with cache-busting for instant live update
-    const interval = setInterval(fetchLiveOrder, 1500);
-
-    // Supabase Realtime Channel for instant push updates (<100ms)
+    // 1. Supabase Realtime Channel for instant push updates (<100ms)
     let channel: any = null;
     try {
       import('@/lib/supabase/client').then(({ createClient }) => {
         const supabase = createClient();
         channel = supabase
-          .channel(`order_${orderId}`)
+          .channel(`order_live_${orderId}`)
           .on(
             'postgres_changes',
             { event: 'UPDATE', schema: 'public', table: 'orders' },
@@ -74,18 +71,26 @@ export default function OrderTrackerPage() {
               fetchLiveOrder();
             }
           )
-          .subscribe();
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              fetchLiveOrder();
+            }
+          });
       });
     } catch (e) {
       console.warn('Realtime channel error:', e);
     }
+
+    // 2. Slow Heartbeat Polling (15 seconds) as fallback safety net
+    const interval = setInterval(fetchLiveOrder, 15000);
 
     return () => {
       clearInterval(interval);
       if (channel) {
         try {
           import('@/lib/supabase/client').then(({ createClient }) => {
-            createClient().removeChannel(channel);
+            const supabase = createClient();
+            supabase.removeChannel(channel);
           });
         } catch (e) {}
       }
@@ -489,8 +494,47 @@ function CustomerWaiterCallSection({ tableCode }: { tableCode: string }) {
 
   useEffect(() => {
     fetchTableRequests();
-    const interval = setInterval(fetchTableRequests, 3500);
-    return () => clearInterval(interval);
+
+    // 1. Supabase Realtime Listener for table waiter requests
+    let channel: any = null;
+    try {
+      import('@/lib/supabase/client').then(({ createClient }) => {
+        const supabase = createClient();
+        channel = supabase
+          .channel(`customer_table_requests_${tableCode}`)
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'waiter_requests' },
+            (payload: any) => {
+              if (payload.new && String(payload.new.table_code) === String(tableCode)) {
+                fetchTableRequests();
+              }
+            }
+          )
+          .subscribe((status) => {
+            if (status === 'SUBSCRIBED') {
+              fetchTableRequests();
+            }
+          });
+      });
+    } catch (e) {
+      console.warn('Customer requests realtime error:', e);
+    }
+
+    // 2. Slow Heartbeat Polling (15 seconds)
+    const interval = setInterval(fetchTableRequests, 15000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel) {
+        try {
+          import('@/lib/supabase/client').then(({ createClient }) => {
+            const supabase = createClient();
+            supabase.removeChannel(channel);
+          });
+        } catch (e) {}
+      }
+    };
   }, [tableCode]);
 
   useEffect(() => {
