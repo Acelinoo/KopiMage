@@ -926,12 +926,12 @@ export function EditorialHome() {
                                         <div className={`p-3.5 border rounded-xl shadow-sm transition-colors ${
                                             isDark 
                                                 ? 'bg-[#0E0B0A] border-white/10 text-[#F3EFEA]' 
-                                                : 'bg-[#F9F7F5] border-[#9E1F1F]/20 text-[#1A1A1A]'
+                                                : 'bg-white border-[#9E1F1F] text-[#1A1A1A]'
                                         }`}>
                                             <span className={`font-bold block mb-1 ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
                                                 Alamat Cabang
                                             </span>
-                                            <span className={isDark ? 'text-[#A89F91]' : 'text-[#333333]'}>
+                                            <span className={isDark ? 'text-[#A89F91]' : 'text-[#1A1A1A]'}>
                                                 {activeOutlet === 'gading'
                                                     ? 'Jl. Gading Tutuka No. 88, Soreang, Kab. Bandung (Dekat Tol Seroja)'
                                                     : 'Kawasan Lanud Sulaiman, Margahayu, Kab. Bandung'}
@@ -940,12 +940,12 @@ export function EditorialHome() {
                                         <div className={`p-3.5 border rounded-xl shadow-sm transition-colors ${
                                             isDark 
                                                 ? 'bg-[#0E0B0A] border-white/10 text-[#F3EFEA]' 
-                                                : 'bg-[#F9F7F5] border-[#9E1F1F]/20 text-[#1A1A1A]'
+                                                : 'bg-white border-[#9E1F1F] text-[#1A1A1A]'
                                         }`}>
                                             <span className={`font-bold block mb-1 ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
                                                 Jam Operasional
                                             </span>
-                                            <span className={isDark ? 'text-[#A89F91]' : 'text-[#333333]'}>
+                                            <span className={isDark ? 'text-[#A89F91]' : 'text-[#1A1A1A]'}>
                                                 Buka Setiap Hari: 07.00 - 23.00 WIB
                                             </span>
                                         </div>
