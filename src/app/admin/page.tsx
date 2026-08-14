@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { useTheme } from '@/context/ThemeContext';
 import Image from 'next/image';
 import {
   ShieldCheck,
@@ -33,6 +34,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 
 export default function AdminDashboardPage() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'verification' | 'menu' | 'tables'>('verification');
   const [ordersList, setOrdersList] = useState<any[]>([]);
   const [selectedImageModal, setSelectedImageModal] = useState<string | null>(null);
@@ -570,20 +573,48 @@ export default function AdminDashboardPage() {
   const totalOrdersCount = ordersList.length;
 
   return (
-    <main style={{ background: 'var(--bg-main)', color: 'var(--text-primary)', transition: 'background-color 0.25s ease, color 0.25s ease' }} className="min-h-screen font-sans pb-20 selection:bg-[#B82E2E] selection:text-[#FFFFFF]">
+    <main
+      style={{
+        background: isDark ? '#0E0B0A' : '#9E1F1F',
+        color: isDark ? '#F7F4EF' : '#FFFFFF',
+        minHeight: '100vh',
+        transition: 'background-color 0.25s ease, color 0.25s ease',
+      }}
+      className="font-sans pb-20 selection:bg-[#B82E2E] selection:text-[#FFFFFF]"
+    >
       {/* Industrial Craftsman Header */}
-      <header className="sticky top-0 z-40 bg-[#120F0D]/95 backdrop-blur-md border-b border-[#FFFFFF]/10 px-4 sm:px-8 py-4">
+      <header
+        style={{
+          background: isDark ? '#161210' : '#FFFFFF',
+          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+          boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 30px rgba(0, 0, 0, 0.12)',
+        }}
+        className="sticky top-0 z-40 backdrop-blur-md px-4 sm:px-8 py-4"
+      >
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl bg-[#B82E2E] flex items-center justify-center shadow-lg shadow-[#B82E2E]/20 shrink-0">
+            <div
+              style={{ background: '#9E1F1F' }}
+              className="w-11 h-11 rounded-xl flex items-center justify-center shadow-md shrink-0"
+            >
               <ShieldCheck className="w-6 h-6 text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[0.65rem] tracking-widest uppercase font-mono text-[#C29B7F]">KOPIMAGE INDUSTRIAL COMMAND</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span
+                  style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                  className="text-[0.65rem] tracking-widest uppercase font-mono font-bold"
+                >
+                  KOPIMAGE INDUSTRIAL COMMAND
+                </span>
               </div>
-              <h1 className="text-xl font-serif text-white font-normal leading-tight">Admin Operations Console</h1>
+              <h1
+                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                className="text-xl font-serif font-bold leading-tight"
+              >
+                Admin Operations Console
+              </h1>
             </div>
           </div>
 
@@ -592,26 +623,43 @@ export default function AdminDashboardPage() {
             <button
               onClick={() => fetchAdminOrders(true)}
               disabled={isRefreshing}
-              className="p-2.5 rounded-xl border border-[#FFFFFF]/15 bg-[#171311] text-[#C29B7F] hover:text-white hover:border-[#B82E2E] transition-all cursor-pointer shadow-sm flex items-center gap-2 text-xs font-mono"
+              style={{
+                background: isDark ? '#0E0B0A' : '#FAF7F5',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : '#9E1F1F',
+                color: isDark ? '#D4A373' : '#9E1F1F',
+              }}
+              className="p-2.5 rounded-xl border transition-all cursor-pointer shadow-sm flex items-center gap-2 text-xs font-mono font-bold"
               title="Refresh Sync Real-time"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#B82E2E]' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-[#9E1F1F]' : ''}`} />
               <span>SYNC NOW</span>
             </button>
 
             {/* Industrial Navigation Tabs */}
-            <div className="flex bg-[#0E0B0A] p-1 rounded-xl border border-[#FFFFFF]/10 gap-1 overflow-x-auto max-w-full shrink-0">
+            <div
+              style={{
+                background: isDark ? '#0E0B0A' : '#FAF7F5',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+              }}
+              className="flex p-1 rounded-xl gap-1 overflow-x-auto max-w-full shrink-0"
+            >
               <button
                 onClick={() => setActiveTab('verification')}
-                className={`px-4 py-2 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer flex items-center gap-2 ${
-                  activeTab === 'verification'
-                    ? 'bg-[#B82E2E] text-white shadow-md font-semibold'
-                    : 'text-[#A89F91] hover:text-white'
-                }`}
+                style={{
+                  background: activeTab === 'verification' ? '#9E1F1F' : 'transparent',
+                  color: activeTab === 'verification' ? '#FFFFFF' : (isDark ? '#A89F91' : '#555555'),
+                }}
+                className="px-4 py-2 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer flex items-center gap-2 font-bold"
               >
                 <span>VERIFIKASI BAYAR</span>
                 {verifyingCount > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-md bg-white text-[#B82E2E] text-[0.65rem] font-bold font-mono">
+                  <span
+                    style={{
+                      background: activeTab === 'verification' ? '#FFFFFF' : '#9E1F1F',
+                      color: activeTab === 'verification' ? '#9E1F1F' : '#FFFFFF',
+                    }}
+                    className="px-1.5 py-0.5 rounded-md text-[0.65rem] font-bold font-mono"
+                  >
                     {verifyingCount}
                   </span>
                 )}
@@ -619,22 +667,22 @@ export default function AdminDashboardPage() {
 
               <button
                 onClick={() => setActiveTab('menu')}
-                className={`px-4 py-2 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer ${
-                  activeTab === 'menu'
-                    ? 'bg-[#B82E2E] text-white shadow-md font-semibold'
-                    : 'text-[#A89F91] hover:text-white'
-                }`}
+                style={{
+                  background: activeTab === 'menu' ? '#9E1F1F' : 'transparent',
+                  color: activeTab === 'menu' ? '#FFFFFF' : (isDark ? '#A89F91' : '#555555'),
+                }}
+                className="px-4 py-2 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer font-bold"
               >
                 <span>KATALOG MENU</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('tables')}
-                className={`px-4 py-2 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer ${
-                  activeTab === 'tables'
-                    ? 'bg-[#B82E2E] text-white shadow-md font-semibold'
-                    : 'text-[#A89F91] hover:text-white'
-                }`}
+                style={{
+                  background: activeTab === 'tables' ? '#9E1F1F' : 'transparent',
+                  color: activeTab === 'tables' ? '#FFFFFF' : (isDark ? '#A89F91' : '#555555'),
+                }}
+                className="px-4 py-2 rounded-lg text-xs font-mono tracking-wider uppercase transition-all cursor-pointer font-bold"
               >
                 <span>MEJA QR</span>
               </button>
@@ -643,7 +691,12 @@ export default function AdminDashboardPage() {
                 href="/kitchen"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3.5 py-2 rounded-lg bg-[#C29B7F]/15 border border-[#C29B7F]/40 text-[#C29B7F] hover:bg-[#C29B7F] hover:text-[#070605] font-mono text-xs font-bold uppercase transition-all flex items-center gap-1.5"
+                style={{
+                  background: isDark ? 'rgba(194, 155, 127, 0.15)' : '#FAF7F5',
+                  border: isDark ? '1px solid rgba(194, 155, 127, 0.4)' : '1px solid #9E1F1F',
+                  color: isDark ? '#C29B7F' : '#9E1F1F',
+                }}
+                className="px-3.5 py-2 rounded-lg font-mono text-xs font-bold uppercase transition-all flex items-center gap-1.5 hover:opacity-80"
                 title="Buka Monitor Dapur / Kitchen Display System"
               >
                 <span>STASIUN DAPUR (KDS)</span>
@@ -656,58 +709,135 @@ export default function AdminDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-8">
         {/* KPI Operations Bar */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="p-4 rounded-2xl bg-[#161210] border border-[#B82E2E]/40 flex items-center justify-between shadow-lg">
+          <div
+            style={{
+              background: isDark ? '#161210' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(184, 46, 46, 0.4)' : '1.5px solid #9E1F1F',
+              boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+            }}
+            className="p-4 rounded-2xl flex items-center justify-between"
+          >
             <div>
-              <span className="text-[0.62rem] tracking-widest font-mono uppercase text-[#A89F91] block mb-1">VERIFIKASI PENDING</span>
-              <span className="text-2xl font-serif font-semibold text-white">{verifyingCount} Pesanan</span>
+              <span
+                style={{ color: isDark ? '#A89F91' : '#555555' }}
+                className="text-[0.65rem] tracking-widest font-mono uppercase block mb-1 font-bold"
+              >
+                VERIFIKASI PENDING
+              </span>
+              <span
+                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                className="text-2xl font-serif font-bold"
+              >
+                {verifyingCount} Pesanan
+              </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-amber-400" />
+              <Clock className="w-5 h-5 text-amber-500" />
             </div>
           </div>
 
           {/* Cancellation Requested KPI */}
           {cancellationRequestedCount > 0 && (
-            <div className="p-4 rounded-2xl bg-[#161210] border border-orange-500/40 flex items-center justify-between shadow-lg">
+            <div
+              style={{
+                background: isDark ? '#161210' : '#FFFFFF',
+                border: '1.5px solid #E67E22',
+                boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+              }}
+              className="p-4 rounded-2xl flex items-center justify-between"
+            >
               <div>
-                <span className="text-[0.62rem] tracking-widest font-mono uppercase text-[#A89F91] block mb-1">PERMINTAAN BATAL</span>
-                <span className="text-2xl font-serif font-semibold text-orange-400">{cancellationRequestedCount} Pesanan</span>
+                <span
+                  style={{ color: isDark ? '#A89F91' : '#555555' }}
+                  className="text-[0.65rem] tracking-widest font-mono uppercase block mb-1 font-bold"
+                >
+                  PERMINTAAN BATAL
+                </span>
+                <span className="text-2xl font-serif font-bold text-orange-500">
+                  {cancellationRequestedCount} Pesanan
+                </span>
               </div>
               <div className="w-10 h-10 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center">
-                <XCircle className="w-5 h-5 text-orange-400" />
+                <XCircle className="w-5 h-5 text-orange-500" />
               </div>
             </div>
           )}
 
-          <div className="p-4 rounded-2xl bg-[#161210] border border-[#FFFFFF]/10 flex items-center justify-between shadow-lg">
+          <div
+            style={{
+              background: isDark ? '#161210' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+              boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+            }}
+            className="p-4 rounded-2xl flex items-center justify-between"
+          >
             <div>
-              <span className="text-[0.62rem] tracking-widest font-mono uppercase text-[#A89F91] block mb-1">TERVERIFIKASI LUNAS</span>
-              <span className="text-2xl font-serif font-semibold text-emerald-400">
+              <span
+                style={{ color: isDark ? '#A89F91' : '#555555' }}
+                className="text-[0.65rem] tracking-widest font-mono uppercase block mb-1 font-bold"
+              >
+                TERVERIFIKASI LUNAS
+              </span>
+              <span className="text-2xl font-serif font-bold text-emerald-500">
                 {paidCount} Transaksi
               </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#161210] border border-[#FFFFFF]/10 flex items-center justify-between shadow-lg">
+          <div
+            style={{
+              background: isDark ? '#161210' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+              boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+            }}
+            className="p-4 rounded-2xl flex items-center justify-between"
+          >
             <div>
-              <span className="text-[0.62rem] tracking-widest font-mono uppercase text-[#A89F91] block mb-1">KATALOG MENU QR</span>
-              <span className="text-2xl font-serif font-semibold text-white">{menuItemsState.length} Item</span>
+              <span
+                style={{ color: isDark ? '#A89F91' : '#555555' }}
+                className="text-[0.65rem] tracking-widest font-mono uppercase block mb-1 font-bold"
+              >
+                KATALOG MENU QR
+              </span>
+              <span
+                style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                className="text-2xl font-serif font-bold"
+              >
+                {menuItemsState.length} Item
+              </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-[#B82E2E]/15 border border-[#B82E2E]/30 flex items-center justify-center">
-              <Coffee className="w-5 h-5 text-[#B82E2E]" />
+              <Coffee className="w-5 h-5 text-[#9E1F1F]" />
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-[#161210] border border-[#FFFFFF]/10 flex items-center justify-between shadow-lg">
+          <div
+            style={{
+              background: isDark ? '#161210' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+              boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+            }}
+            className="p-4 rounded-2xl flex items-center justify-between"
+          >
             <div>
-              <span className="text-[0.62rem] tracking-widest font-mono uppercase text-[#A89F91] block mb-1">TOTAL MEJA AKTIF</span>
-              <span className="text-2xl font-serif font-semibold text-[#C29B7F]">{tablesState.length} Meja</span>
+              <span
+                style={{ color: isDark ? '#A89F91' : '#555555' }}
+                className="text-[0.65rem] tracking-widest font-mono uppercase block mb-1 font-bold"
+              >
+                TOTAL MEJA AKTIF
+              </span>
+              <span
+                style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                className="text-2xl font-serif font-bold"
+              >
+                {tablesState.length} Meja
+              </span>
             </div>
             <div className="w-10 h-10 rounded-xl bg-[#C29B7F]/15 border border-[#C29B7F]/30 flex items-center justify-center">
-              <QrCode className="w-5 h-5 text-[#C29B7F]" />
+              <QrCode className="w-5 h-5 text-[#9E1F1F]" />
             </div>
           </div>
         </div>
@@ -716,20 +846,31 @@ export default function AdminDashboardPage() {
         {activeTab === 'verification' && (
           <section>
             {/* Filter & Search Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 bg-[#120F0D] p-4 rounded-2xl border border-[#FFFFFF]/10">
+            <div
+              style={{
+                background: isDark ? '#161210' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+                boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+              }}
+              className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 p-4 rounded-2xl"
+            >
               <div className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
-                <span className="text-xs font-mono text-[#A89F91] mr-1 flex items-center gap-1">
-                  <Filter className="w-3.5 h-3.5 text-[#B82E2E]" /> FILTER:
+                <span
+                  style={{ color: isDark ? '#A89F91' : '#555555' }}
+                  className="text-xs font-mono mr-1 flex items-center gap-1 font-bold"
+                >
+                  <Filter className="w-3.5 h-3.5 text-[#9E1F1F]" /> FILTER:
                 </span>
                 {(['VERIFYING', 'PAID', 'REJECTED', 'ALL'] as const).map((st) => (
                   <button
                     key={st}
                     onClick={() => setStatusFilter(st)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 ${
-                      statusFilter === st
-                        ? 'bg-[#B82E2E] text-white font-semibold shadow-md'
-                        : 'bg-[#0E0B0A] text-[#A89F91] hover:text-white border border-[#FFFFFF]/10'
-                    }`}
+                    style={{
+                      background: statusFilter === st ? '#9E1F1F' : (isDark ? '#0E0B0A' : '#FAF7F5'),
+                      border: statusFilter === st ? '1px solid #9E1F1F' : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F'),
+                      color: statusFilter === st ? '#FFFFFF' : (isDark ? '#A89F91' : '#1A1A1A'),
+                    }}
+                    className="px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5 font-bold"
                   >
                     <span>
                       {st === 'VERIFYING'
@@ -740,7 +881,13 @@ export default function AdminDashboardPage() {
                         ? 'DITOLAK'
                         : 'SEMUA'}
                     </span>
-                    <span className="px-1.5 py-0.2 rounded-md bg-black/40 text-[0.65rem] font-bold">
+                    <span
+                      style={{
+                        background: statusFilter === st ? 'rgba(255, 255, 255, 0.25)' : (isDark ? 'rgba(0, 0, 0, 0.4)' : '#E8DFD8'),
+                        color: statusFilter === st ? '#FFFFFF' : (isDark ? '#FFFFFF' : '#1A1A1A'),
+                      }}
+                      className="px-1.5 py-0.2 rounded-md text-[0.65rem] font-bold"
+                    >
                       {st === 'VERIFYING'
                         ? verifyingCount
                         : st === 'PAID'
@@ -754,29 +901,55 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="relative w-full md:w-72">
-                <Search className="w-4 h-4 text-[#A89F91] absolute left-3.5 top-3" />
+                <Search className="w-4 h-4 text-[#777777] absolute left-3.5 top-3" />
                 <input
                   type="text"
                   placeholder="Cari No. Order, Nama, WA..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#0E0B0A] border border-[#FFFFFF]/15 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                  style={{
+                    background: isDark ? '#0E0B0A' : '#FAF7F5',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                    color: isDark ? '#FFFFFF' : '#1A1A1A',
+                  }}
+                  className="w-full pl-9 pr-4 py-2 rounded-xl text-xs focus:outline-none focus:border-[#9E1F1F]"
                 />
               </div>
             </div>
 
             {loading ? (
-              <div className="flex flex-col items-center justify-center gap-3 py-24 text-[#A89F91]">
-                <RefreshCw className="w-6 h-6 animate-spin text-[#B82E2E]" />
-                <span className="text-xs font-mono tracking-widest uppercase">Mengambil data transaksi real-time...</span>
+              <div
+                style={{ color: isDark ? '#A89F91' : '#FFFFFF' }}
+                className="flex flex-col items-center justify-center gap-3 py-24"
+              >
+                <RefreshCw className="w-6 h-6 animate-spin text-white" />
+                <span className="text-xs font-mono tracking-widest uppercase font-bold">
+                  Mengambil data transaksi real-time...
+                </span>
               </div>
             ) : filteredOrders.length === 0 ? (
-              <div className="p-12 rounded-3xl bg-[#120F0D] border border-emerald-500/30 text-center max-w-md mx-auto my-12 shadow-2xl">
+              <div
+                style={{
+                  background: isDark ? '#161210' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(39, 174, 96, 0.3)' : '1.5px solid #27AE60',
+                }}
+                className="p-12 rounded-3xl text-center max-w-md mx-auto my-12 shadow-2xl"
+              >
                 <div className="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+                  <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                 </div>
-                <h3 className="text-lg font-serif text-white mb-1">Tidak Ada Pesanan Dalam Status Ini</h3>
-                <p className="text-xs text-[#A89F91]">Semua bukti pembayaran terverifikasi atau tidak ada data yang cocok dengan pencarian.</p>
+                <h3
+                  style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                  className="text-lg font-serif font-bold mb-1"
+                >
+                  Tidak Ada Pesanan Dalam Status Ini
+                </h3>
+                <p
+                  style={{ color: isDark ? '#A89F91' : '#555555' }}
+                  className="text-xs"
+                >
+                  Semua bukti pembayaran terverifikasi atau tidak ada data yang cocok dengan pencarian.
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -789,81 +962,134 @@ export default function AdminDashboardPage() {
                   return (
                     <div
                       key={order.id}
-                      className={`p-6 rounded-2xl border transition-all flex flex-col justify-between shadow-xl relative overflow-hidden ${
-                        isVerifying
-                          ? 'bg-[#161210] border-[#B82E2E]/50'
+                      style={{
+                        background: isDark
+                          ? (isVerifying ? '#161210' : isPaid ? '#121613' : '#181111')
+                          : '#FFFFFF',
+                        border: isVerifying
+                          ? (isDark ? '1px solid rgba(184, 46, 46, 0.5)' : '1.5px solid #9E1F1F')
                           : isPaid
-                          ? 'bg-[#121613] border-emerald-500/30'
-                          : 'bg-[#181111] border-red-500/30'
-                      }`}
+                          ? (isDark ? '1px solid rgba(39, 174, 96, 0.3)' : '1.5px solid #27AE60')
+                          : (isDark ? '1px solid rgba(231, 76, 60, 0.3)' : '1.5px solid #E74C3C'),
+                        boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+                      }}
+                      className="p-6 rounded-2xl transition-all flex flex-col justify-between relative overflow-hidden"
                     >
                       <div>
                         {/* Order Header Card */}
-                        <div className="flex items-center justify-between mb-4 border-b border-[#FFFFFF]/10 pb-3">
+                        <div
+                          style={{
+                            borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(158, 31, 31, 0.15)',
+                          }}
+                          className="flex items-center justify-between mb-4 pb-3"
+                        >
                           <div>
-                            <span className="font-serif text-lg font-bold text-[#D4A373] block leading-none mb-1">
+                            <span
+                              style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                              className="font-serif text-lg font-bold block leading-none mb-1"
+                            >
                               {order.order_display_number ? `${order.order_display_number} (${order.order_number})` : order.order_number}
                             </span>
-                            <span className="text-[0.68rem] text-[#C29B7F] font-mono">
+                            <span
+                              style={{ color: isDark ? '#C29B7F' : '#555555' }}
+                              className="text-[0.72rem] font-mono font-semibold"
+                            >
                               {order.mode === 'dine-in' ? `DINE-IN • MEJA ${order.table_id || '01'}` : 'TAKEAWAY'}
                             </span>
                           </div>
                           <span
-                            className={`px-1 py-0.5 text-[0.68rem] font-mono tracking-widest uppercase font-bold border-y ${
-                              isVerifying
-                                ? 'border-amber-500/50 text-amber-400'
-                                : isPaid
-                                ? 'border-emerald-500/50 text-emerald-400'
-                                : 'border-red-500/50 text-red-400'
-                            }`}
+                            style={{
+                              borderTop: '1px solid currentColor',
+                              borderBottom: '1px solid currentColor',
+                              color: isVerifying ? '#E67E22' : isPaid ? '#27AE60' : '#E74C3C',
+                            }}
+                            className="px-1 py-0.5 text-[0.68rem] font-mono tracking-widest uppercase font-bold"
                           >
                             {order.payment_status}
                           </span>
                         </div>
 
                         {/* Details Grid */}
-                        <div className="space-y-2 text-xs text-[#A89F91] mb-5">
+                        <div
+                          style={{ color: isDark ? '#A89F91' : '#555555' }}
+                          className="space-y-2 text-xs mb-5 font-mono"
+                        >
                           <div className="flex justify-between">
                             <span>Pemesan:</span>
-                            <strong className="text-white font-medium">{order.customer_name}</strong>
+                            <strong style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }} className="font-serif text-sm">
+                              {order.customer_name}
+                            </strong>
                           </div>
                           <div className="flex justify-between">
                             <span>No. WhatsApp:</span>
-                            <strong className="text-emerald-400 font-mono">{order.customer_phone || '-'}</strong>
+                            <strong className="text-emerald-500 font-mono font-bold">
+                              {order.customer_phone || '-'}
+                            </strong>
                           </div>
                           <div className="flex justify-between">
                             <span>Total Pembayaran:</span>
-                            <strong className="text-[#C29B7F] font-serif text-sm font-semibold">
+                            <strong
+                              style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                              className="font-serif text-sm font-bold"
+                            >
                               Rp {order.subtotal?.toLocaleString('id-ID')}
                             </strong>
                           </div>
                           <div className="flex justify-between">
                             <span>Metode:</span>
-                            <span className="uppercase text-white font-mono font-semibold">{order.payment_method}</span>
+                            <span
+                              style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                              className="uppercase font-mono font-bold"
+                            >
+                              {order.payment_method}
+                            </span>
                           </div>
 
                           {isRejected && order.rejection_reason && (
-                            <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[0.7rem] mt-2">
-                              📌 <strong>Alasan Ditolak:</strong> "{order.rejection_reason}"
+                            <div
+                              style={{
+                                background: isDark ? 'rgba(231, 76, 60, 0.1)' : '#FDEDEC',
+                                borderColor: '#E74C3C',
+                                color: '#E74C3C',
+                              }}
+                              className="p-2.5 rounded-xl border text-[0.72rem] mt-2 font-medium"
+                            >
+                              <strong>Alasan Ditolak:</strong> "{order.rejection_reason}"
                             </div>
                           )}
 
                           {/* CANCELLATION REQUESTED BADGE */}
                           {order.order_status === 'CANCELLATION_REQUESTED' && (
-                            <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/30 text-orange-400 text-[0.7rem] mt-2">
+                            <div
+                              style={{
+                                background: isDark ? 'rgba(230, 126, 34, 0.15)' : '#FFF9F4',
+                                borderColor: '#E67E22',
+                                color: '#E67E22',
+                              }}
+                              className="p-2.5 rounded-xl border text-[0.72rem] mt-2"
+                            >
                               <div className="flex items-center gap-1.5 mb-1">
                                 <XCircle className="w-3.5 h-3.5" />
                                 <strong className="font-mono uppercase tracking-wider">PEMBATALAN DIMINTA</strong>
                               </div>
                               {order.cancellation_reason && (
-                                <span className="text-orange-300">Alasan: "{order.cancellation_reason}"</span>
+                                <span style={{ color: isDark ? '#F39C12' : '#C0392B' }}>
+                                  Alasan: "{order.cancellation_reason}"
+                                </span>
                               )}
                             </div>
                           )}
 
                           {/* CANCELLED STATUS BADGE */}
                           {order.order_status === 'CANCELLED' && (
-                            <div className="p-2.5 rounded-xl bg-[#FFFFFF]/5 border border-[#FFFFFF]/10 text-[#888] text-[0.7rem] mt-2">
+                            <div
+                              style={{
+                                background: isDark ? 'rgba(255, 255, 255, 0.05)' : '#F5F5F5',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#DDD',
+                                color: '#777777',
+                              }}
+                              className="p-2.5 rounded-xl border text-[0.72rem] mt-2"
+                            >
                               <div className="flex items-center gap-1.5">
                                 <XCircle className="w-3.5 h-3.5" />
                                 <strong className="font-mono uppercase tracking-wider">PESANAN DIBATALKAN</strong>
@@ -873,11 +1099,18 @@ export default function AdminDashboardPage() {
                         </div>
 
                         {/* Payment Proof Photo Box */}
-                        <div className="bg-[#0B0908] p-3 rounded-xl border border-dashed border-[#FFFFFF]/15 text-center mb-6">
+                        <div
+                          style={{
+                            background: isDark ? '#0B0908' : '#FAF7F5',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(158, 31, 31, 0.3)',
+                          }}
+                          className="p-3 rounded-xl border border-dashed text-center mb-6"
+                        >
                           {proofImg ? (
                             <div>
                               <div
-                                className="relative h-48 w-full rounded-lg overflow-hidden mb-2 cursor-pointer group bg-[#161210]"
+                                style={{ background: isDark ? '#161210' : '#FFFFFF' }}
+                                className="relative h-48 w-full rounded-lg overflow-hidden mb-2 cursor-pointer group"
                                 onClick={() => setSelectedImageModal(proofImg)}
                               >
                                 <img
@@ -885,8 +1118,8 @@ export default function AdminDashboardPage() {
                                   alt="Bukti Transfer"
                                   className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                                 />
-                                <div className="absolute inset-0 bg-[#0B0908]/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-mono font-semibold gap-1.5">
-                                  <Eye className="w-4 h-4 text-[#B82E2E]" />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-mono font-semibold gap-1.5">
+                                  <Eye className="w-4 h-4 text-white" />
                                   <span>KLIK PERBESAR</span>
                                 </div>
                               </div>
@@ -894,15 +1127,16 @@ export default function AdminDashboardPage() {
                                 href={proofImg}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 text-[0.7rem] text-[#C29B7F] hover:text-white font-mono"
+                                style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                                className="inline-flex items-center gap-1 text-[0.72rem] hover:underline font-mono font-bold"
                               >
                                 <ExternalLink className="w-3 h-3" />
                                 <span>BUKA UKURAN FULL</span>
                               </a>
                             </div>
                           ) : (
-                            <div className="py-6 text-[#A89F91]">
-                              <AlertCircle className="w-6 h-6 text-[#B82E2E] mx-auto mb-1.5" />
+                            <div style={{ color: isDark ? '#A89F91' : '#777777' }} className="py-6">
+                              <AlertCircle className="w-6 h-6 text-[#9E1F1F] mx-auto mb-1.5" />
                               <span className="text-xs font-mono">Foto bukti bayar tidak terlampir</span>
                             </div>
                           )}
@@ -911,19 +1145,23 @@ export default function AdminDashboardPage() {
 
                       {/* Action Buttons */}
                       <div className="grid grid-cols-2 gap-3">
-                        {/* CANCELLATION REQUESTED: Show Approve/Reject Cancellation */}
                         {order.order_status === 'CANCELLATION_REQUESTED' ? (
                           <>
                             <button
                               onClick={() => handleApproveCancellation(order.id)}
-                              className="w-full py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                              className="w-full py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white text-xs font-mono tracking-wider uppercase font-bold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
                             >
                               <Check className="w-4 h-4" />
                               <span>SETUJUI BATAL</span>
                             </button>
                             <button
                               onClick={() => handleRejectCancellation(order.id)}
-                              className="w-full py-2.5 rounded-xl bg-[#0E0B0A] hover:bg-[#161210] border border-[#FFFFFF]/20 text-[#A89F91] text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                              style={{
+                                background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.2)' : '#9E1F1F',
+                                color: isDark ? '#A89F91' : '#1A1A1A',
+                              }}
+                              className="w-full py-2.5 rounded-xl border text-xs font-mono tracking-wider uppercase font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                             >
                               <X className="w-4 h-4" />
                               <span>TOLAK BATAL</span>
@@ -934,19 +1172,27 @@ export default function AdminDashboardPage() {
                             <button
                               onClick={() => handleApprovePayment(order.id)}
                               disabled={isPaid}
-                              className={`w-full py-2.5 rounded-xl text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer ${
-                                isPaid
-                                  ? 'bg-emerald-950/50 text-emerald-600 border border-emerald-800/40 cursor-not-allowed'
-                                  : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                              style={{
+                                background: isPaid ? (isDark ? 'rgba(39, 174, 96, 0.2)' : '#E8F6ED') : '#27AE60',
+                                color: isPaid ? '#27AE60' : '#FFFFFF',
+                                border: isPaid ? '1px solid #27AE60' : 'none',
+                              }}
+                              className={`w-full py-2.5 rounded-xl text-xs font-mono tracking-wider uppercase font-bold transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer ${
+                                isPaid ? 'cursor-not-allowed' : 'hover:opacity-90'
                               }`}
                             >
                               <Check className="w-4 h-4" />
-                              <span>{isPaid ? 'LUNAS ✓' : '💵 TANDAI LUNAS'}</span>
+                              <span>{isPaid ? 'LUNAS' : 'TANDAI LUNAS'}</span>
                             </button>
 
                             <button
                               onClick={() => setRejectingOrder(order)}
-                              className="w-full py-2.5 rounded-xl bg-[#0E0B0A] hover:bg-red-950 border border-red-500/40 text-red-400 text-xs font-mono tracking-wider uppercase font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                              style={{
+                                background: isDark ? '#0E0B0A' : '#FAF7F5',
+                                borderColor: '#E74C3C',
+                                color: '#E74C3C',
+                              }}
+                              className="w-full py-2.5 rounded-xl border hover:bg-red-50 text-xs font-mono tracking-wider uppercase font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                             >
                               <X className="w-4 h-4" />
                               <span>TOLAK</span>
@@ -967,13 +1213,18 @@ export default function AdminDashboardPage() {
           <section>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-xl font-serif text-white font-light">Katalog Menu QR Order</h2>
-                <p className="text-xs text-[#A89F91]">Tambah, edit, hapus item menu dan kelola ketersediaan stok.</p>
+                <h2 className="text-xl font-serif text-white font-bold">Katalog Menu QR Order</h2>
+                <p className="text-xs text-white/80 font-mono">Tambah, edit, hapus item menu dan kelola ketersediaan stok.</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleClearAllMenu}
-                  className="px-3.5 py-2.5 rounded-xl bg-[#0B0908] hover:bg-red-950 border border-red-500/40 text-red-400 text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
+                  style={{
+                    background: isDark ? '#0B0908' : 'rgba(0,0,0,0.2)',
+                    borderColor: isDark ? 'rgba(231, 76, 60, 0.4)' : 'rgba(255,255,255,0.4)',
+                    color: isDark ? '#E74C3C' : '#FFFFFF',
+                  }}
+                  className="px-3.5 py-2.5 rounded-xl border text-xs font-mono font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
                   title="Kosongkan Semua Katalog Menu"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -987,7 +1238,11 @@ export default function AdminDashboardPage() {
                     setMenuDesc('');
                     setIsAddMenuOpen(true);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-md"
+                  style={{
+                    background: isDark ? '#B82E2E' : '#FFFFFF',
+                    color: isDark ? '#FFFFFF' : '#9E1F1F',
+                  }}
+                  className="px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-md"
                 >
                   <Plus className="w-4 h-4" />
                   <span>TAMBAH MENU BARU</span>
@@ -997,34 +1252,71 @@ export default function AdminDashboardPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {menuItemsState.map((item) => (
-                <div key={item.id} className="p-5 rounded-2xl bg-[#120F0D] border border-[#FFFFFF]/10 flex flex-col justify-between">
+                <div
+                  key={item.id}
+                  style={{
+                    background: isDark ? '#161210' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+                    boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+                  }}
+                  className="p-5 rounded-2xl flex flex-col justify-between"
+                >
                   <div>
                     <div className="flex items-start justify-between gap-3 mb-3">
-                      <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-[#0B0908] border border-[#FFFFFF]/10 shrink-0">
+                      <div
+                        style={{
+                          background: isDark ? '#0B0908' : '#FAF7F5',
+                          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+                        }}
+                        className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0"
+                      >
                         {item.image ? (
                           <Image src={item.image} alt={item.name} fill className="object-cover" sizes="64px" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-[#A89F91]">
-                            <Coffee className="w-6 h-6 text-[#B82E2E]" />
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Coffee className="w-6 h-6 text-[#9E1F1F]" />
                           </div>
                         )}
                       </div>
                       <div className="flex-1">
-                        <span className="px-2 py-0.5 rounded bg-[#B82E2E]/20 text-[#C29B7F] text-[0.6rem] font-mono uppercase font-semibold border border-[#B82E2E]/30 mb-1 inline-block">
+                        <span
+                          style={{
+                            borderTop: '1px solid currentColor',
+                            borderBottom: '1px solid currentColor',
+                            color: isDark ? '#D4A373' : '#9E1F1F',
+                          }}
+                          className="px-1.5 py-0.5 text-[0.62rem] font-mono uppercase font-bold mb-1 inline-block"
+                        >
                           {item.category || 'KOPI'}
                         </span>
-                        <h4 className="font-serif text-base font-normal text-white">{item.name}</h4>
-                        <span className="font-serif text-sm font-semibold text-[#C29B7F]">
+                        <h4
+                          style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                          className="font-serif text-base font-bold"
+                        >
+                          {item.name}
+                        </h4>
+                        <span
+                          style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                          className="font-mono text-sm font-bold block"
+                        >
                           {item.price || `Rp ${item.base_price?.toLocaleString('id-ID')}`}
                         </span>
                       </div>
                     </div>
-                    <p className="text-xs text-[#A89F91] line-clamp-2 mb-4 font-light leading-relaxed">
+                    <p
+                      style={{ color: isDark ? '#A89F91' : '#555555' }}
+                      className="text-xs line-clamp-2 mb-4 font-light leading-relaxed"
+                    >
                       {item.description || 'Racikan khas berkualitas KOPIMAGE.'}
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-[#FFFFFF]/10 flex items-center justify-end gap-2">
+                  <div
+                    style={{
+                      borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(158, 31, 31, 0.15)',
+                    }}
+                    className="pt-3 flex items-center justify-end gap-2"
+                  >
                     <button
                       onClick={() => {
                         setEditingMenu(item);
@@ -1034,14 +1326,24 @@ export default function AdminDashboardPage() {
                         setMenuDesc(item.description || '');
                         setIsAddMenuOpen(true);
                       }}
-                      className="p-2 rounded-lg bg-[#0B0908] hover:bg-[#FFFFFF]/10 text-white transition-colors cursor-pointer"
+                      style={{
+                        background: isDark ? '#0B0908' : '#FAF7F5',
+                        border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                      }}
+                      className="p-2 rounded-lg transition-colors cursor-pointer"
                       title="Edit Menu"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteMenu(item.id)}
-                      className="p-2 rounded-lg bg-[#0B0908] hover:bg-red-950 text-red-400 transition-colors cursor-pointer"
+                      style={{
+                        background: isDark ? '#0B0908' : '#FAF7F5',
+                        border: '1px solid #E74C3C',
+                        color: '#E74C3C',
+                      }}
+                      className="p-2 rounded-lg transition-colors cursor-pointer hover:bg-red-50"
                       title="Hapus Menu"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -1058,13 +1360,18 @@ export default function AdminDashboardPage() {
           <section>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <h2 className="text-xl font-serif text-white font-light">Registry Meja &amp; Generator Stiker QR</h2>
-                <p className="text-xs text-[#A89F91]">Kelola daftar meja dan cetak stiker Kode QR presisi per meja.</p>
+                <h2 className="text-xl font-serif text-white font-bold">Registry Meja &amp; Generator Stiker QR</h2>
+                <p className="text-xs text-white/80 font-mono">Kelola daftar meja dan cetak stiker Kode QR presisi per meja.</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleClearAllTables}
-                  className="px-3.5 py-2.5 rounded-xl bg-[#0B0908] hover:bg-red-950 border border-red-500/40 text-red-400 text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
+                  style={{
+                    background: isDark ? '#0B0908' : 'rgba(0,0,0,0.2)',
+                    borderColor: isDark ? 'rgba(231, 76, 60, 0.4)' : 'rgba(255,255,255,0.4)',
+                    color: isDark ? '#E74C3C' : '#FFFFFF',
+                  }}
+                  className="px-3.5 py-2.5 rounded-xl border text-xs font-mono font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
                   title="Kosongkan Semua Registry Meja"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -1077,7 +1384,11 @@ export default function AdminDashboardPage() {
                     setTableNameInput('');
                     setIsAddTableOpen(true);
                   }}
-                  className="px-4 py-2.5 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-md"
+                  style={{
+                    background: isDark ? '#B82E2E' : '#FFFFFF',
+                    color: isDark ? '#FFFFFF' : '#9E1F1F',
+                  }}
+                  className="px-4 py-2.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-colors flex items-center gap-2 cursor-pointer shrink-0 shadow-md"
                 >
                   <Plus className="w-4 h-4" />
                   <span>TAMBAH MEJA BARU</span>
@@ -1087,18 +1398,44 @@ export default function AdminDashboardPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {tablesState.map((t) => (
-                <div key={t.id} className="p-5 rounded-2xl bg-[#120F0D] border border-[#FFFFFF]/10 flex flex-col justify-between">
+                <div
+                  key={t.id}
+                  style={{
+                    background: isDark ? '#161210' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.5px solid #9E1F1F',
+                    boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.6)' : '0 8px 25px rgba(0, 0, 0, 0.1)',
+                  }}
+                  className="p-5 rounded-2xl flex flex-col justify-between"
+                >
                   <div>
-                    <h3 className="font-serif text-xl text-white font-normal mb-1">{t.name}</h3>
-                    <span className="text-[0.65rem] font-mono uppercase text-[#A89F91] block mb-4">
+                    <h3
+                      style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                      className="font-serif text-xl font-bold mb-1"
+                    >
+                      {t.name}
+                    </h3>
+                    <span
+                      style={{ color: isDark ? '#A89F91' : '#555555' }}
+                      className="text-[0.68rem] font-mono uppercase block mb-4 font-semibold"
+                    >
                       KODE: {t.code} • AREA: {t.area || 'Indoor AC'}
                     </span>
                   </div>
 
-                  <div className="pt-3 border-t border-[#FFFFFF]/10 flex items-center justify-between gap-2">
+                  <div
+                    style={{
+                      borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(158, 31, 31, 0.15)',
+                    }}
+                    className="pt-3 flex items-center justify-between gap-2"
+                  >
                     <button
                       onClick={() => setViewingQrTable(t)}
-                      className="px-3 py-1.5 rounded-xl bg-[#B82E2E]/20 hover:bg-[#B82E2E] border border-[#B82E2E]/40 text-[#C29B7F] hover:text-white text-xs font-mono font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
+                      style={{
+                        background: isDark ? 'rgba(184, 46, 46, 0.2)' : '#F5EBEB',
+                        border: isDark ? '1px solid rgba(184, 46, 46, 0.4)' : '1px solid #9E1F1F',
+                        color: isDark ? '#D4A373' : '#9E1F1F',
+                      }}
+                      className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       <span>STIKER QR</span>
@@ -1113,14 +1450,24 @@ export default function AdminDashboardPage() {
                           setTableAreaInput(t.area || 'Indoor AC');
                           setIsAddTableOpen(true);
                         }}
-                        className="p-2 rounded-lg bg-[#0B0908] hover:bg-[#FFFFFF]/10 text-white transition-colors cursor-pointer"
+                        style={{
+                          background: isDark ? '#0B0908' : '#FAF7F5',
+                          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+                          color: isDark ? '#FFFFFF' : '#1A1A1A',
+                        }}
+                        className="p-2 rounded-lg transition-colors cursor-pointer"
                         title="Edit Meja"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDeleteTable(t.id)}
-                        className="p-2 rounded-lg bg-[#0B0908] hover:bg-red-950 text-red-400 transition-colors cursor-pointer"
+                        style={{
+                          background: isDark ? '#0B0908' : '#FAF7F5',
+                          border: '1px solid #E74C3C',
+                          color: '#E74C3C',
+                        }}
+                        className="p-2 rounded-lg transition-colors cursor-pointer hover:bg-red-50"
                         title="Hapus Meja"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1143,28 +1490,45 @@ export default function AdminDashboardPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setRejectingOrder(null)}
-              className="fixed inset-0 bg-[#0B0908]/85 backdrop-blur-md"
+              className="fixed inset-0 bg-black/85 backdrop-blur-md"
             />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative z-10 w-full max-w-lg bg-[#120F0D] border border-red-500/40 rounded-3xl p-6 shadow-2xl"
+              style={{
+                background: isDark ? '#161210' : '#FFFFFF',
+                border: '2px solid #E74C3C',
+                color: isDark ? '#FFFFFF' : '#1A1A1A',
+              }}
+              className="relative z-10 w-full max-w-lg rounded-3xl p-6 shadow-2xl"
             >
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#FFFFFF]/10">
-                <div className="flex items-center gap-2 text-red-400 font-serif text-lg">
+              <div
+                style={{
+                  borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(231, 76, 60, 0.2)',
+                }}
+                className="flex items-center justify-between mb-4 pb-3"
+              >
+                <div className="flex items-center gap-2 text-red-500 font-serif text-lg font-bold">
                   <AlertCircle className="w-5 h-5" />
                   <span>Tolak Pembayaran #{rejectingOrder.order_number}</span>
                 </div>
-                <button onClick={() => setRejectingOrder(null)} className="text-[#A89F91] hover:text-white cursor-pointer">
+                <button
+                  onClick={() => setRejectingOrder(null)}
+                  style={{ color: isDark ? '#A89F91' : '#1A1A1A' }}
+                  className="cursor-pointer"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-2">
+                  <label
+                    style={{ color: isDark ? '#A89F91' : '#555555' }}
+                    className="text-[0.68rem] font-mono uppercase font-bold block mb-2"
+                  >
                     PILIH ALASAN PENOLAKAN:
                   </label>
                   <div className="space-y-2">
@@ -1178,13 +1542,17 @@ export default function AdminDashboardPage() {
                         key={reason}
                         type="button"
                         onClick={() => setRejectionReason(reason)}
-                        className={`w-full text-left p-3 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
-                          rejectionReason === reason
-                            ? 'bg-[#B82E2E]/20 border-[#B82E2E] text-white'
-                            : 'bg-[#0B0908] border-[#FFFFFF]/10 text-[#A89F91] hover:text-white'
-                        }`}
+                        style={{
+                          background: rejectionReason === reason
+                            ? (isDark ? 'rgba(184, 46, 46, 0.25)' : '#FDF2F2')
+                            : (isDark ? '#0E0B0A' : '#FAF7F5'),
+                          borderColor: rejectionReason === reason ? '#9E1F1F' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F'),
+                          color: rejectionReason === reason ? '#9E1F1F' : (isDark ? '#A89F91' : '#1A1A1A'),
+                          fontWeight: rejectionReason === reason ? 700 : 500,
+                        }}
+                        className="w-full text-left p-3 rounded-xl border text-xs transition-all cursor-pointer"
                       >
-                        {reason === 'Custom' ? '✍️ Tulis Alasan Khusus Lainnya...' : `📌 ${reason}`}
+                        {reason === 'Custom' ? 'Tulis Alasan Khusus Lainnya...' : reason}
                       </button>
                     ))}
                   </div>
@@ -1192,7 +1560,10 @@ export default function AdminDashboardPage() {
 
                 {rejectionReason === 'Custom' && (
                   <div>
-                    <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">
+                    <label
+                      style={{ color: isDark ? '#A89F91' : '#555555' }}
+                      className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                    >
                       Tulis Alasan Khusus:
                     </label>
                     <textarea
@@ -1200,7 +1571,12 @@ export default function AdminDashboardPage() {
                       value={customReason}
                       onChange={(e) => setCustomReason(e.target.value)}
                       placeholder="misal: Foto bukti transfer terpotong, harap kirim ulang yang lengkap..."
-                      className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                      style={{
+                        background: isDark ? '#0E0B0A' : '#FAF7F5',
+                        border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                      }}
+                      className="w-full p-3 rounded-xl text-xs focus:outline-none focus:border-[#9E1F1F]"
                     />
                   </div>
                 )}
@@ -1208,10 +1584,10 @@ export default function AdminDashboardPage() {
 
               <button
                 onClick={handleConfirmRejection}
-                className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <Send className="w-4 h-4" />
-                <span>SIMPAN &amp; BUKAH CHAT WHATSAPP</span>
+                <span>SIMPAN &amp; BUKA CHAT WHATSAPP</span>
               </button>
             </motion.div>
           </div>
@@ -1227,29 +1603,51 @@ export default function AdminDashboardPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setViewingQrTable(null)}
-              className="fixed inset-0 bg-[#0B0908]/90 backdrop-blur-md"
+              className="fixed inset-0 bg-black/90 backdrop-blur-md"
             />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="relative z-10 w-full max-w-md bg-[#120F0D] border border-[#B82E2E]/40 rounded-3xl p-6 sm:p-8 text-center shadow-2xl"
+              style={{
+                background: isDark ? '#161210' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '2px solid #9E1F1F',
+                color: isDark ? '#FFFFFF' : '#1A1A1A',
+              }}
+              className="relative z-10 w-full max-w-md rounded-3xl p-6 sm:p-8 text-center shadow-2xl"
             >
-              <button onClick={() => setViewingQrTable(null)} className="absolute top-4 right-4 text-[#A89F91] hover:text-white cursor-pointer">
+              <button
+                onClick={() => setViewingQrTable(null)}
+                style={{ color: isDark ? '#A89F91' : '#1A1A1A' }}
+                className="absolute top-4 right-4 cursor-pointer"
+              >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="mb-4">
-                <span className="text-[0.62rem] font-mono tracking-widest uppercase font-semibold text-[#C29B7F] block">
+                <span
+                  style={{ color: isDark ? '#D4A373' : '#9E1F1F' }}
+                  className="text-[0.65rem] font-mono tracking-widest uppercase font-bold block"
+                >
                   KOPIMAGE CRAFTSMAN STICKER
                 </span>
-                <h3 className="font-serif text-2xl font-normal text-white">{viewingQrTable.name}</h3>
-                <span className="text-xs text-[#A89F91]">Kode: {viewingQrTable.code} • Area: {viewingQrTable.area}</span>
+                <h3
+                  style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                  className="font-serif text-2xl font-bold"
+                >
+                  {viewingQrTable.name}
+                </h3>
+                <span
+                  style={{ color: isDark ? '#A89F91' : '#555555' }}
+                  className="text-xs font-mono"
+                >
+                  Kode: {viewingQrTable.code} • Area: {viewingQrTable.area}
+                </span>
               </div>
 
               {/* QR Vector Box */}
-              <div className="bg-white p-6 rounded-2xl inline-block border-4 border-[#B82E2E] shadow-2xl mb-6 my-2">
+              <div className="bg-white p-6 rounded-2xl inline-block border-4 border-[#9E1F1F] shadow-2xl mb-6 my-2">
                 <QRCodeSVG
                   value={`https://kopimage.vercel.app/?table=${viewingQrTable.code}`}
                   size={200}
@@ -1257,7 +1655,7 @@ export default function AdminDashboardPage() {
                   fgColor="#0B0908"
                   level="H"
                 />
-                <span className="font-mono text-[0.6rem] tracking-widest uppercase text-black font-bold block mt-3">
+                <span className="font-mono text-[0.62rem] tracking-widest uppercase text-black font-bold block mt-3">
                   SCAN TO ORDER • MEJA {viewingQrTable.code}
                 </span>
               </div>
@@ -1268,14 +1666,19 @@ export default function AdminDashboardPage() {
                     navigator.clipboard.writeText(`https://kopimage.vercel.app/?table=${viewingQrTable.code}`);
                     alert('Link QR Meja berhasil disalin!');
                   }}
-                  className="flex-1 py-3 rounded-xl bg-[#0B0908] hover:bg-[#FFFFFF]/10 border border-[#FFFFFF]/20 text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  style={{
+                    background: isDark ? '#0B0908' : '#FAF7F5',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #9E1F1F',
+                    color: isDark ? '#FFFFFF' : '#1A1A1A',
+                  }}
+                  className="flex-1 py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <Copy className="w-4 h-4 text-[#C29B7F]" />
+                  <Copy className="w-4 h-4 text-[#9E1F1F]" />
                   <span>SALIN LINK</span>
                 </button>
                 <button
                   onClick={() => window.print()}
-                  className="flex-1 py-3 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                  className="flex-1 py-3 rounded-xl bg-[#9E1F1F] hover:opacity-90 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-md"
                 >
                   <Printer className="w-4 h-4" />
                   <span>CETAK STIKER</span>
@@ -1295,54 +1698,101 @@ export default function AdminDashboardPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsAddTableOpen(false)}
-              className="fixed inset-0 bg-[#0B0908]/85 backdrop-blur-md"
+              className="fixed inset-0 bg-black/85 backdrop-blur-md"
             />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative z-10 w-full max-w-md bg-[#120F0D] border border-[#B82E2E]/40 rounded-3xl p-6 shadow-2xl"
+              style={{
+                background: isDark ? '#161210' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '2px solid #9E1F1F',
+                color: isDark ? '#FFFFFF' : '#1A1A1A',
+              }}
+              className="relative z-10 w-full max-w-md rounded-3xl p-6 shadow-2xl"
             >
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#FFFFFF]/10">
-                <h3 className="font-serif text-lg text-white">
+              <div
+                style={{
+                  borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(158, 31, 31, 0.15)',
+                }}
+                className="flex items-center justify-between mb-4 pb-3"
+              >
+                <h3
+                  style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                  className="font-serif text-lg font-bold"
+                >
                   {editingTable ? 'Edit Data Meja' : 'Tambah Meja Baru'}
                 </h3>
-                <button onClick={() => setIsAddTableOpen(false)} className="text-[#A89F91] hover:text-white cursor-pointer">
+                <button
+                  onClick={() => setIsAddTableOpen(false)}
+                  style={{ color: isDark ? '#A89F91' : '#1A1A1A' }}
+                  className="cursor-pointer"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <form onSubmit={handleSaveTable} className="space-y-4">
                 <div>
-                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">Kode Meja (misal: 13)</label>
+                  <label
+                    style={{ color: isDark ? '#A89F91' : '#555555' }}
+                    className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                  >
+                    Kode Meja (misal: 13)
+                  </label>
                   <input
                     type="text"
                     required
                     placeholder="13"
                     value={tableCodeInput}
                     onChange={(e) => setTableCodeInput(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                    style={{
+                      background: isDark ? '#0B0908' : '#FAF7F5',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                      color: isDark ? '#FFFFFF' : '#1A1A1A',
+                    }}
+                    className="w-full p-3 rounded-xl text-xs focus:outline-none focus:border-[#9E1F1F]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">Nama Meja (misal: MEJA 13)</label>
+                  <label
+                    style={{ color: isDark ? '#A89F91' : '#555555' }}
+                    className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                  >
+                    Nama Meja (misal: MEJA 13)
+                  </label>
                   <input
                     type="text"
                     placeholder="MEJA 13"
                     value={tableNameInput}
                     onChange={(e) => setTableNameInput(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                    style={{
+                      background: isDark ? '#0B0908' : '#FAF7F5',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                      color: isDark ? '#FFFFFF' : '#1A1A1A',
+                    }}
+                    className="w-full p-3 rounded-xl text-xs focus:outline-none focus:border-[#9E1F1F]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">Area Lokasi Kedai</label>
+                  <label
+                    style={{ color: isDark ? '#A89F91' : '#555555' }}
+                    className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                  >
+                    Area Lokasi Kedai
+                  </label>
                   <select
                     value={tableAreaInput}
                     onChange={(e) => setTableAreaInput(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white outline-none focus:border-[#B82E2E]"
+                    style={{
+                      background: isDark ? '#0B0908' : '#FAF7F5',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                      color: isDark ? '#FFFFFF' : '#1A1A1A',
+                    }}
+                    className="w-full p-3 rounded-xl text-xs outline-none focus:border-[#9E1F1F]"
                   >
                     <option value="Indoor AC">Indoor AC</option>
                     <option value="Outdoor Teras">Outdoor Teras</option>
@@ -1353,7 +1803,7 @@ export default function AdminDashboardPage() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors shadow-md cursor-pointer mt-4"
+                  className="w-full py-3.5 rounded-xl bg-[#9E1F1F] hover:opacity-90 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-md cursor-pointer mt-4"
                 >
                   SIMPAN DATA MEJA
                 </button>
@@ -1372,44 +1822,81 @@ export default function AdminDashboardPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsAddMenuOpen(false)}
-              className="fixed inset-0 bg-[#0B0908]/85 backdrop-blur-md"
+              className="fixed inset-0 bg-black/85 backdrop-blur-md"
             />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative z-10 w-full max-w-lg bg-[#120F0D] border border-[#B82E2E]/40 rounded-3xl p-6 shadow-2xl my-auto text-white"
+              style={{
+                background: isDark ? '#161210' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '2px solid #9E1F1F',
+                color: isDark ? '#FFFFFF' : '#1A1A1A',
+              }}
+              className="relative z-10 w-full max-w-lg rounded-3xl p-6 shadow-2xl my-auto"
             >
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#FFFFFF]/10">
-                <h3 className="font-serif text-lg text-white">
+              <div
+                style={{
+                  borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(158, 31, 31, 0.15)',
+                }}
+                className="flex items-center justify-between mb-4 pb-3"
+              >
+                <h3
+                  style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                  className="font-serif text-lg font-bold"
+                >
                   {editingMenu ? 'Edit Menu Katalog QR' : 'Tambah Menu Baru'}
                 </h3>
-                <button onClick={() => setIsAddMenuOpen(false)} className="text-[#A89F91] hover:text-white cursor-pointer">
+                <button
+                  onClick={() => setIsAddMenuOpen(false)}
+                  style={{ color: isDark ? '#A89F91' : '#1A1A1A' }}
+                  className="cursor-pointer"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <form onSubmit={handleSaveMenu} className="space-y-4">
                 <div>
-                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">Nama Menu *</label>
+                  <label
+                    style={{ color: isDark ? '#A89F91' : '#555555' }}
+                    className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                  >
+                    Nama Menu *
+                  </label>
                   <input
                     type="text"
                     required
                     placeholder="misal: Es Kopi Susu Signature"
                     value={menuName}
                     onChange={(e) => setMenuName(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                    style={{
+                      background: isDark ? '#0B0908' : '#FAF7F5',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                      color: isDark ? '#FFFFFF' : '#1A1A1A',
+                    }}
+                    className="w-full p-3 rounded-xl text-xs focus:outline-none focus:border-[#9E1F1F]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">Kategori</label>
+                    <label
+                      style={{ color: isDark ? '#A89F91' : '#555555' }}
+                      className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                    >
+                      Kategori
+                    </label>
                     <select
                       value={menuCategory}
                       onChange={(e) => setMenuCategory(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white outline-none focus:border-[#B82E2E]"
+                      style={{
+                        background: isDark ? '#0B0908' : '#FAF7F5',
+                        border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                      }}
+                      className="w-full p-3 rounded-xl text-xs outline-none focus:border-[#9E1F1F]"
                     >
                       <option value="coffee">KOPI RACIKAN</option>
                       <option value="non-coffee">NON-COFFEE &amp; TEA</option>
@@ -1420,39 +1907,74 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div>
-                    <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">Harga (Rp) *</label>
+                    <label
+                      style={{ color: isDark ? '#A89F91' : '#555555' }}
+                      className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                    >
+                      Harga (Rp) *
+                    </label>
                     <input
                       type="text"
                       required
                       placeholder="25000"
                       value={menuPrice}
                       onChange={(e) => setMenuPrice(e.target.value)}
-                      className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                      style={{
+                        background: isDark ? '#0B0908' : '#FAF7F5',
+                        border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                      }}
+                      className="w-full p-3 rounded-xl text-xs focus:outline-none focus:border-[#9E1F1F]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">
+                  <label
+                    style={{ color: isDark ? '#A89F91' : '#555555' }}
+                    className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                  >
                     FOTO MENU (PILIH GAMBAR ATAU UPLOAD)
                   </label>
 
                   {/* 1. Direct File Upload Button */}
-                  <div className="mb-3 p-3 rounded-2xl bg-[#0B0908] border border-dashed border-[#B82E2E]/40 flex items-center justify-between gap-3">
+                  <div
+                    style={{
+                      background: isDark ? '#0B0908' : '#FAF7F5',
+                      borderColor: isDark ? 'rgba(184, 46, 46, 0.4)' : '#9E1F1F',
+                    }}
+                    className="mb-3 p-3 rounded-2xl border border-dashed flex items-center justify-between gap-3"
+                  >
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-[#161210] border border-[#FFFFFF]/10 flex items-center justify-center overflow-hidden shrink-0">
+                      <div
+                        style={{
+                          background: isDark ? '#161210' : '#FFFFFF',
+                          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F',
+                        }}
+                        className="w-12 h-12 rounded-xl flex items-center justify-center overflow-hidden shrink-0"
+                      >
                         {menuImg ? (
                           <img src={menuImg} alt="Preview" className="w-full h-full object-cover" />
                         ) : (
-                          <ImageIcon className="w-5 h-5 text-[#A89F91]" />
+                          <ImageIcon className="w-5 h-5 text-[#9E1F1F]" />
                         )}
                       </div>
                       <div>
-                        <span className="text-xs text-white font-semibold block">Upload Foto dari Perangkat</span>
-                        <span className="text-[0.65rem] text-[#A89F91]">Pilih file JPG/PNG dari Komputer atau HP</span>
+                        <span
+                          style={{ color: isDark ? '#FFFFFF' : '#1A1A1A' }}
+                          className="text-xs font-bold block"
+                        >
+                          Upload Foto dari Perangkat
+                        </span>
+                        <span
+                          style={{ color: isDark ? '#A89F91' : '#777777' }}
+                          className="text-[0.65rem]"
+                        >
+                          Pilih file JPG/PNG dari Komputer atau HP
+                        </span>
                       </div>
                     </div>
-                    <label className="px-3 py-2 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-[0.7rem] font-mono font-semibold uppercase tracking-wider transition-colors cursor-pointer shrink-0">
+                    <label className="px-3 py-2 rounded-xl bg-[#9E1F1F] hover:opacity-90 text-white text-[0.7rem] font-mono font-bold uppercase tracking-wider transition-colors cursor-pointer shrink-0">
                       <span>PILIH FILE</span>
                       <input type="file" accept="image/*" onChange={handleMenuImageFileSelect} className="hidden" />
                     </label>
@@ -1460,26 +1982,34 @@ export default function AdminDashboardPage() {
 
                   {/* 2. Visual Preset Selector */}
                   <div className="mb-3">
-                    <span className="text-[0.6rem] font-mono text-[#A89F91] block mb-1.5">Atau Pilih dari Preset Foto KOPIMAGE:</span>
+                    <span
+                      style={{ color: isDark ? '#A89F91' : '#555555' }}
+                      className="text-[0.65rem] font-mono font-bold block mb-1.5"
+                    >
+                      Atau Pilih dari Preset Foto KOPIMAGE:
+                    </span>
                     <div className="grid grid-cols-4 gap-2">
                       {[
-                        { label: '☕ Kopi', url: '/images/kopimage_hero_atmosphere_1786480906850.webp' },
-                        { label: '🍵 Thai Tea', url: '/images/Moments-Top coffe.webp' },
-                        { label: '🍝 Makanan', url: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.webp' },
-                        { label: '🥐 Cemilan', url: '/images/Moments-Weekend perfect with coffe in hand.webp' },
+                        { label: 'Kopi', url: '/images/kopimage_hero_atmosphere_1786480906850.webp' },
+                        { label: 'Thai Tea', url: '/images/Moments-Top coffe.webp' },
+                        { label: 'Makanan', url: '/images/Moments-Bukber bareng teman-teman lebih asyikkk.webp' },
+                        { label: 'Cemilan', url: '/images/Moments-Weekend perfect with coffe in hand.webp' },
                       ].map((p) => (
                         <button
                           key={p.label}
                           type="button"
                           onClick={() => setMenuImg(p.url)}
-                          className={`p-1.5 rounded-xl border flex flex-col items-center gap-1 transition-all cursor-pointer ${
-                            menuImg === p.url
-                              ? 'bg-[#B82E2E]/20 border-[#B82E2E] text-white'
-                              : 'bg-[#0B0908] border-[#FFFFFF]/10 text-[#A89F91] hover:border-[#C29B7F]'
-                          }`}
+                          style={{
+                            background: menuImg === p.url
+                              ? (isDark ? 'rgba(184, 46, 46, 0.25)' : '#FDF2F2')
+                              : (isDark ? '#0B0908' : '#FAF7F5'),
+                            borderColor: menuImg === p.url ? '#9E1F1F' : (isDark ? 'rgba(255, 255, 255, 0.1)' : '#9E1F1F'),
+                            color: menuImg === p.url ? '#9E1F1F' : (isDark ? '#A89F91' : '#1A1A1A'),
+                          }}
+                          className="p-1.5 rounded-xl border flex flex-col items-center gap-1 transition-all cursor-pointer"
                         >
                           <img src={p.url} alt={p.label} className="w-full h-10 object-cover rounded-lg" />
-                          <span className="text-[0.6rem] font-mono font-semibold">{p.label}</span>
+                          <span className="text-[0.62rem] font-mono font-bold">{p.label}</span>
                         </button>
                       ))}
                     </div>
@@ -1487,31 +2017,51 @@ export default function AdminDashboardPage() {
 
                   {/* 3. Link URL Input (Optional) */}
                   <div>
-                    <span className="text-[0.6rem] font-mono text-[#A89F91] block mb-1">Atau Paste Link URL Gambar (Opsional):</span>
+                    <span
+                      style={{ color: isDark ? '#A89F91' : '#555555' }}
+                      className="text-[0.65rem] font-mono font-bold block mb-1"
+                    >
+                      Atau Paste Link URL Gambar (Opsional):
+                    </span>
                     <input
                       type="text"
                       placeholder="https://..."
                       value={menuImg}
                       onChange={(e) => setMenuImg(e.target.value)}
-                      className="w-full p-2.5 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                      style={{
+                        background: isDark ? '#0B0908' : '#FAF7F5',
+                        border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                        color: isDark ? '#FFFFFF' : '#1A1A1A',
+                      }}
+                      className="w-full p-2.5 rounded-xl text-xs focus:outline-none focus:border-[#9E1F1F]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-[0.65rem] font-mono uppercase font-semibold text-[#A89F91] block mb-1">Deskripsi Menu</label>
+                  <label
+                    style={{ color: isDark ? '#A89F91' : '#555555' }}
+                    className="text-[0.68rem] font-mono uppercase font-bold block mb-1"
+                  >
+                    Deskripsi Menu
+                  </label>
                   <textarea
                     rows={3}
                     placeholder="Racikan khas berkualitas disajikan hangat di KOPIMAGE."
                     value={menuDesc}
                     onChange={(e) => setMenuDesc(e.target.value)}
-                    className="w-full p-3 rounded-xl bg-[#0B0908] border border-[#FFFFFF]/10 text-xs text-white placeholder-[#A89F91] focus:outline-none focus:border-[#B82E2E]"
+                    style={{
+                      background: isDark ? '#0B0908' : '#FAF7F5',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
+                      color: isDark ? '#FFFFFF' : '#1A1A1A',
+                    }}
+                    className="w-full p-3 rounded-xl text-xs focus:outline-none focus:border-[#9E1F1F]"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 rounded-xl bg-[#B82E2E] hover:bg-[#D63434] text-white text-xs font-mono font-semibold uppercase tracking-wider transition-colors shadow-md cursor-pointer mt-4"
+                  className="w-full py-3.5 rounded-xl bg-[#9E1F1F] hover:opacity-90 text-white text-xs font-mono font-bold uppercase tracking-wider transition-colors shadow-md cursor-pointer mt-4"
                 >
                   SIMPAN MENU KATALOG
                 </button>
@@ -1530,18 +2080,23 @@ export default function AdminDashboardPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedImageModal(null)}
-              className="fixed inset-0 bg-[#0B0908]/90 backdrop-blur-md"
+              className="fixed inset-0 bg-black/90 backdrop-blur-md"
             />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="relative z-10 max-w-3xl max-h-[85vh] p-2 bg-[#120F0D] border border-[#B82E2E]/40 rounded-3xl overflow-hidden shadow-2xl"
+              style={{
+                background: isDark ? '#161210' : '#FFFFFF',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '2px solid #9E1F1F',
+              }}
+              className="relative z-10 max-w-3xl max-h-[85vh] p-2 rounded-3xl overflow-hidden shadow-2xl"
             >
               <button
                 onClick={() => setSelectedImageModal(null)}
-                className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-[#0B0908]/80 text-white hover:bg-[#B82E2E] transition-all cursor-pointer"
+                style={{ background: '#9E1F1F', color: '#FFFFFF' }}
+                className="absolute top-4 right-4 z-20 p-2.5 rounded-full hover:opacity-90 transition-all cursor-pointer shadow-md"
               >
                 <X className="w-5 h-5" />
               </button>
