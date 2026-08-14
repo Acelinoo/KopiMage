@@ -147,8 +147,7 @@
 [data-theme="light"] .quote-highlight-card,
 [data-theme="light"] .bg-\[\#7A1414\],
 [data-theme="light"] div[style*="#7A1414"],
-[data-theme="light"] div[style*="7A1414"],
-[data-theme="light"] .bg-\[\#0E0B0A\].reveal-step-card {
+[data-theme="light"] div[style*="7A1414"] {
   background-color: #7A1414 !important;
   border-color: rgba(255, 255, 255, 0.25) !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;

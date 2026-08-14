@@ -661,38 +661,73 @@ export function EditorialHome() {
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-                            <div className="p-6 sm:p-8 border border-[#FFFFFF]/10 relative flex flex-col justify-between h-56 sm:h-64 bg-[#0E0B0A] rounded-xl shadow-sm reveal-step-card">
-                                <span className="font-serif text-3xl sm:text-4xl text-[#B82E2E] font-light">01</span>
+                            <div className={`p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-xl shadow-sm reveal-step-card transition-colors ${
+                                isDark 
+                                    ? 'bg-[#0E0B0A] border border-white/10' 
+                                    : 'bg-white border border-[#9E1F1F]'
+                            }`}>
+                                <span className={`font-serif text-3xl sm:text-4xl font-light ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`}>
+                                    01
+                                </span>
                                 <div>
-                                    <h3 className="font-serif text-xl sm:text-2xl text-[#FFFFFF] mb-2 font-medium">DUDUK</h3>
-                                    <p className="font-sans text-xs text-[#A89F91] font-light">
+                                    <h3 className={`font-serif text-xl sm:text-2xl mb-2 font-medium ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                        DUDUK
+                                    </h3>
+                                    <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
                                         Pilih spot duduk favoritmu di indoor maupun teras outdoor.
                                     </p>
                                 </div>
                             </div>
-                            <div className="p-6 sm:p-8 border border-[#FFFFFF]/10 relative flex flex-col justify-between h-56 sm:h-64 bg-[#0E0B0A] rounded-xl shadow-sm reveal-step-card" style={{ transitionDelay: '0.15s' }}>
-                                <span className="font-serif text-3xl sm:text-4xl text-[#B82E2E] font-light">02</span>
+
+                            <div className={`p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-xl shadow-sm reveal-step-card transition-colors ${
+                                isDark 
+                                    ? 'bg-[#0E0B0A] border border-white/10' 
+                                    : 'bg-white border border-[#9E1F1F]'
+                            }`} style={{ transitionDelay: '0.15s' }}>
+                                <span className={`font-serif text-3xl sm:text-4xl font-light ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`}>
+                                    02
+                                </span>
                                 <div>
-                                    <h3 className="font-serif text-xl sm:text-2xl text-[#FFFFFF] mb-2 font-medium">SCAN QR</h3>
-                                    <p className="font-sans text-xs text-[#A89F91] font-light">
+                                    <h3 className={`font-serif text-xl sm:text-2xl mb-2 font-medium ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                        SCAN QR
+                                    </h3>
+                                    <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
                                         Buka kamera HP terus scan stiker QR yang terpasang di mejamu.
                                     </p>
                                 </div>
                             </div>
-                            <div className="p-6 sm:p-8 border border-[#FFFFFF]/10 relative flex flex-col justify-between h-56 sm:h-64 bg-[#0E0B0A] rounded-xl shadow-sm reveal-step-card" style={{ transitionDelay: '0.3s' }}>
-                                <span className="font-serif text-3xl sm:text-4xl text-[#B82E2E] font-light">03</span>
+
+                            <div className={`p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-xl shadow-sm reveal-step-card transition-colors ${
+                                isDark 
+                                    ? 'bg-[#0E0B0A] border border-white/10' 
+                                    : 'bg-white border border-[#9E1F1F]'
+                            }`} style={{ transitionDelay: '0.3s' }}>
+                                <span className={`font-serif text-3xl sm:text-4xl font-light ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`}>
+                                    03
+                                </span>
                                 <div>
-                                    <h3 className="font-serif text-xl sm:text-2xl text-[#FFFFFF] mb-2 font-medium">PILIH MENU</h3>
-                                    <p className="font-sans text-xs text-[#A89F91] font-light">
+                                    <h3 className={`font-serif text-xl sm:text-2xl mb-2 font-medium ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                        PILIH MENU
+                                    </h3>
+                                    <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
                                         Pilih kopi racikan, minuman segar, cemilan, atau makanan utama.
                                     </p>
                                 </div>
                             </div>
-                            <div className="p-6 sm:p-8 border border-[#FFFFFF]/10 relative flex flex-col justify-between h-56 sm:h-64 bg-[#0E0B0A] rounded-xl shadow-sm reveal-step-card" style={{ transitionDelay: '0.45s' }}>
-                                <span className="font-serif text-3xl sm:text-4xl text-[#B82E2E] font-light">04</span>
+
+                            <div className={`p-6 sm:p-8 relative flex flex-col justify-between h-56 sm:h-64 rounded-xl shadow-sm reveal-step-card transition-colors ${
+                                isDark 
+                                    ? 'bg-[#0E0B0A] border border-white/10' 
+                                    : 'bg-white border border-[#9E1F1F]'
+                            }`} style={{ transitionDelay: '0.45s' }}>
+                                <span className={`font-serif text-3xl sm:text-4xl font-light ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`}>
+                                    04
+                                </span>
                                 <div>
-                                    <h3 className="font-serif text-xl sm:text-2xl text-[#FFFFFF] mb-2 font-medium">NIKMATI</h3>
-                                    <p className="font-sans text-xs text-[#A89F91] font-light">
+                                    <h3 className={`font-serif text-xl sm:text-2xl mb-2 font-medium ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                        NIKMATI
+                                    </h3>
+                                    <p className={`font-sans text-xs font-light ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
                                         Tinggal santai, pesananmu bakal langsung dianterin hangat ke meja.
                                     </p>
                                 </div>
