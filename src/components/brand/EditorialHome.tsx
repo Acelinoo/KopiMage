@@ -875,8 +875,8 @@ export function EditorialHome() {
                             <button
                                 onClick={() => setActiveOutlet('gading')}
                                 style={activeOutlet === 'gading'
-                                    ? { background: '#FFFFFF', color: '#8C1C1C', borderColor: '#FFFFFF', fontWeight: 'bold' }
-                                    : { background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.3)' }
+                                    ? { background: isDark ? '#FFFFFF' : '#9E1F1F', color: isDark ? '#8C1C1C' : '#FFFFFF', borderColor: isDark ? '#FFFFFF' : '#9E1F1F', fontWeight: 'bold' }
+                                    : { background: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.05)', color: isDark ? '#FFFFFF' : '#1A1A1A', borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.15)' }
                                 }
                                 className="py-3.5 px-5 sm:px-6 w-full sm:w-auto font-sans text-xs tracking-[0.18em] uppercase transition-all border rounded-xl shadow-sm cursor-pointer"
                             >
@@ -885,8 +885,8 @@ export function EditorialHome() {
                             <button
                                 onClick={() => setActiveOutlet('lanud')}
                                 style={activeOutlet === 'lanud'
-                                    ? { background: '#FFFFFF', color: '#8C1C1C', borderColor: '#FFFFFF', fontWeight: 'bold' }
-                                    : { background: 'rgba(255, 255, 255, 0.15)', color: '#FFFFFF', borderColor: 'rgba(255, 255, 255, 0.3)' }
+                                    ? { background: isDark ? '#FFFFFF' : '#9E1F1F', color: isDark ? '#8C1C1C' : '#FFFFFF', borderColor: isDark ? '#FFFFFF' : '#9E1F1F', fontWeight: 'bold' }
+                                    : { background: isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.05)', color: isDark ? '#FFFFFF' : '#1A1A1A', borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.15)' }
                                 }
                                 className="py-3.5 px-5 sm:px-6 w-full sm:w-auto font-sans text-xs tracking-[0.18em] uppercase transition-all border rounded-xl shadow-sm cursor-pointer"
                             >
@@ -923,31 +923,45 @@ export function EditorialHome() {
                                     </span>
 
                                     <div className="space-y-3 font-sans text-xs font-light mb-6">
-                                        <div style={{ background: '#ffffffff', borderColor: 'rgba(255, 0, 0, 1)' }} className="p-3.5 border rounded-xl shadow-sm">
-                                            <span style={{ color: '#ffffffff' }} className="font-bold block mb-1">Alamat Cabang</span>
-                                            <span style={{ color: '#FFFFFF' }}>
+                                        <div className={`p-3.5 border rounded-xl shadow-sm transition-colors ${
+                                            isDark 
+                                                ? 'bg-[#0E0B0A] border-white/10 text-[#F3EFEA]' 
+                                                : 'bg-[#F9F7F5] border-[#9E1F1F]/20 text-[#1A1A1A]'
+                                        }`}>
+                                            <span className={`font-bold block mb-1 ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                                Alamat Cabang
+                                            </span>
+                                            <span className={isDark ? 'text-[#A89F91]' : 'text-[#333333]'}>
                                                 {activeOutlet === 'gading'
                                                     ? 'Jl. Gading Tutuka No. 88, Soreang, Kab. Bandung (Dekat Tol Seroja)'
                                                     : 'Kawasan Lanud Sulaiman, Margahayu, Kab. Bandung'}
                                             </span>
                                         </div>
-                                        <div style={{ background: '#ffffffff', borderColor: 'rgba(255, 0, 0, 1)' }} className="p-3.5 border rounded-xl shadow-sm">
-                                            <span style={{ color: '#ffffffff' }} className="font-bold block mb-1">Jam Operasional</span>
-                                            <span style={{ color: '#FFFFFF' }}>Buka Setiap Hari: 07.00 - 23.00 WIB</span>
+                                        <div className={`p-3.5 border rounded-xl shadow-sm transition-colors ${
+                                            isDark 
+                                                ? 'bg-[#0E0B0A] border-white/10 text-[#F3EFEA]' 
+                                                : 'bg-[#F9F7F5] border-[#9E1F1F]/20 text-[#1A1A1A]'
+                                        }`}>
+                                            <span className={`font-bold block mb-1 ${isDark ? 'text-[#FFFFFF]' : 'text-[#1A1A1A]'}`}>
+                                                Jam Operasional
+                                            </span>
+                                            <span className={isDark ? 'text-[#A89F91]' : 'text-[#333333]'}>
+                                                Buka Setiap Hari: 07.00 - 23.00 WIB
+                                            </span>
                                         </div>
                                     </div>
 
                                     <div className="space-y-3 pt-4 border-t border-[#FFFFFF]/10">
-                                        <div className="flex items-center gap-3 text-xs text-[#A89F91]">
-                                            <Music className="w-4 h-4 text-[#B82E2E] shrink-0" />
+                                        <div className={`flex items-center gap-3 text-xs ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
+                                            <Music className={`w-4 h-4 shrink-0 ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`} />
                                             <span>Live Music Akustik Setiap Weekend</span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-xs text-[#A89F91]">
-                                            <Car className="w-4 h-4 text-[#B82E2E] shrink-0" />
+                                        <div className={`flex items-center gap-3 text-xs ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
+                                            <Car className={`w-4 h-4 shrink-0 ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`} />
                                             <span>Area Parkir Luas (Mobil & Motor)</span>
                                         </div>
-                                        <div className="flex items-center gap-3 text-xs text-[#A89F91]">
-                                            <Wifi className="w-4 h-4 text-[#B82E2E] shrink-0" />
+                                        <div className={`flex items-center gap-3 text-xs ${isDark ? 'text-[#A89F91]' : 'text-[#4A4543]'}`}>
+                                            <Wifi className={`w-4 h-4 shrink-0 ${isDark ? 'text-[#B82E2E]' : 'text-[#9E1F1F]'}`} />
                                             <span>Koneksi WiFi Cepat & Banyak Colokan</span>
                                         </div>
                                     </div>
