@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Coffee, Clock, CheckCircle, ChevronUp, ChevronRight, X } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useTheme } from '@/context/ThemeContext';
 import { isSameTable, isActiveCustomerOrder, isCompletedOrCancelledOrder } from '@/lib/tableUtils';
 import { CheckoutModal } from '@/components/CheckoutModal';
 
@@ -13,12 +14,15 @@ interface FloatingOrderStatusWidgetProps {
 
 export const FloatingOrderStatusWidget: React.FC<FloatingOrderStatusWidgetProps> = ({ currentTableId: propTableId }) => {
   const { activeTableId } = useCart();
+  const { theme } = useTheme();
   const currentTableId = propTableId || activeTableId || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('table') : null);
 
   const [activeOrder, setActiveOrder] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
   const autoDismissTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const isDark = theme === 'dark';
 
   // Read active order from LocalStorage ONLY IF table_id matches current URL table context
   const checkActiveOrder = () => {
@@ -114,14 +118,11 @@ export const FloatingOrderStatusWidget: React.FC<FloatingOrderStatusWidgetProps>
   if (!activeOrder || isDismissed) return null;
 
   const isApproved = activeOrder.payment_status === 'PAID';
-  const isPreparing = activeOrder.order_status === 'PREPARING';
   const isReady = activeOrder.order_status === 'READY';
-  const isCompleted = activeOrder.order_status === 'COMPLETED';
-  const isCancelled = activeOrder.order_status === 'CANCELLED';
 
   return (
     <>
-      {/* FLOATING ORDER STATUS BAR FOR CUSTOMER */}
+      {/* FLOATING ORDER STATUS BAR FOR CUSTOMER (No AI Slop Icon Box) */}
       <div
         style={{
           position: 'fixed',
@@ -142,78 +143,55 @@ export const FloatingOrderStatusWidget: React.FC<FloatingOrderStatusWidgetProps>
             pointerEvents: 'auto',
             width: '100%',
             maxWidth: '460px',
-            background: 'linear-gradient(135deg, #161210 0%, #0B0908 100%)',
+            background: isDark ? 'linear-gradient(135deg, #161210 0%, #0B0908 100%)' : '#FFFFFF',
             border: isReady
               ? '1.5px solid #2ECC71'
               : isApproved
-              ? '1.5px solid #D4A373'
-              : '1.5px solid #E67E22',
+              ? (isDark ? '1.5px solid #D4A373' : '1.5px solid #2ECC71')
+              : (isDark ? '1.5px solid #E67E22' : '1.5px solid #9E1F1F'),
             borderRadius: '16px',
-            padding: '0.75rem 1rem',
+            padding: '0.85rem 1.25rem',
             boxShadow: isReady
               ? '0 10px 30px rgba(46, 204, 113, 0.25)'
-              : '0 10px 30px rgba(0, 0, 0, 0.7)',
+              : (isDark ? '0 10px 30px rgba(0, 0, 0, 0.7)' : '0 8px 30px rgba(0, 0, 0, 0.12)'),
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '0.75rem',
             cursor: 'pointer',
+            transition: 'all 0.2s ease',
           }}
           onClick={() => setIsModalOpen(true)}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '10px',
-                background: isReady
-                  ? 'rgba(46, 204, 113, 0.15)'
-                  : isApproved
-                  ? 'rgba(212, 163, 115, 0.15)'
-                  : 'rgba(230, 126, 34, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              {isReady ? (
-                <Coffee className="w-5 h-5 text-[#2ECC71] animate-bounce" />
-              ) : (
-                <Coffee className="w-5 h-5 text-[#D4A373] animate-pulse" />
-              )}
-            </div>
-
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <span style={{ fontSize: '0.62rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#A89F91', fontWeight: 800, fontFamily: 'monospace' }}>
-                  PROGRES PESANAN • MEJA {activeOrder.table_id || '01'}
-                </span>
-              </div>
-              <span
-                style={{
-                  fontSize: '0.85rem',
-                  fontWeight: 800,
-                  color: isReady ? '#2ECC71' : '#D4A373',
-                  display: 'block',
-                  lineHeight: '1.2',
-                }}
-              >
-                {isReady
-                  ? '☕ SIAP DIHIDANGKAN!'
-                  : isApproved
-                  ? '✓ PEMBAYARAN LUNAS'
-                  : '👨‍🍳 DIPROSES DAPUR & BARISTA'}
+          <div style={{ textAlign: 'left' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+              <span style={{ fontSize: '0.65rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: isDark ? '#A89F91' : '#666666', fontWeight: 800, fontFamily: 'monospace' }}>
+                PROGRES PESANAN • MEJA {activeOrder.table_id || '01'}
               </span>
             </div>
+            <span
+              style={{
+                fontSize: '0.92rem',
+                fontWeight: 800,
+                color: isReady ? '#27AE60' : isApproved ? '#27AE60' : (isDark ? '#D4A373' : '#9E1F1F'),
+                display: 'block',
+                lineHeight: '1.2',
+                fontFamily: 'serif',
+              }}
+            >
+              {isReady
+                ? 'SIAP DIHIDANGKAN'
+                : isApproved
+                ? 'PEMBAYARAN LUNAS'
+                : 'DIPROSES DAPUR & BARISTA'}
+            </span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#D4A373', fontFamily: 'monospace' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: isDark ? '#D4A373' : '#9E1F1F', fontFamily: 'monospace' }}>
               LIHAT STATUS
             </span>
-            <ChevronRight className="w-4 h-4 text-[#D4A373]" />
+            <ChevronRight className="w-4 h-4" style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} />
           </div>
         </motion.div>
       </div>

@@ -105,7 +105,15 @@
 [data-theme="light"] [class*="bg-[#171311]"],
 [data-theme="light"] [class*="bg-[#1C1815]"],
 [data-theme="light"] [class*="bg-[#1E1815]"],
-[data-theme="light"] [class*="bg-[#120E0C]"] {
+[data-theme="light"] [class*="bg-[#120E0C]"],
+[data-theme="light"] [class*="bg-[#0E0B0A]"],
+[data-theme="light"] [class*="bg-[#0E0C0A]"],
+[data-theme="light"] [class*="bg-[#100D0B]"],
+[data-theme="light"] [class*="bg-[#181310]"],
+[data-theme="light"] [class*="bg-[#1A1412]"],
+[data-theme="light"] [class*="bg-[#1D1714]"],
+[data-theme="light"] [class*="bg-[#161311]"],
+[data-theme="light"] [class*="bg-[#1A1210]"] {
   background-color: #FFFFFF !important;
   color: #1A1A1A !important;
   border: 1px solid #9E1F1F !important;

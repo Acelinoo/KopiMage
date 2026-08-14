@@ -246,14 +246,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           right: 0,
           bottom: 0,
           zIndex: 9999,
-          background: 'rgba(14, 11, 10, 0.96)',
+          background: isDark ? 'rgba(14, 11, 10, 0.96)' : 'rgba(255, 255, 255, 0.96)',
           backdropFilter: 'blur(20px)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           padding: '2rem',
-          color: '#FFFFFF',
+          color: isDark ? '#FFFFFF' : '#1A1A1A',
           textAlign: 'center',
         }}
       >
@@ -263,50 +263,94 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
               width: '100px',
               height: '100px',
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(184, 46, 46, 0.4) 0%, rgba(212, 163, 115, 0.15) 70%, transparent 100%)',
+              background: isDark
+                ? 'radial-gradient(circle, rgba(184, 46, 46, 0.4) 0%, rgba(212, 163, 115, 0.15) 70%, transparent 100%)'
+                : 'radial-gradient(circle, rgba(158, 31, 31, 0.2) 0%, rgba(158, 31, 31, 0.05) 70%, transparent 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '1px solid rgba(212, 163, 115, 0.4)',
-              boxShadow: '0 0 50px rgba(184, 46, 46, 0.4)',
+              border: isDark ? '1px solid rgba(212, 163, 115, 0.4)' : '1.5px solid #9E1F1F',
+              boxShadow: isDark ? '0 0 50px rgba(184, 46, 46, 0.4)' : '0 0 40px rgba(158, 31, 31, 0.15)',
             }}
           >
-            <Loader2 className="w-10 h-10 text-[#D4A373] animate-spin" />
+            <Loader2 className="w-10 h-10 animate-spin" style={{ color: isDark ? '#D4A373' : '#9E1F1F' }} />
           </div>
         </div>
 
-        <h3 style={{ fontFamily: 'serif', fontSize: '1.8rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.5rem' }}>
-          Memproses Pesananmu...
+        <h3 style={{ fontFamily: 'serif', fontSize: '1.8rem', fontWeight: 700, color: isDark ? '#FFFFFF' : '#1A1A1A', marginBottom: '0.5rem' }}>
+          Memproses Pesanan Anda...
         </h3>
-        <p style={{ fontSize: '0.88rem', color: '#D4A373', maxWidth: '420px', marginBottom: '2.5rem', lineHeight: 1.5 }}>
-          Tunggu sebentar ya, pesananmu lagi diverifikasi dan disambungin ke Stasiun Dapur KopiMage.
+        <p style={{ fontSize: '0.88rem', color: isDark ? '#A89F91' : '#555555', maxWidth: '420px', marginBottom: '2.5rem', lineHeight: 1.5 }}>
+          Pesanan sedang diverifikasi dan diteruskan langsung ke Stasiun Dapur KopiMage.
         </p>
 
         {/* Steps Progress Checklist */}
         <div style={{ width: '100%', maxWidth: '380px', display: 'flex', flexDirection: 'column', gap: '0.85rem', textAlign: 'left' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 1 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 1 ? '#2ECC71' : submissionStep === 1 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 1 ? '#000' : '#777', flexShrink: 0 }}>
+            <div
+              style={{
+                width: '26px',
+                height: '26px',
+                borderRadius: '50%',
+                background: submissionStep > 1 ? '#2ECC71' : submissionStep === 1 ? (isDark ? '#D4A373' : '#9E1F1F') : (isDark ? '#2A2421' : '#E0D8D4'),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                color: submissionStep >= 1 ? '#FFFFFF' : '#777',
+                flexShrink: 0,
+              }}
+            >
               {submissionStep > 1 ? '✓' : '1'}
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 1 ? 600 : 400, color: submissionStep >= 1 ? '#F7F4EF' : '#777' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 1 ? 700 : 400, color: submissionStep >= 1 ? (isDark ? '#FFFFFF' : '#1A1A1A') : '#888' }}>
               Mengecek pemesanan & nomor meja
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 2 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 2 ? '#2ECC71' : submissionStep === 2 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 2 ? '#000' : '#777', flexShrink: 0 }}>
+            <div
+              style={{
+                width: '26px',
+                height: '26px',
+                borderRadius: '50%',
+                background: submissionStep > 2 ? '#2ECC71' : submissionStep === 2 ? (isDark ? '#D4A373' : '#9E1F1F') : (isDark ? '#2A2421' : '#E0D8D4'),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                color: submissionStep >= 2 ? '#FFFFFF' : '#777',
+                flexShrink: 0,
+              }}
+            >
               {submissionStep > 2 ? '✓' : '2'}
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 2 ? 600 : 400, color: submissionStep >= 2 ? '#F7F4EF' : '#777' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 2 ? 700 : 400, color: submissionStep >= 2 ? (isDark ? '#FFFFFF' : '#1A1A1A') : '#888' }}>
               Membuat pesanan di sistem KopiMage
             </span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', opacity: submissionStep >= 3 ? 1 : 0.35, transition: 'all 0.3s ease' }}>
-            <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: submissionStep > 3 ? '#2ECC71' : submissionStep === 3 ? '#D4A373' : '#2A2421', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.78rem', fontWeight: 800, color: submissionStep >= 3 ? '#000' : '#777', flexShrink: 0 }}>
+            <div
+              style={{
+                width: '26px',
+                height: '26px',
+                borderRadius: '50%',
+                background: submissionStep > 3 ? '#2ECC71' : submissionStep === 3 ? (isDark ? '#D4A373' : '#9E1F1F') : (isDark ? '#2A2421' : '#E0D8D4'),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.78rem',
+                fontWeight: 800,
+                color: submissionStep >= 3 ? '#FFFFFF' : '#777',
+                flexShrink: 0,
+              }}
+            >
               {submissionStep > 3 ? '✓' : '3'}
             </div>
-            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 3 ? 600 : 400, color: submissionStep >= 3 ? '#F7F4EF' : '#777' }}>
+            <span style={{ fontSize: '0.85rem', fontWeight: submissionStep === 3 ? 700 : 400, color: submissionStep >= 3 ? (isDark ? '#FFFFFF' : '#1A1A1A') : '#888' }}>
               Mengirimkan pesanan ke Admin Kasir & Dapur
             </span>
           </div>
@@ -409,53 +453,52 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
         }}
       >
         <div
-          className="glass-panel"
           style={{
             width: '100%',
             maxWidth: '520px',
             borderRadius: '24px',
             padding: '1.25rem 1.5rem',
             position: 'relative',
-            background: '#161311',
+            background: isDark ? '#161210' : '#FFFFFF',
             border: isCancelled
-              ? '1px solid rgba(255, 255, 255, 0.15)'
+              ? (isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #999')
               : isCancellationRequested
-              ? '1px solid rgba(230, 126, 34, 0.5)'
+              ? (isDark ? '1px solid rgba(230, 126, 34, 0.5)' : '1.5px solid #E67E22')
               : isApproved
-              ? '1px solid rgba(46, 204, 113, 0.5)'
-              : '1px solid rgba(212, 163, 115, 0.4)',
+              ? (isDark ? '1px solid rgba(46, 204, 113, 0.5)' : '1.5px solid #2ECC71')
+              : (isDark ? '1px solid rgba(212, 163, 115, 0.4)' : '1.5px solid #9E1F1F'),
             maxHeight: '88vh',
             display: 'flex',
             flexDirection: 'column',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.9)',
+            boxShadow: isDark ? '0 25px 60px rgba(0,0,0,0.9)' : '0 25px 60px rgba(0,0,0,0.15)',
           }}
         >
           {/* Header (Fixed at top - Never cut off) */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.85rem', flexShrink: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F', paddingBottom: '0.85rem', flexShrink: 0 }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                <span style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: isCancelled ? '#666' : '#D4A373', fontWeight: 800 }}>
+                <span style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: isCancelled ? '#888' : (isDark ? '#D4A373' : '#9E1F1F'), fontWeight: 800, fontFamily: 'monospace' }}>
                   {isCancelled ? 'PESANAN DIBATALKAN' : 'STATUS PESANAN LIVE'}
                 </span>
                 {!isCancelled && (
                   <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: isCancellationRequested ? '#E67E22' : isApproved ? '#2ECC71' : '#E67E22', display: 'inline-block' }} className="animate-ping" />
                 )}
               </div>
-              <h3 style={{ fontSize: '1.35rem', color: isCancelled ? '#666' : '#F7F4EF', fontWeight: 800, margin: 0, fontFamily: 'serif', textDecoration: isCancelled ? 'line-through' : 'none' }}>
+              <h3 style={{ fontSize: '1.35rem', color: isCancelled ? '#888' : (isDark ? '#FFFFFF' : '#1A1A1A'), fontWeight: 800, margin: 0, fontFamily: 'serif', textDecoration: isCancelled ? 'line-through' : 'none' }}>
                 {createdOrder.order_display_number ? `${createdOrder.order_display_number} (${createdOrder.order_number})` : createdOrder.order_number}
               </h3>
-              <p style={{ fontSize: '0.78rem', color: '#A89F91', marginTop: '0.15rem', margin: 0 }}>
+              <p style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555', marginTop: '0.15rem', margin: 0, fontFamily: 'monospace' }}>
                 {createdOrder.mode === 'dine-in' ? `Dine-In • MEJA ${createdOrder.table_id || '01'}` : 'Takeaway'} ({createdOrder.customer_name})
               </p>
             </div>
             <button
               onClick={onClose}
               style={{
-                background: 'rgba(255,255,255,0.1)',
-                border: 'none',
-                color: '#FFF',
+                background: isDark ? 'rgba(255,255,255,0.1)' : '#F5EBEB',
+                border: isDark ? 'none' : '1px solid #9E1F1F',
+                color: isDark ? '#FFF' : '#1A1A1A',
                 cursor: 'pointer',
-                padding: '0.5rem',
+                padding: '0.4rem',
                 borderRadius: '50%',
                 display: 'flex',
                 alignItems: 'center',
@@ -463,7 +506,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 marginTop: '-0.2rem',
               }}
             >
-              <X className="w-5 h-5" />
+              <X size={18} />
             </button>
           </div>
 
@@ -477,20 +520,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 padding: '1.2rem',
                 borderRadius: '16px',
                 marginBottom: '1.5rem',
-                background: 'linear-gradient(135deg, rgba(100, 100, 100, 0.2) 0%, rgba(50, 50, 50, 0.1) 100%)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                background: isDark ? 'linear-gradient(135deg, rgba(100, 100, 100, 0.2) 0%, rgba(50, 50, 50, 0.1) 100%)' : '#F5F5F5',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #CCCCCC',
                 textAlign: 'center',
               }}
             >
               <XCircle className="w-10 h-10 text-[#999] mx-auto mb-2" />
-              <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#999', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                ❌ PESANAN TELAH DIBATALKAN
+              <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: isDark ? '#999' : '#555', marginBottom: '0.3rem', fontFamily: 'serif' }}>
+                PESANAN TELAH DIBATALKAN
               </h4>
-              <p style={{ fontSize: '0.82rem', color: '#888' }}>
+              <p style={{ fontSize: '0.82rem', color: isDark ? '#888' : '#666' }}>
                 Pembatalan pesanan telah disetujui oleh Admin. Pesanan ini tidak lagi diproses.
               </p>
               {createdOrder.cancellation_reason && (
-                <p style={{ fontSize: '0.78rem', color: '#A89F91', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                <p style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#777', marginTop: '0.5rem', fontStyle: 'italic' }}>
                   Alasan: "{createdOrder.cancellation_reason}"
                 </p>
               )}
@@ -504,27 +547,27 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 padding: '1.2rem',
                 borderRadius: '16px',
                 marginBottom: '1.5rem',
-                background: 'linear-gradient(135deg, rgba(230, 126, 34, 0.2) 0%, rgba(211, 84, 0, 0.1) 100%)',
-                border: '1px solid rgba(230, 126, 34, 0.5)',
+                background: isDark ? 'linear-gradient(135deg, rgba(230, 126, 34, 0.2) 0%, rgba(211, 84, 0, 0.1) 100%)' : '#FFF9F4',
+                border: '1.5px solid #E67E22',
                 textAlign: 'center',
               }}
             >
               <Clock className="w-9 h-9 text-[#E67E22] mx-auto mb-2 animate-pulse" />
               <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#E67E22', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                ⏳ MENUNGGU PERSETUJUAN PEMBATALAN
+                MENUNGGU PERSETUJUAN PEMBATALAN
               </h4>
-              <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
-                Permintaan pembatalanmu lagi ditinjau oleh Admin KOPIMAGE. Tunggu sebentar ya.
+              <p style={{ fontSize: '0.82rem', color: isDark ? '#F7F4EF' : '#333333' }}>
+                Permintaan pembatalan sedang ditinjau oleh Admin KOPIMAGE.
               </p>
               {createdOrder.cancellation_reason && (
-                <p style={{ fontSize: '0.78rem', color: '#A89F91', marginTop: '0.5rem', fontStyle: 'italic' }}>
-                  Alasanmu: "{createdOrder.cancellation_reason}"
+                <p style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#666666', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                  Alasan: "{createdOrder.cancellation_reason}"
                 </p>
               )}
             </div>
           )}
 
-          {/* REALTIME APPROVAL ANIMATION BANNER (only when not cancelled/requesting) */}
+          {/* REALTIME APPROVAL ANIMATION BANNER */}
           {!isCancelled && !isCancellationRequested && (
             <div
               style={{
@@ -532,101 +575,90 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 borderRadius: '16px',
                 marginBottom: '1.5rem',
                 background: isCompleted
-                  ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(212, 163, 115, 0.2) 100%)'
+                  ? (isDark ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(212, 163, 115, 0.2) 100%)' : '#F2FAF5')
                   : isReady
-                  ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(39, 174, 96, 0.1) 100%)'
+                  ? (isDark ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.25) 0%, rgba(39, 174, 96, 0.1) 100%)' : '#F2FAF5')
                   : isApproved
-                  ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.18) 0%, rgba(212, 163, 115, 0.1) 100%)'
-                  : 'linear-gradient(135deg, rgba(212, 163, 115, 0.2) 0%, rgba(184, 46, 46, 0.1) 100%)',
-                border: isCompleted || isReady
-                  ? '1px solid #2ECC71'
-                  : isApproved
-                  ? '1px solid rgba(46, 204, 113, 0.4)'
-                  : '1px solid rgba(212, 163, 115, 0.5)',
+                  ? (isDark ? 'linear-gradient(135deg, rgba(46, 204, 113, 0.18) 0%, rgba(212, 163, 115, 0.1) 100%)' : '#F2FAF5')
+                  : (isDark ? 'linear-gradient(135deg, rgba(212, 163, 115, 0.2) 0%, rgba(184, 46, 46, 0.1) 100%)' : '#FAF7F5'),
+                border: isCompleted || isReady || isApproved
+                  ? '1.5px solid #2ECC71'
+                  : (isDark ? '1px solid rgba(212, 163, 115, 0.5)' : '1.5px solid #9E1F1F'),
                 textAlign: 'center',
-                boxShadow: isCompleted ? '0 10px 30px rgba(46, 204, 113, 0.2)' : 'none',
               }}
             >
               {isCompleted ? (
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
-                    <Sparkles className="w-6 h-6 text-[#D4A373] animate-pulse" />
-                    <Heart className="w-9 h-9 text-[#2ECC71] animate-bounce" />
-                    <Sparkles className="w-6 h-6 text-[#D4A373] animate-pulse" />
-                  </div>
-                  <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.35rem', fontFamily: 'serif' }}>
-                    🙏 TERIMA KASIH UDAH PESEN!
+                  <h4 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#27AE60', marginBottom: '0.35rem', fontFamily: 'serif' }}>
+                    TERIMA KASIH ATAS PESANAN ANDA
                   </h4>
-                  <p style={{ fontSize: '0.85rem', color: '#F7F4EF', lineHeight: 1.5 }}>
-                    Pesananmu udah 100% selesai disajiin oleh Dapur & Barista KOPIMAGE. Selamat menikmati kopi & makanan terbaik kami! ☕✨
+                  <p style={{ fontSize: '0.85rem', color: isDark ? '#FFFFFF' : '#1A1A1A', lineHeight: 1.5 }}>
+                    Pesanan Anda telah selesai disajikan oleh Dapur & Barista KOPIMAGE. Selamat menikmati!
                   </p>
                 </div>
               ) : isReady ? (
                 <div>
-                  <Coffee className="w-10 h-10 text-[#2ECC71] mx-auto mb-2 animate-bounce" />
-                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                    ☕ PESANAN SIAP DIHIDANGKAN!
+                  <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#27AE60', marginBottom: '0.3rem', fontFamily: 'serif' }}>
+                    PESANAN SIAP DIHIDANGKAN
                   </h4>
-                  <p style={{ fontSize: '0.85rem', color: '#F7F4EF' }}>
-                    Pesananmu udah selesai diracik oleh Barista & Dapur KopiMage dan siap meluncur ke mejamu.
+                  <p style={{ fontSize: '0.85rem', color: isDark ? '#FFFFFF' : '#1A1A1A' }}>
+                    Pesanan Anda telah selesai diracik dan siap diantarkan ke meja Anda.
                   </p>
                 </div>
               ) : isApproved ? (
                 <div>
-                  <CheckCircle className="w-9 h-9 text-[#2ECC71] mx-auto mb-2 animate-pulse" />
-                  <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#2ECC71', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                    ✓ PEMBAYARAN TERVERIFIKASI LUNAS!
+                  <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#27AE60', marginBottom: '0.3rem', fontFamily: 'serif' }}>
+                    PEMBAYARAN TERVERIFIKASI
                   </h4>
-                  <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
-                    Pesananmu telah disetujui Admin dan lagi diracik oleh Dapur & Barista KopiMage.
+                  <p style={{ fontSize: '0.82rem', color: isDark ? '#FFFFFF' : '#1A1A1A' }}>
+                    Pesanan Anda telah disetujui Admin dan sedang diracik oleh Dapur & Barista KopiMage.
                   </p>
                 </div>
               ) : (
                 <div>
-                  <Coffee className="w-9 h-9 text-[#D4A373] mx-auto mb-2 animate-pulse" />
-                  <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#D4A373', marginBottom: '0.3rem', fontFamily: 'serif' }}>
-                    👨‍🍳 PESANAN LAGI DIRACIK DAPUR & BARISTA
+                  <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: isDark ? '#D4A373' : '#9E1F1F', marginBottom: '0.3rem', fontFamily: 'serif' }}>
+                    PESANAN SEDANG DIRACIK
                   </h4>
-                  <p style={{ fontSize: '0.82rem', color: '#F7F4EF' }}>
-                    Pesananmu udah diteruskan ke Dapur & Barista KopiMage dan lagi diracik ya. Kasir Admin bakal cek verifikasi pembayaranmu secara paralel.
+                  <p style={{ fontSize: '0.82rem', color: isDark ? '#FFFFFF' : '#1A1A1A' }}>
+                    Pesanan Anda telah diteruskan ke Dapur & Barista KopiMage.
                   </p>
                 </div>
               )}
             </div>
           )}
 
-          {/* REALTIME STATUS TRACKER STEPS (hide when cancelled) */}
+          {/* REALTIME STATUS TRACKER STEPS */}
           {!isCancelled && (
-            <div style={{ marginBottom: '1.5rem', background: '#0E0C0A', padding: '1rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <span style={{ fontSize: '0.7rem', color: '#A89F91', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '0.8rem' }}>
+            <div style={{ marginBottom: '1.5rem', background: isDark ? '#0E0C0A' : '#FFFFFF', padding: '1rem', borderRadius: '16px', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #9E1F1F' }}>
+              <span style={{ fontSize: '0.72rem', color: isDark ? '#A89F91' : '#555555', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700, fontFamily: 'monospace', display: 'block', marginBottom: '0.8rem' }}>
                 PROGRES REALTIME DAPUR & KASIR:
               </span>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', textAlign: 'center' }}>
                 {/* Step 1: Terkirim */}
-                <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: '1px solid #2ECC71' }}>
-                  <span style={{ fontSize: '0.65rem', display: 'block', color: '#2ECC71', fontWeight: 700 }}>
-                    ✓ TERKIRIM
+                <div style={{ padding: '0.6rem 0.3rem', borderRadius: '8px', background: isDark ? 'rgba(255,255,255,0.03)' : '#FAF7F5', border: '1px solid #2ECC71' }}>
+                  <span style={{ fontSize: '0.65rem', display: 'block', color: '#27AE60', fontWeight: 800, fontFamily: 'monospace' }}>
+                    TERKIRIM
                   </span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FFF' }}>Kasir Admin</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: isDark ? '#FFF' : '#1A1A1A' }}>Kasir Admin</span>
                 </div>
 
                 {/* Step 2: Diproses Dapur */}
-                <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: isCompleted ? '1px solid #2ECC71' : isCancellationRequested ? '1px solid #E67E22' : '1px solid #D4A373' }}>
-                  <span style={{ fontSize: '0.65rem', display: 'block', color: isCompleted ? '#2ECC71' : isCancellationRequested ? '#E67E22' : '#D4A373', fontWeight: 700 }}>
-                    {isCompleted ? '✓ SELESAI' : isCancellationRequested ? '⏳ BATAL?' : '👨‍🍳 DIPROSES'}
+                <div style={{ padding: '0.6rem 0.3rem', borderRadius: '8px', background: isDark ? 'rgba(255,255,255,0.03)' : '#FAF7F5', border: isCompleted ? '1px solid #2ECC71' : isCancellationRequested ? '1px solid #E67E22' : (isDark ? '1px solid #D4A373' : '1px solid #9E1F1F') }}>
+                  <span style={{ fontSize: '0.65rem', display: 'block', color: isCompleted ? '#27AE60' : isCancellationRequested ? '#E67E22' : (isDark ? '#D4A373' : '#9E1F1F'), fontWeight: 800, fontFamily: 'monospace' }}>
+                    {isCompleted ? 'SELESAI' : isCancellationRequested ? 'BATAL?' : 'DIPROSES'}
                   </span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#FFF' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: isDark ? '#FFF' : '#1A1A1A' }}>
                     {isCancellationRequested ? 'Menunggu Admin' : 'Dapur & Barista'}
                   </span>
                 </div>
 
                 {/* Step 3: Siap Hidangkan */}
-                <div style={{ padding: '0.6rem 0.3rem', borderRadius: '10px', background: 'rgba(255,255,255,0.03)', border: isReady || isCompleted ? '1px solid #2ECC71' : '1px solid rgba(255,255,255,0.1)' }}>
-                  <span style={{ fontSize: '0.65rem', display: 'block', color: isReady || isCompleted ? '#2ECC71' : '#666', fontWeight: 700 }}>
-                    {isCompleted ? '✓ SELESAI' : isReady ? '☕ SIAP' : 'TUNGGU'}
+                <div style={{ padding: '0.6rem 0.3rem', borderRadius: '8px', background: isDark ? 'rgba(255,255,255,0.03)' : '#FAF7F5', border: isReady || isCompleted ? '1px solid #2ECC71' : (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.15)') }}>
+                  <span style={{ fontSize: '0.65rem', display: 'block', color: isReady || isCompleted ? '#27AE60' : (isDark ? '#666' : '#888'), fontWeight: 800, fontFamily: 'monospace' }}>
+                    {isCompleted ? 'SELESAI' : isReady ? 'SIAP' : 'ANTREAN'}
                   </span>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: isReady || isCompleted ? '#FFF' : '#666' }}>
-                    {isCompleted ? 'Sudah Disajikan' : 'Siap Meja'}
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: isReady || isCompleted ? (isDark ? '#FFF' : '#1A1A1A') : (isDark ? '#666' : '#888') }}>
+                    {isCompleted ? 'Disajikan' : 'Siap Meja'}
                   </span>
                 </div>
               </div>
@@ -635,37 +667,37 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
           {/* ITEM RINGKASAN */}
           {createdOrder.items && createdOrder.items.length > 0 && (
-            <div style={{ marginBottom: '1.5rem', background: '#0E0C0A', padding: '1rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <span style={{ fontSize: '0.7rem', color: '#A89F91', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '0.6rem' }}>
+            <div style={{ marginBottom: '1.5rem', background: isDark ? '#0E0C0A' : '#FFFFFF', padding: '1rem', borderRadius: '16px', border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #9E1F1F' }}>
+              <span style={{ fontSize: '0.72rem', color: isDark ? '#A89F91' : '#555555', letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 700, fontFamily: 'monospace', display: 'block', marginBottom: '0.6rem' }}>
                 RINCIAN ITEM PESANAN:
               </span>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 {createdOrder.items.map((item: any, idx: number) => (
-                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: isCancelled ? '#666' : '#F7F4EF', textDecoration: isCancelled ? 'line-through' : 'none' }}>
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: isCancelled ? '#888' : (isDark ? '#FFFFFF' : '#1A1A1A'), textDecoration: isCancelled ? 'line-through' : 'none' }}>
                     <span>{item.quantity}x {item.item_name}</span>
-                    <span style={{ color: isCancelled ? '#666' : '#D4A373', fontWeight: 600 }}>Rp {(item.subtotal || item.unit_price * item.quantity).toLocaleString('id-ID')}</span>
+                    <span style={{ color: isCancelled ? '#888' : (isDark ? '#D4A373' : '#9E1F1F'), fontWeight: 700, fontFamily: 'monospace' }}>Rp {(item.subtotal || item.unit_price * item.quantity).toLocaleString('id-ID')}</span>
                   </div>
                 ))}
               </div>
-              <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '0.8rem', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '0.95rem', color: isCancelled ? '#666' : '#FFF', textDecoration: isCancelled ? 'line-through' : 'none' }}>
+              <div style={{ borderTop: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(158, 31, 31, 0.2)', marginTop: '0.8rem', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '0.95rem', color: isCancelled ? '#888' : (isDark ? '#FFF' : '#1A1A1A'), textDecoration: isCancelled ? 'line-through' : 'none' }}>
                 <span>Total Pembayaran</span>
-                <span style={{ color: isCancelled ? '#666' : '#D4A373' }}>Rp {createdOrder.total_amount?.toLocaleString('id-ID')}</span>
+                <span style={{ color: isCancelled ? '#888' : (isDark ? '#FFFFFF' : '#9E1F1F'), fontFamily: 'monospace' }}>Rp {createdOrder.total_amount?.toLocaleString('id-ID')}</span>
               </div>
             </div>
           )}
 
           {/* CANCELLATION CONFIRMATION DIALOG */}
           {showCancelConfirm && (
-            <div style={{ marginBottom: '1.5rem', background: '#1A1210', padding: '1.25rem', borderRadius: '16px', border: '1px solid rgba(231, 76, 60, 0.4)' }}>
+            <div style={{ marginBottom: '1.5rem', background: isDark ? '#1A1210' : '#FFFFFF', padding: '1.25rem', borderRadius: '16px', border: isDark ? '1px solid rgba(231, 76, 60, 0.4)' : '1.5px solid #9E1F1F' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
                 <AlertCircle size={18} color="#E74C3C" />
                 <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#E74C3C' }}>Konfirmasi Pembatalan Pesanan</span>
               </div>
-              <p style={{ fontSize: '0.82rem', color: '#A89F91', marginBottom: '1rem', lineHeight: 1.5 }}>
+              <p style={{ fontSize: '0.82rem', color: isDark ? '#A89F91' : '#555555', marginBottom: '1rem', lineHeight: 1.5 }}>
                 Pembatalan akan dikirimkan ke Admin untuk ditinjau. Pesanan belum dibatalkan sampai Admin menyetujui.
               </p>
 
-              <label style={{ fontSize: '0.82rem', color: '#C4BBB4', fontWeight: 600, display: 'block', marginBottom: '0.4rem' }}>
+              <label style={{ fontSize: '0.82rem', color: isDark ? '#FFFFFF' : '#1A1A1A', fontWeight: 600, display: 'block', marginBottom: '0.4rem' }}>
                 Alasan Pembatalan:
               </label>
               <select
@@ -674,10 +706,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   width: '100%',
                   padding: '0.65rem 0.85rem',
-                  background: 'rgba(30, 26, 23, 0.9)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: isDark ? '#0E0B0A' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F',
                   borderRadius: '10px',
-                  color: '#F7F4EF',
+                  color: isDark ? '#FFFFFF' : '#1A1A1A',
                   fontSize: '0.85rem',
                   outline: 'none',
                   marginBottom: '0.65rem',
@@ -699,10 +731,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   style={{
                     width: '100%',
                     padding: '0.65rem 0.85rem',
-                    background: 'rgba(30, 26, 23, 0.9)',
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    background: isDark ? '#0E0B0A' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F',
                     borderRadius: '10px',
-                    color: '#F7F4EF',
+                    color: isDark ? '#FFFFFF' : '#1A1A1A',
                     fontSize: '0.85rem',
                     outline: 'none',
                     marginBottom: '0.65rem',
@@ -717,10 +749,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     flex: 1,
                     padding: '0.7rem',
                     borderRadius: '10px',
-                    background: 'rgba(255,255,255,0.06)',
-                    color: '#A89F91',
+                    background: isDark ? 'rgba(255,255,255,0.06)' : '#F0EBE8',
+                    color: isDark ? '#A89F91' : '#1A1A1A',
                     fontWeight: 700,
-                    border: '1px solid rgba(255,255,255,0.1)',
+                    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.15)',
                     cursor: 'pointer',
                     fontSize: '0.82rem',
                   }}
@@ -734,10 +766,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     flex: 1,
                     padding: '0.7rem',
                     borderRadius: '10px',
-                    background: 'rgba(231, 76, 60, 0.2)',
+                    background: isDark ? 'rgba(231, 76, 60, 0.2)' : '#FDEDEC',
                     color: '#E74C3C',
                     fontWeight: 800,
-                    border: '1px solid rgba(231, 76, 60, 0.5)',
+                    border: '1px solid #E74C3C',
                     cursor: isCancelling ? 'not-allowed' : 'pointer',
                     fontSize: '0.82rem',
                     opacity: isCancelling || (cancelReason === 'Custom' && !customCancelReason.trim()) ? 0.5 : 1,
@@ -758,21 +790,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   width: '100%',
                   padding: '0.9rem',
-                  borderRadius: '14px',
-                  background: 'linear-gradient(135deg, #B82E2E 0%, #8E2020 100%)',
+                  borderRadius: '10px',
+                  background: isDark ? '#B82E2E' : '#9E1F1F',
                   color: '#FFFFFF',
                   fontWeight: 800,
-                  border: '1px solid rgba(255,255,255,0.2)',
+                  border: isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F',
                   cursor: 'pointer',
                   fontSize: '0.9rem',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '0.5rem',
-                  boxShadow: '0 8px 20px rgba(184, 46, 46, 0.35)',
                 }}
               >
-                <span>🔄 KEMBALI KE MENU (PESAN ULANG)</span>
+                <span>KEMBALI KE MENU (PESAN ULANG)</span>
               </button>
             ) : (
               <>
@@ -782,21 +813,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   style={{
                     width: '100%',
                     padding: '0.9rem',
-                    borderRadius: '14px',
-                    background: 'linear-gradient(135deg, #B82E2E 0%, #8E2020 100%)',
+                    borderRadius: '10px',
+                    background: isDark ? '#B82E2E' : '#9E1F1F',
                     color: '#FFFFFF',
                     fontWeight: 800,
-                    border: '1px solid rgba(255,255,255,0.2)',
+                    border: isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F',
                     cursor: 'pointer',
                     fontSize: '0.9rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '0.5rem',
-                    boxShadow: '0 8px 20px rgba(184, 46, 46, 0.35)',
                   }}
                 >
-                  <span>➕ TAMBAH PESANAN LAIN (PILIH MENU)</span>
+                  <span>TAMBAH PESANAN LAIN (PILIH MENU)</span>
                 </button>
 
                 {/* BATALKAN PESANAN — only when status allows */}
@@ -806,8 +836,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      borderRadius: '14px',
-                      background: 'rgba(231, 76, 60, 0.08)',
+                      borderRadius: '10px',
+                      background: isDark ? 'rgba(231, 76, 60, 0.1)' : '#FDEDEC',
                       color: '#E74C3C',
                       fontWeight: 700,
                       border: '1px solid rgba(231, 76, 60, 0.3)',
@@ -832,8 +862,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      borderRadius: '14px',
-                      background: 'rgba(230, 126, 34, 0.1)',
+                      borderRadius: '10px',
+                      background: isDark ? 'rgba(230, 126, 34, 0.1)' : '#FFF9F4',
                       color: '#E67E22',
                       fontWeight: 700,
                       border: '1px solid rgba(230, 126, 34, 0.3)',
@@ -995,8 +1025,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           {/* Table Selector (If Dine-In) */}
           {mode === 'dine-in' && (
             <div>
-              <label style={{ fontSize: '0.88rem', color: '#C4BBB4', fontWeight: 600, display: 'block', marginBottom: '0.5rem' }}>
-                Pilih Meja Kedai:
+              <label style={{ fontSize: '0.82rem', color: isDark ? '#A89F91' : '#555555', fontWeight: 700, fontFamily: 'monospace', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+                PILIH MEJA KEDAI:
               </label>
               <select
                 value={selectedTable}
@@ -1004,16 +1034,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   width: '100%',
                   padding: '0.75rem 1rem',
-                  background: 'rgba(30, 26, 23, 0.9)',
-                  border: '1px solid rgba(212, 163, 115, 0.3)',
+                  background: isDark ? '#0E0B0A' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid #9E1F1F',
                   borderRadius: '12px',
-                  color: '#F7F4EF',
+                  color: isDark ? '#FFFFFF' : '#1A1A1A',
                   fontSize: '0.92rem',
+                  fontWeight: 600,
                   outline: 'none',
                 }}
               >
                 {liveTables.map((t) => (
-                  <option key={t.id || t.code} value={t.code || t.id} style={{ background: '#161311', color: '#F7F4EF' }}>
+                  <option key={t.id || t.code} value={t.code || t.id} style={{ background: isDark ? '#161311' : '#FFFFFF', color: isDark ? '#FFFFFF' : '#1A1A1A' }}>
                     {t.name} ({t.area || 'Indoor AC'})
                   </option>
                 ))}
@@ -1024,8 +1055,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
           {/* Customer Name & Phone */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
             <div>
-              <label style={{ fontSize: '0.85rem', color: '#C4BBB4', fontWeight: 600, display: 'block', marginBottom: '0.35rem' }}>
-                Nama Pemesan *
+              <label style={{ fontSize: '0.82rem', color: isDark ? '#A89F91' : '#555555', fontWeight: 700, fontFamily: 'monospace', textTransform: 'uppercase', display: 'block', marginBottom: '0.35rem' }}>
+                NAMA PEMESAN *
               </label>
               <input
                 type="text"
@@ -1036,19 +1067,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  background: 'rgba(30, 26, 23, 0.9)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: isDark ? '#0E0B0A' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid #9E1F1F',
                   borderRadius: '12px',
-                  color: '#F7F4EF',
+                  color: isDark ? '#FFFFFF' : '#1A1A1A',
                   fontSize: '0.9rem',
+                  fontWeight: 600,
                   outline: 'none',
                 }}
               />
             </div>
 
             <div>
-              <label style={{ fontSize: '0.85rem', color: '#C4BBB4', fontWeight: 600, display: 'block', marginBottom: '0.35rem' }}>
-                No. WhatsApp (Wajib) *
+              <label style={{ fontSize: '0.82rem', color: isDark ? '#A89F91' : '#555555', fontWeight: 700, fontFamily: 'monospace', textTransform: 'uppercase', display: 'block', marginBottom: '0.35rem' }}>
+                NO. WHATSAPP (WAJIB) *
               </label>
               <input
                 type="tel"
@@ -1059,11 +1091,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  background: 'rgba(30, 26, 23, 0.9)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: isDark ? '#0E0B0A' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(255,255,255,0.15)' : '1px solid #9E1F1F',
                   borderRadius: '12px',
-                  color: '#F7F4EF',
+                  color: isDark ? '#FFFFFF' : '#1A1A1A',
                   fontSize: '0.9rem',
+                  fontWeight: 600,
                   outline: 'none',
                 }}
               />
@@ -1072,16 +1105,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
           {/* Payment Method Selector */}
           <div>
-            <label style={{ fontSize: '0.88rem', color: '#C4BBB4', fontWeight: 600, display: 'block', marginBottom: '0.5rem' }}>
-              Metode Pembayaran:
+            <label style={{ fontSize: '0.82rem', color: isDark ? '#A89F91' : '#555555', fontWeight: 700, fontFamily: 'monospace', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+              METODE PEMBAYARAN:
             </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               <label
                 style={{
                   padding: '0.85rem 1rem',
                   borderRadius: '12px',
-                  border: paymentMethod === 'cashier' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
-                  background: paymentMethod === 'cashier' ? 'rgba(212, 163, 115, 0.15)' : 'rgba(30, 26, 23, 0.6)',
+                  border: paymentMethod === 'cashier'
+                    ? (isDark ? '1.5px solid #B82E2E' : '2px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F'),
+                  background: paymentMethod === 'cashier'
+                    ? (isDark ? 'rgba(184, 46, 46, 0.2)' : '#FDF7F7')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -1095,11 +1132,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   value="cashier"
                   checked={paymentMethod === 'cashier'}
                   onChange={() => setPaymentMethod('cashier')}
+                  style={{ accentColor: '#9E1F1F' }}
                 />
-                <Store size={20} color="#D4A373" />
+                <Store size={20} color={isDark ? '#D4A373' : '#9E1F1F'} />
                 <div>
-                  <div style={{ fontSize: '0.92rem', color: '#F7F4EF', fontWeight: 700 }}>Bayar di Kasir / Tempat</div>
-                  <div style={{ fontSize: '0.78rem', color: '#8E847C' }}>Bayar tunai/EDC saat mengambil/di meja</div>
+                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'cashier' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>Bayar di Kasir / Tempat</div>
+                  <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>Bayar tunai/EDC saat mengambil/di meja</div>
                 </div>
               </label>
 
@@ -1107,8 +1145,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   padding: '0.85rem 1rem',
                   borderRadius: '12px',
-                  border: paymentMethod === 'qris_static' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
-                  background: paymentMethod === 'qris_static' ? 'rgba(212, 163, 115, 0.15)' : 'rgba(30, 26, 23, 0.6)',
+                  border: paymentMethod === 'qris_static'
+                    ? (isDark ? '1.5px solid #B82E2E' : '2px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F'),
+                  background: paymentMethod === 'qris_static'
+                    ? (isDark ? 'rgba(184, 46, 46, 0.2)' : '#FDF7F7')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -1122,11 +1164,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   value="qris_static"
                   checked={paymentMethod === 'qris_static'}
                   onChange={() => setPaymentMethod('qris_static')}
+                  style={{ accentColor: '#9E1F1F' }}
                 />
-                <QrCode size={20} color="#D4A373" />
+                <QrCode size={20} color={isDark ? '#D4A373' : '#9E1F1F'} />
                 <div>
-                  <div style={{ fontSize: '0.92rem', color: '#F7F4EF', fontWeight: 700 }}>QRIS Statis KOPIMAGE</div>
-                  <div style={{ fontSize: '0.78rem', color: '#8E847C' }}>Scan via GoPay/OVO/Dana/BCA Mobile</div>
+                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'qris_static' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>QRIS Statis KOPIMAGE</div>
+                  <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>Scan via GoPay/OVO/Dana/BCA Mobile</div>
                 </div>
               </label>
 
@@ -1134,8 +1177,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 style={{
                   padding: '0.85rem 1rem',
                   borderRadius: '12px',
-                  border: paymentMethod === 'bank_transfer' ? '1px solid #D4A373' : '1px solid rgba(255,255,255,0.08)',
-                  background: paymentMethod === 'bank_transfer' ? 'rgba(212, 163, 115, 0.15)' : 'rgba(30, 26, 23, 0.6)',
+                  border: paymentMethod === 'bank_transfer'
+                    ? (isDark ? '1.5px solid #B82E2E' : '2px solid #9E1F1F')
+                    : (isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #9E1F1F'),
+                  background: paymentMethod === 'bank_transfer'
+                    ? (isDark ? 'rgba(184, 46, 46, 0.2)' : '#FDF7F7')
+                    : (isDark ? '#0E0B0A' : '#FFFFFF'),
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -1149,11 +1196,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                   value="bank_transfer"
                   checked={paymentMethod === 'bank_transfer'}
                   onChange={() => setPaymentMethod('bank_transfer')}
+                  style={{ accentColor: '#9E1F1F' }}
                 />
-                <CreditCard size={20} color="#D4A373" />
+                <CreditCard size={20} color={isDark ? '#D4A373' : '#9E1F1F'} />
                 <div>
-                  <div style={{ fontSize: '0.92rem', color: '#F7F4EF', fontWeight: 700 }}>Transfer Bank BCA</div>
-                  <div style={{ fontSize: '0.78rem', color: '#8E847C' }}>Rekening 1234567890 a.n KOPIMAGE</div>
+                  <div style={{ fontSize: '0.92rem', color: isDark ? '#FFFFFF' : (paymentMethod === 'bank_transfer' ? '#9E1F1F' : '#1A1A1A'), fontWeight: 700 }}>Transfer Bank BCA</div>
+                  <div style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#555555' }}>Rekening 1234567890 a.n KOPIMAGE</div>
                 </div>
               </label>
             </div>
@@ -1161,25 +1209,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
 
           {/* Upload Proof (If QRIS / Transfer) */}
           {(paymentMethod === 'qris_static' || paymentMethod === 'bank_transfer') && (
-            <div style={{ background: 'rgba(30, 26, 23, 0.8)', padding: '1rem', borderRadius: '12px', border: '1px dashed rgba(212, 163, 115, 0.3)' }}>
-              <label style={{ fontSize: '0.85rem', color: '#D4A373', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
+            <div style={{ background: isDark ? '#0E0B0A' : '#FAF7F5', padding: '1rem', borderRadius: '12px', border: isDark ? '1px dashed rgba(255,255,255,0.2)' : '1px dashed #9E1F1F' }}>
+              <label style={{ fontSize: '0.85rem', color: isDark ? '#FFFFFF' : '#1A1A1A', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
                 <Upload size={16} />
-                <span>Upload Bukti Transfer / QRIS (Opsional sekarang, bisa di tracker):</span>
+                <span>Upload Bukti Transfer / QRIS:</span>
               </label>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(e) => setProofFile(e.target.files ? e.target.files[0] : null)}
-                style={{ fontSize: '0.82rem', color: '#C4BBB4' }}
+                style={{ fontSize: '0.82rem', color: isDark ? '#FFFFFF' : '#1A1A1A' }}
               />
             </div>
           )}
 
           {/* Order Summary & Final CTA */}
-          <div style={{ paddingTop: '1.25rem', borderTop: '1px solid rgba(212, 163, 115, 0.15)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ paddingTop: '1.25rem', borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #9E1F1F', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <span style={{ fontSize: '0.8rem', color: '#8E847C', display: 'block' }}>Total Pembayaran:</span>
-              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#D4A373', fontFamily: 'serif' }}>
+              <span style={{ fontSize: '0.78rem', color: isDark ? '#A89F91' : '#666666', display: 'block', fontFamily: 'monospace' }}>TOTAL PEMBAYARAN:</span>
+              <span style={{ fontSize: '1.4rem', fontWeight: 800, color: isDark ? '#FFFFFF' : '#9E1F1F', fontFamily: 'monospace' }}>
                 Rp {estimatedSubtotal.toLocaleString('id-ID')}
               </span>
             </div>
@@ -1187,7 +1235,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn btn-primary"
               style={{
                 display: 'inline-flex',
                 flexDirection: 'row',
@@ -1198,8 +1245,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({ onClose, onSuccess
                 padding: '0.85rem 1.6rem',
                 fontSize: '0.95rem',
                 fontWeight: 700,
+                borderRadius: '10px',
+                backgroundColor: isDark ? '#B82E2E' : '#9E1F1F',
+                color: '#FFFFFF',
+                border: isDark ? '1px solid #B82E2E' : '1px solid #9E1F1F',
                 opacity: isSubmitting ? 0.7 : 1,
-                cursor: isSubmitting ? 'not-allowed' : 'pointer'
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
               }}
             >
               <CheckCircle size={18} strokeWidth={2.5} />
