@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Coffee, Sparkles, Thermometer, MapPin, QrCode, ArrowRight, CheckCircle2, Flame } from 'lucide-react';
+import { X, Coffee, MapPin, QrCode, ArrowRight } from 'lucide-react';
 import { MenuItem } from '../../types/menu';
 
 interface MenuDetailModalProps {
@@ -67,8 +67,8 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose 
                   </div>
                 )}
                 {item.isBestSeller && (
-                  <span className="absolute top-4 left-4 px-3 py-1 bg-[#B82E2E] text-[#FFFFFF] text-[0.65rem] font-sans tracking-widest uppercase font-semibold rounded-md shadow-md border border-[#B82E2E]">
-                    ⭐ BEST SELLER
+                  <span className="absolute top-4 left-4 text-[#FFFFFF] text-[0.65rem] font-mono tracking-widest uppercase font-bold border-y border-[#FFFFFF]/60 py-0.5">
+                    BEST SELLER
                   </span>
                 )}
               </div>
@@ -76,14 +76,13 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose 
               {/* Right Column: Menu Details & Information */}
               <div className="md:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
                 <div>
-                  {/* Category Badges */}
-                  <div className="flex items-center gap-2 flex-wrap mb-3">
-                    <span className="px-2.5 py-1 bg-[#B82E2E]/20 text-[#C29B7F] text-[0.62rem] font-sans tracking-wider uppercase font-semibold rounded-md border border-[#B82E2E]/30">
+                  {/* Category Badges (Under + Top Line) */}
+                  <div className="flex items-center gap-3 flex-wrap mb-3">
+                    <span className="text-[#B82E2E] text-[0.68rem] font-mono tracking-wider uppercase font-bold border-y border-[#B82E2E]/40 py-0.5">
                       {item.category === 'coffee' ? 'KOPI RACIKAN' : item.category === 'main-course' ? 'MAKANAN UTAMA' : item.category === 'non-coffee' ? 'NON-COFFEE' : 'SPESIAL KOPI MAGE'}
                     </span>
                     {item.temperature && (
-                      <span className="px-2.5 py-1 bg-[#FFFFFF]/08 text-[#A89F91] text-[0.62rem] font-sans tracking-wider uppercase font-medium rounded-md border border-[#FFFFFF]/10 flex items-center gap-1">
-                        <Thermometer className="w-3 h-3 text-[#B82E2E]" />
+                      <span className="text-[#A89F91] text-[0.68rem] font-mono tracking-wider uppercase font-medium border-y border-white/20 py-0.5">
                         {item.temperature}
                       </span>
                     )}
@@ -104,19 +103,19 @@ export const MenuDetailModal: React.FC<MenuDetailModalProps> = ({ item, onClose 
 
                   {/* Description */}
                   <p className="font-sans text-xs sm:text-sm text-[#A89F91] font-light leading-relaxed mb-6 border-t border-[#FFFFFF]/08 pt-4">
-                    {item.description || 'Racikan khas Kopi Mage dengan bahan pilihan. Diracik langsung oleh barista kami biar rasanya selalu pas di lidahmu.'}
+                    {item.description || 'Racikan khas KOPIMAGE dengan bahan berkualitas pilihan yang disajikan segar oleh barista.'}
                   </p>
 
                   {/* Item Features / Specs */}
                   <div className="bg-[#0E0B0A] border border-[#FFFFFF]/08 rounded-xl p-4 mb-6 space-y-2.5">
                     <div className="flex items-center gap-2.5 text-xs text-[#FFFFFF]">
-                      <CheckCircle2 className="w-4 h-4 text-[#B82E2E] shrink-0" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#B82E2E]" />
                       <span>Tersedia di <strong>Cabang Gading Tutuka & Lanud Sulaiman</strong></span>
                     </div>
                     {isDrink && (
                       <div className="flex items-center gap-2.5 text-xs text-[#A89F91]">
-                        <Flame className="w-4 h-4 text-[#C29B7F] shrink-0" />
-                        <span>Karakter Rasa: <strong>Pas di lidah, rasa konsisten & segar</strong></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#C29B7F]" />
+                        <span>Karakter Rasa: <strong>Konsisten, autentik, dan seimbang</strong></span>
                       </div>
                     )}
                   </div>

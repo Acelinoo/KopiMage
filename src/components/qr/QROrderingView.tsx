@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { CATEGORIES } from '@/data/menuData';
+import { CATEGORIES, MENU_ITEMS as defaultMenuItems } from '@/data/menuData';
 import { MenuCategoryId, MenuItem } from '@/types/menu';
 import { MenuItemCard } from '@/components/MenuItemCard';
 import { Header } from '@/components/Header';
@@ -32,40 +32,29 @@ export const QROrderingView: React.FC<QROrderingViewProps> = ({ tableId }) => {
     return str;
   }, [tableId]);
 
-  // Fetch Live Menu Items from /api/menu & LocalStorage fallback
+  // Fetch Live Menu Items from /api/menu & default fallback
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
         ['kopimage_custom_menu', 'kopimage_custom_menu_v2', 'kopimage_custom_menu_v3'].forEach((k) => {
-          const raw = localStorage.getItem(k);
-          if (raw && (raw.includes('data:image') || raw.length > 10000)) {
-            localStorage.removeItem(k);
-          }
+          localStorage.removeItem(k);
         });
       } catch (e) {}
     }
 
-    const isCleared = typeof window !== 'undefined' && localStorage.getItem('kopimage_menu_cleared') === 'true';
-    const localMenu = typeof window !== 'undefined' ? localStorage.getItem('kopimage_custom_menu_v3') : null;
-    const parsedLocal = localMenu ? JSON.parse(localMenu) : [];
-
-    if (isCleared && parsedLocal.length === 0) {
-      setLiveMenuItems([]);
-    } else {
-      fetch('/api/menu')
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && Array.isArray(data.menu)) {
-            const apiIds = new Set(data.menu.map((m: any) => m.id));
-            const merged = [...data.menu, ...parsedLocal.filter((m: any) => !apiIds.has(m.id))];
-            setLiveMenuItems(merged);
-          }
-        })
-        .catch((err) => {
-          console.error('Failed to fetch live menu:', err);
-          setLiveMenuItems(parsedLocal);
-        });
-    }
+    fetch('/api/menu')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.menu) && data.menu.length > 0) {
+          setLiveMenuItems(data.menu);
+        } else {
+          setLiveMenuItems(defaultMenuItems);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch live menu:', err);
+        setLiveMenuItems(defaultMenuItems);
+      });
   }, []);
 
   // Filtered menu items

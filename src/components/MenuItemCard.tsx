@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { MenuItem } from '../types/menu';
-import { Sparkles, Thermometer, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { ItemCustomizerModal } from './ItemCustomizerModal';
 
 interface MenuItemCardProps {
@@ -41,33 +41,35 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
             />
           </div>
 
-          {/* Badges Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', marginBottom: '0.85rem' }}>
-            {item.isSeasonal && (
-              <span className="badge badge-seasonal">
-                <Sparkles size={12} /> Seasonal
-              </span>
-            )}
-            {item.isBestSeller && (
-              <span className="badge badge-bestseller">
-                ⭐ Best Seller
-              </span>
-            )}
-            {item.temperature && (
-              <span className="badge badge-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                <Thermometer size={12} /> {item.temperature}
-              </span>
-            )}
-          </div>
+          {/* Badges Bar (Clean Under + Top Line Editorial) */}
+          {(item.isSeasonal || item.isBestSeller || item.temperature) && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.85rem' }}>
+              {item.isSeasonal && (
+                <span className="badge badge-seasonal">
+                  Seasonal
+                </span>
+              )}
+              {item.isBestSeller && (
+                <span className="badge badge-bestseller">
+                  Best Seller
+                </span>
+              )}
+              {item.temperature && (
+                <span className="badge badge-tag">
+                  {item.temperature}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Item Title */}
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#F7F4EF', marginBottom: '0.4rem', lineHeight: 1.3 }}>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'inherit', marginBottom: '0.4rem', lineHeight: 1.3 }}>
             {item.name}
           </h3>
 
           {/* Description */}
           {item.description && (
-            <p style={{ fontSize: '0.86rem', color: '#C4BBB4', lineHeight: 1.5, marginBottom: '1.1rem' }}>
+            <p style={{ fontSize: '0.86rem', color: '#888888', lineHeight: 1.5, marginBottom: '1.1rem' }}>
               {item.description}
             </p>
           )}
@@ -76,7 +78,7 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
           {item.tags && item.tags.length > 0 && (
             <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '1.1rem' }}>
               {item.tags.map((tag, idx) => (
-                <span key={idx} style={{ fontSize: '0.72rem', color: '#8E847C', background: 'rgba(255, 255, 255, 0.03)', padding: '0.15rem 0.5rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <span key={idx} style={{ fontSize: '0.7rem', color: '#888888', background: 'transparent', padding: '0.1rem 0.35rem', borderTop: '1px solid rgba(150,150,150,0.25)', borderBottom: '1px solid rgba(150,150,150,0.25)', fontFamily: 'monospace' }}>
                   #{tag}
                 </span>
               ))}
@@ -85,13 +87,13 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
         </div>
 
         {/* Bottom Pricing & Order Action */}
-        <div style={{ paddingTop: '1rem', borderTop: '1px solid rgba(212, 163, 115, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
+        <div style={{ paddingTop: '0.9rem', borderTop: '1px solid rgba(158, 31, 31, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
           <div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#D4A373', lineHeight: 1 }}>
+            <div style={{ fontSize: '1.15rem', fontWeight: 800, fontFamily: 'monospace', color: '#9E1F1F', lineHeight: 1 }}>
               {item.price}
             </div>
             {item.priceLiter && (
-              <div style={{ fontSize: '0.75rem', color: '#C67D5A', fontWeight: 600, marginTop: '0.25rem' }}>
+              <div style={{ fontSize: '0.72rem', color: '#666666', fontWeight: 600, marginTop: '0.35rem', letterSpacing: '0.02em' }}>
                 Literan: {item.priceLiter}
               </div>
             )}
@@ -99,20 +101,22 @@ export const MenuItemCard: React.FC<MenuItemCardProps> = ({ item }) => {
 
           <button
             onClick={() => setIsCustomizerOpen(true)}
-            className="btn btn-primary btn-sm"
-            title={`Pilih varian ${item.name}`}
             style={{
               display: 'inline-flex',
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.4rem',
+              gap: '0.35rem',
               whiteSpace: 'nowrap',
               padding: '0.5rem 0.95rem',
-              fontSize: '0.82rem',
+              fontSize: '0.8rem',
               fontWeight: 700,
-              borderRadius: '10px',
-              cursor: 'pointer'
+              borderRadius: '8px',
+              backgroundColor: '#9E1F1F',
+              color: '#FFFFFF',
+              border: '1px solid #9E1F1F',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
             }}
           >
             <Plus size={14} strokeWidth={2.5} />

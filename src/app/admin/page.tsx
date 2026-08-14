@@ -646,7 +646,7 @@ export default function AdminDashboardPage() {
                 className="px-3.5 py-2 rounded-lg bg-[#C29B7F]/15 border border-[#C29B7F]/40 text-[#C29B7F] hover:bg-[#C29B7F] hover:text-[#070605] font-mono text-xs font-bold uppercase transition-all flex items-center gap-1.5"
                 title="Buka Monitor Dapur / Kitchen Display System"
               >
-                <span>🔥 STASIUN DAPUR (KDS)</span>
+                <span>STASIUN DAPUR (KDS)</span>
               </a>
             </div>
           </div>
@@ -809,12 +809,12 @@ export default function AdminDashboardPage() {
                             </span>
                           </div>
                           <span
-                            className={`px-2.5 py-1 rounded-md text-[0.65rem] font-mono tracking-wider uppercase font-bold border ${
+                            className={`px-1 py-0.5 text-[0.68rem] font-mono tracking-widest uppercase font-bold border-y ${
                               isVerifying
-                                ? 'bg-amber-500/15 border-amber-500/30 text-amber-400'
+                                ? 'border-amber-500/50 text-amber-400'
                                 : isPaid
-                                ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'
-                                : 'bg-red-500/15 border-red-500/30 text-red-400'
+                                ? 'border-emerald-500/50 text-emerald-400'
+                                : 'border-red-500/50 text-red-400'
                             }`}
                           >
                             {order.payment_status}

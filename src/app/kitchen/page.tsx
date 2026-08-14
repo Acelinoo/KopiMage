@@ -347,7 +347,7 @@ export default function KitchenDisplayPage() {
                 : 'text-[#A89F91] hover:text-white'
             }`}
           >
-            🔥 TIKET AKTIF DOK ({activeOrdersCount})
+            TIKET AKTIF ({activeOrdersCount})
           </button>
           <button
             onClick={() => setStatusTab('COMPLETED')}
@@ -357,7 +357,6 @@ export default function KitchenDisplayPage() {
                 : 'text-[#A89F91] hover:text-white'
             }`}
           >
-            ✅ SELESAI DISAJIKAN
             SELESAI DISAJIKAN
           </button>
         </div>
@@ -540,7 +539,7 @@ export default function KitchenDisplayPage() {
                           className="w-full p-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white font-mono text-sm font-black uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/40 active:scale-95"
                         >
                           <CheckCircle2 className="w-5 h-5" />
-                          <span>✅ SELESAI DISAJIKAN (1-TAP)</span>
+                          <span>SELESAI DISAJIKAN (1-TAP)</span>
                         </button>
                       ) : (
                         <div className="text-center py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-xs font-mono text-emerald-400 flex items-center justify-center gap-1.5">

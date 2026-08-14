@@ -66,7 +66,7 @@ export const Header: React.FC = () => {
           </nav>
         )}
 
-        {/* In Table Order Mode: Show Sleek Table Badge Indicator */}
+        {/* In Table Order Mode: Clean Under + Top Line Indicator */}
         {isTableMode && (
           <div
             className="desktop-nav"
@@ -74,14 +74,16 @@ export const Header: React.FC = () => {
               display: 'none',
               alignItems: 'center',
               gap: '0.5rem',
-              background: 'rgba(212, 163, 115, 0.1)',
-              border: '1px solid rgba(212, 163, 115, 0.25)',
-              padding: '0.4rem 0.9rem',
-              borderRadius: '9999px',
-              fontSize: '0.78rem',
+              background: 'transparent',
+              borderTop: '1px solid rgba(158, 31, 31, 0.4)',
+              borderBottom: '1px solid rgba(158, 31, 31, 0.4)',
+              padding: '0.25rem 0.6rem',
+              borderRadius: '0',
+              fontSize: '0.72rem',
               fontWeight: 700,
-              color: '#D4A373',
-              letterSpacing: '0.05em'
+              fontFamily: 'monospace',
+              color: '#9E1F1F',
+              letterSpacing: '0.14em'
             }}
           >
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#2ECC71' }} />
