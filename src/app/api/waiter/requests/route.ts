@@ -141,16 +141,20 @@ export async function POST(request: Request) {
       .select()
       .maybeSingle();
 
-    if (insertError) {
-      console.warn('Supabase waiter request insert warning:', insertError.message);
+    if (insertError || !insertedDb) {
+      console.error('Supabase waiter request insert error:', insertError?.message);
+      return NextResponse.json(
+        { error: 'Gagal menyimpan panggilan waiter ke database: ' + (insertError?.message || 'Database error') },
+        { status: 500 }
+      );
     }
 
-    // 4. Insert into in-memory store
-    addWaiterRequestToStore(newRequest);
+    // 4. Insert into in-memory store mirror
+    addWaiterRequestToStore(insertedDb);
 
     return NextResponse.json({
       success: true,
-      request: insertedDb || newRequest,
+      request: insertedDb,
       message: 'Panggilan waiter berhasil dikirim. Staf kami segera menuju mejamu.',
     });
   } catch (err: any) {

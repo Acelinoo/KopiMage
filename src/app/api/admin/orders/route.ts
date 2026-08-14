@@ -152,20 +152,39 @@ export async function PATCH(request: Request) {
 
     const supabase = createAdminSupabaseClient();
 
-    // 1. Fetch current order state to enforce strict cancellation & transition rules
-    const { data: currentOrder } = await supabase
+    // 1. Fetch current order state to enforce strict state machine & transition rules
+    const { data: currentOrder, error: fetchErr } = await supabase
       .from('orders')
       .select('order_status, payment_status')
       .eq('id', order_id)
       .maybeSingle();
 
+    if (!currentOrder && !fetchErr) {
+      return NextResponse.json({ error: 'Pesanan tidak ditemukan.' }, { status: 404 });
+    }
+
     if (currentOrder) {
-      // Rule 1: COMPLETED orders CANNOT be directly cancelled
-      if (order_status === 'CANCELLED' && currentOrder.order_status === 'COMPLETED') {
-        return NextResponse.json(
-          { error: 'Pesanan yang sudah selesai disajikan (COMPLETED) tidak dapat langsung dibatalkan.' },
-          { status: 400 }
-        );
+      // Rule 1: Strict Order State Machine Transition Matrix
+      const VALID_ORDER_TRANSITIONS: Record<string, string[]> = {
+        NEW_ORDER: ['PREPARING', 'CANCELLED'],
+        PREPARING: ['READY', 'CANCELLED'],
+        READY: ['DELIVERING', 'CANCELLED'],
+        DELIVERING: ['COMPLETED', 'CANCELLED'],
+        COMPLETED: [],
+        CANCELLED: [],
+      };
+
+      if (order_status && order_status !== currentOrder.order_status) {
+        const allowedTransitions = VALID_ORDER_TRANSITIONS[currentOrder.order_status] || [];
+        if (!allowedTransitions.includes(order_status)) {
+          return NextResponse.json(
+            {
+              error: `Transisi status tidak valid: tidak dapat mengubah pesanan dari ${currentOrder.order_status} ke ${order_status}.`,
+              current_status: currentOrder.order_status,
+            },
+            { status: 400 }
+          );
+        }
       }
 
       // Rule 2: Concurrency Lock Check if expected_current_status is provided
@@ -215,6 +234,14 @@ export async function PATCH(request: Request) {
     }
     const { data: updatedDb, error } = await dbQuery.select('*, order_items(*)');
 
+    if (error) {
+      console.error('Supabase DB order update error:', error.message);
+      return NextResponse.json(
+        { error: 'Gagal memperbarui status pesanan di database: ' + error.message },
+        { status: 500 }
+      );
+    }
+
     // If expected_current_status was required and PostgreSQL updated 0 rows -> 409 CONFLICT
     if (expected_current_status && (!updatedDb || updatedDb.length === 0)) {
       return NextResponse.json(
@@ -235,10 +262,6 @@ export async function PATCH(request: Request) {
       updatedInMemory = memoryResult.order;
     } else {
       updatedInMemory = updateOrderInStore(order_id, updatePayload);
-    }
-
-    if (error) {
-      console.warn('Supabase DB update warning:', error.message);
     }
 
     const returnOrder =

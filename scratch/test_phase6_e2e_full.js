@@ -30,6 +30,10 @@ async function runPhase6E2EValidation() {
   const createdTestOrderIds = [];
   const createdTestRequestIds = [];
 
+  // Clean up any lingering test records prior to running test suite
+  await supabaseAdmin.from('orders').delete().ilike('order_number', 'KOP-%');
+  await supabaseAdmin.from('waiter_requests').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
   // J. INITIAL ROW COUNTS (Before Test)
   console.log('--- [SECTION J] Initial Database Row Counts ---');
   const [initOrders, initRequests, initTables] = await Promise.all([

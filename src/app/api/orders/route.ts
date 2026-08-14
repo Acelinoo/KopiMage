@@ -218,15 +218,19 @@ export async function POST(request: Request) {
       .select('*, tables(*)')
       .maybeSingle();
 
-    if (orderError) {
-      console.warn('Supabase DB order insert warning:', orderError.message);
+    if (orderError || !orderData) {
+      console.error('Supabase DB order insert error:', orderError?.message);
+      return NextResponse.json(
+        { error: 'Gagal menyimpan pesanan ke database: ' + (orderError?.message || 'Database error') },
+        { status: 500 }
+      );
     }
 
-    // 7. Insert order items into order_items table in Supabase
+    // 7. Insert order items into order_items table in Supabase (with atomic rollback on failure)
     if (processedItems.length > 0) {
       const itemsToInsert = processedItems.map((item) => ({
         id: crypto.randomUUID(),
-        order_id: orderData ? orderData.id : orderId,
+        order_id: orderData.id,
         item_name: item.item_name,
         unit_price: item.unit_price,
         quantity: item.quantity,
@@ -236,12 +240,18 @@ export async function POST(request: Request) {
 
       const { error: itemsError } = await supabase.from('order_items').insert(itemsToInsert);
       if (itemsError) {
-        console.warn('Supabase DB order_items insert warning:', itemsError.message);
+        console.error('Supabase DB order_items insert error, rolling back order:', itemsError.message);
+        // Rollback created order to prevent orphaned partial writes
+        await supabase.from('orders').delete().eq('id', orderData.id);
+        return NextResponse.json(
+          { error: 'Gagal menyimpan item pesanan ke database: ' + itemsError.message },
+          { status: 500 }
+        );
       }
     }
 
     const createdRecordPayload: OrderRecord = {
-      id: orderData ? orderData.id : orderId,
+      id: orderData.id,
       client_order_id: client_order_id || null,
       order_number: orderNumber,
       order_display_number: orderDisplayNumber,
@@ -256,13 +266,13 @@ export async function POST(request: Request) {
       total_amount: calculatedSubtotal,
       order_status: initialOrderStatus,
       payment_status: initialPaymentStatus,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
+      created_at: orderData.created_at || new Date().toISOString(),
+      updated_at: orderData.updated_at || new Date().toISOString(),
       items: processedItems,
       order_items: processedItems,
     };
 
-    // Synchronize to shared order store
+    // Synchronize to shared order store mirror
     addOrderToStore(createdRecordPayload);
 
     return NextResponse.json({
